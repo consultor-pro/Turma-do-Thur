@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Turma do Thur</title>
+<meta name="theme-color" content="#FFD60A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Turma do Thur">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: alegre, barulhento de cor, feito para dedinhos de 2 a 6 anos
+   IDEA: um estojo de lápis de cor aberto sobre a mesa
+   PICTURE: o Thur grande na entrada; a folha branca é o centro de tudo
+   COLOUR and TYPE: amarelo-sol dominante, lilás e azul de apoio, Baloo 2
+   LAYOUT: tela cheia, botões gigantes, paleta embaixo, nada de texto miúdo */
+:root{color-scheme:light;--sol:#FFD60A;--lilas:#9B5DE5;--ceu:#4FB3F0;--ink:#2E2440;--papel:#FFF7EC;--sombra:#E9DCC6}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overscroll-behavior:none}
+body{background:var(--papel);color:var(--ink);font:600 17px/1.4 'Baloo 2',system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:4px solid var(--ceu);outline-offset:3px}
+.view{position:fixed;inset:0;display:none;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.view.on{display:flex}
+/* home */
+#home{background:var(--sol);overflow:auto}
+.hero{flex:1;display:flex;align-items:center;justify-content:center;gap:clamp(16px,4vw,56px);padding:24px;flex-wrap:wrap}
+.hero img{height:min(52vh,420px);width:auto;filter:drop-shadow(0 10px 0 rgba(0,0,0,.12))}
+.menu{display:flex;flex-direction:column;gap:18px;align-items:stretch;width:min(420px,100%)}
+.menu h1{margin:0 0 4px;font-weight:800;font-size:clamp(40px,8vw,64px);line-height:1;text-align:center}
+.big{display:flex;align-items:center;gap:18px;padding:18px 24px;border-radius:32px;font-size:clamp(28px,5vw,38px);font-weight:800;box-shadow:0 8px 0 rgba(0,0,0,.18);transition:transform .1s}
+.big:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.big svg{width:64px;height:64px;flex:none}
+.b-draw{background:var(--lilas);color:#fff}.b-color{background:#fff;color:var(--ink)}
+/* top bar */
+.bar{display:flex;align-items:center;gap:12px;padding:10px 14px}
+.bar h2{margin:0;font-weight:800;font-size:28px;flex:1;text-align:center}
+.ico{width:60px;height:60px;border-radius:20px;display:grid;place-items:center;background:#fff;box-shadow:0 5px 0 var(--sombra);flex:none}
+.ico:active{transform:translateY(3px);box-shadow:0 2px 0 var(--sombra)}
+.ico svg{width:32px;height:32px}
+.ico.on{background:var(--ink);color:#fff;box-shadow:0 5px 0 #000}
+/* paper */
+.paper{flex:1;margin:0 14px;background:#fff;border-radius:28px;box-shadow:0 6px 0 var(--sombra);position:relative;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+#page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px}
+#page svg{width:100%;height:100%;touch-action:manipulation}
+#page .r{cursor:pointer;transition:fill .15s}
+/* tools */
+.tools{display:flex;flex-direction:column;gap:10px;padding:12px 14px 14px}
+.pal{display:flex;gap:12px;overflow-x:auto;padding:8px 8px 10px;scrollbar-width:none}
+.pal::-webkit-scrollbar{display:none}
+.sw{width:56px;height:56px;border-radius:50%;flex:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 0 0 3px #fff;transition:transform .12s}
+.sw.on{transform:scale(1.18);box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 0 0 4px var(--ink)}
+.row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.dot{display:block;border-radius:50%;background:currentColor}
+/* gallery */
+#gal{flex:1;overflow:auto;padding:6px 14px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;align-content:start}
+.card{background:#fff;border-radius:26px;padding:10px;box-shadow:0 6px 0 var(--sombra);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:20px;font-weight:800}
+.card:active{transform:translateY(4px);box-shadow:0 2px 0 var(--sombra)}
+.card svg{width:100%;aspect-ratio:1;height:auto}
+/* dialog + toast */
+.veil{position:fixed;inset:0;background:rgba(46,36,64,.5);display:none;align-items:center;justify-content:center;z-index:9}
+.veil.on{display:flex}
+.dlg{background:#fff;border-radius:32px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:18px;width:min(340px,90vw);text-align:center;font-size:24px;font-weight:800}
+.dlg .row button{width:92px;height:92px;border-radius:28px;display:grid;place-items:center;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.dlg svg{width:48px;height:48px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,40px);opacity:0;background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:18px;transition:.25s;z-index:10;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#print{display:none}
+@media print{body{overflow:visible}.view,.veil,#toast{display:none!important}#print{display:block}#print svg{width:100%;height:auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:600px){.bar h2{font-size:22px}.ico{width:52px;height:52px}.sw{width:48px;height:48px}}
+</style>
+</head>
+<body>
+
+<section id="home" class="view on" aria-label="Início">
+  <div class="hero">
+    <img src="thur.png" alt="Thur, sorrindo, de camisa xadrez">
+    <div class="menu">
+      <h1>Turma do Thur</h1>
+      <button class="big b-draw" data-go="desenhar">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 50l4-14L42 12a6 6 0 0 1 9 9L27 45z" fill="#FFD60A" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/><path d="M14 50l4-14 9 9z" fill="#F4C9A0" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/></svg>
+        Desenhar
+      </button>
+      <button class="big b-color" data-go="colorir">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="22" cy="24" r="12" fill="#FF4D4D"/><circle cx="42" cy="24" r="12" fill="#4FB3F0"/><circle cx="32" cy="42" r="12" fill="#4CC764"/></svg>
+        Colorir
+      </button>
+    </div>
+  </div>
+</section>
+
+<section id="desenhar" class="view" aria-label="Desenhar">
+  <div class="bar">
+    <button class="ico" data-go="home" aria-label="Voltar"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M20 6L10 16l10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <h2>Desenhar</h2>
+    <button class="ico" id="undo" aria-label="Desfazer"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 12h11a7 7 0 0 1 0 14h-6M10 12l5-5M10 12l5 5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="ico" id="save" aria-label="Salvar imagem"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5v15M10 14l6 6 6-6M7 26h18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="ico" id="clear" aria-label="Apagar tudo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 9h18M13 9V6h6v3M9 9l1.5 17h11L23 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="paper"><canvas id="cv" aria-label="Folha para desenhar"></canvas></div>
+  <div class="tools">
+    <div class="pal" id="palD" role="group" aria-label="Cores"></div>
+    <div class="row">
+      <button class="ico size" data-size="0.012" aria-label="Pincel fino"><span class="dot" style="width:10px;height:10px"></span></button>
+      <button class="ico size on" data-size="0.025" aria-label="Pincel médio"><span class="dot" style="width:18px;height:18px"></span></button>
+      <button class="ico size" data-size="0.05" aria-label="Pincel grosso"><span class="dot" style="width:28px;height:28px"></span></button>
+      <button class="ico" id="eraser" aria-label="Borracha"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 20l10-12 10 8-8 10h-7z" fill="#FF85C0" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 26h15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<section id="colorir" class="view" aria-label="Escolher desenho para colorir">
+  <div class="bar">
+    <button class="ico" data-go="home" aria-label="Voltar"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M20 6L10 16l10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <h2>Escolha um desenho</h2>
+    <span style="width:60px"></span>
+  </div>
+  <div id="gal"></div>
+</section>
+
+<section id="pintar" class="view" aria-label="Colorir">
+  <div class="bar">
+    <button class="ico" data-go="colorir" aria-label="Voltar"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M20 6L10 16l10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <h2 id="pgName">Colorir</h2>
+    <button class="ico" id="pUndo" aria-label="Desfazer"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 12h11a7 7 0 0 1 0 14h-6M10 12l5-5M10 12l5 5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="ico" id="pPrint" aria-label="Imprimir folha para colorir"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 12V5h14v7M9 22H6V12h20v10h-3M10 18h12v9H10z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg></button>
+    <button class="ico" id="pClear" aria-label="Recomeçar"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 9h18M13 9V6h6v3M9 9l1.5 17h11L23 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="paper"><div id="page"></div></div>
+  <div class="tools"><div class="pal" id="palC" role="group" aria-label="Cores"></div></div>
+</section>
+
+<div class="veil" id="veil" role="dialog" aria-modal="true" aria-labelledby="dlgT">
+  <div class="dlg">
+    <span id="dlgT">Apagar tudo?</span>
+    <div class="row">
+      <button id="no" style="background:#eee" aria-label="Não"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14l20 20M34 14L14 34" stroke="#2E2440" stroke-width="6" stroke-linecap="round"/></svg></button>
+      <button id="yes" style="background:#4CC764" aria-label="Sim"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 25l9 9 17-19" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+<div id="print"></div>
+
+<script>
+{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const COLORS=['#FF4D4D','#FF9F1C','#FFD60A','#4CC764','#8FE0A0','#4FB3F0','#3D5AFE','#9B5DE5','#FF85C0','#F4C9A0','#8D5B3E','#2B2B2B','#FFFFFF'];
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
+let ac;
+function pop(f){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(f||520,ac.currentTime);o.frequency.exponentialRampToValueAtTime((f||520)*1.8,ac.currentTime+.12);g.gain.setValueAtTime(.18,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.18);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.2)}catch(e){}}
+let askCb=null;
+function ask(text,cb){$('#dlgT').textContent=text;askCb=cb;$('#veil').classList.add('on')}
+$('#no').onclick=()=>$('#veil').classList.remove('on');
+$('#yes').onclick=()=>{$('#veil').classList.remove('on');askCb&&askCb()};
+
+/* ---------- desenhos para colorir (cada .r é uma área que pinta) ---------- */
+const SW=w=>`stroke="#2E2440" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;const S=SW(5);
+const R=(d)=>d.replace(/<(path|circle|ellipse|rect|polygon)\b(?![^>]*class="k")/g,'<$1 class="r" fill="#fff" '+S);
+const band=(x,y,o,i)=>`<path d="M${x-o} ${y} A${o} ${o} 0 0 1 ${x+o} ${y} L${x+i} ${y} A${i} ${i} 0 0 0 ${x-i} ${y} Z"/>`;
+const PAGES=[
+{n:'Zuzu',s:R(`<ellipse cx="150" cy="80" rx="26" ry="66" transform="rotate(-12 150 80)"/><ellipse cx="292" cy="150" rx="26" ry="66" transform="rotate(64 292 150)"/>
+<path d="M200 100 C290 100 310 190 304 266 C298 346 252 368 200 368 C148 368 102 346 96 266 C90 190 110 100 200 100 Z"/><ellipse cx="200" cy="300" rx="58" ry="46"/>
+<ellipse cx="166" cy="376" rx="28" ry="15"/><ellipse cx="234" cy="376" rx="28" ry="15"/>
+<path class="k" d="M300 320 C360 318 368 236 334 222 C314 214 302 236 316 246" fill="none" ${SW(9)}/>
+<polygon points="316,196 324,214 344,216 329,229 334,248 316,238 298,248 303,229 288,216 308,214"/>
+<path class="k" d="M136 214 q20 -20 40 0" fill="none" ${SW(7)}/><ellipse class="k" cx="238" cy="212" rx="24" ry="29" fill="#2E2440"/><circle class="k" cx="246" cy="202" r="8" fill="#fff"/>
+<path class="k" d="M164 250 Q200 290 236 250 Z" fill="#2E2440" ${S}/><path d="M190 262 Q194 296 210 296 Q224 296 222 262 Z"/>`)},
+{n:'Lelo',s:R(`<path class="k" d="M200 160 C198 128 210 106 230 98" fill="none" ${SW(7)}/><path d="M230 98 C232 66 274 62 272 92 C270 110 246 110 230 98 Z"/><path d="M200 150 C164 120 130 136 150 160 C162 172 186 166 200 150 Z"/>
+<path d="M200 156 C318 156 352 244 344 292 C336 344 270 352 200 352 C130 352 64 344 56 292 C48 244 82 156 200 156 Z"/>
+<ellipse cx="46" cy="290" rx="16" ry="24" transform="rotate(20 46 290)"/><ellipse cx="354" cy="290" rx="16" ry="24" transform="rotate(-20 354 290)"/>
+<ellipse cx="150" cy="358" rx="30" ry="14"/><ellipse cx="250" cy="358" rx="30" ry="14"/><path d="M318 178 C308 194 308 206 318 210 C328 206 328 194 318 178 Z"/>
+<path class="k" d="M98 214 q18 -12 36 -2 M266 212 q18 -10 36 2" fill="none" ${S}/><circle class="k" cx="118" cy="240" r="12" fill="#2E2440"/><circle class="k" cx="282" cy="240" r="12" fill="#2E2440"/>
+<path class="k" d="M126 266 Q200 344 274 266 Z" fill="#2E2440" ${S}/><rect x="176" y="266" width="22" height="24" rx="4"/><rect x="202" y="266" width="22" height="24" rx="4"/>`)},
+{n:'Pituca',s:R(`<path class="k" d="M168 120 C162 100 174 88 166 72 C158 58 170 48 164 36 M232 120 C238 100 226 86 236 72 C244 60 236 50 244 38" fill="none" ${S}/>
+<path d="M160 40 C140 24 140 6 156 6 C162 6 166 12 166 14 C166 12 170 6 176 6 C192 6 190 24 160 40 Z"/><polygon points="246,10 253,26 270,28 257,39 261,56 246,47 231,56 235,39 222,28 239,26"/>
+<ellipse cx="96" cy="140" rx="18" ry="32" transform="rotate(-35 96 140)"/><ellipse cx="304" cy="140" rx="18" ry="32" transform="rotate(35 304 140)"/>
+<ellipse cx="160" cy="300" rx="20" ry="30" transform="rotate(30 160 300)"/><ellipse cx="240" cy="300" rx="20" ry="30" transform="rotate(-30 240 300)"/>
+<circle cx="200" cy="200" r="100"/><ellipse cx="128" cy="232" rx="18" ry="11"/><ellipse cx="272" cy="232" rx="18" ry="11"/>
+<path class="k" d="M140 166 l26 14 l-26 14 M260 166 l-26 14 l26 14" fill="none" ${SW(7)}/>
+<path class="k" d="M156 212 Q200 280 244 212 Z" fill="#2E2440" ${S}/><ellipse cx="200" cy="248" rx="20" ry="11"/>`)},
+{n:'Bubu',s:R(`<path d="M120 330 C60 330 48 262 96 244 C74 190 136 158 170 184 C184 124 284 124 294 182 C340 168 380 212 354 254 C394 272 382 330 324 330 Z"/>
+${band(320,110,48,36)}${band(320,110,36,24)}${band(320,110,24,12)}
+<ellipse cx="170" cy="340" rx="28" ry="14"/><ellipse cx="270" cy="340" rx="28" ry="14"/><ellipse cx="150" cy="292" rx="16" ry="10"/><ellipse cx="306" cy="292" rx="16" ry="10"/>
+<path class="k" d="M164 254 Q180 236 196 254 M260 254 Q276 236 292 254" fill="none" ${SW(7)}/><path class="k" d="M210 286 q9 11 18 0 q9 11 18 0" fill="none" ${S}/>`)},
+{n:'Casinha',s:R(`<rect x="8" y="8" width="384" height="300" rx="20"/><rect x="8" y="296" width="384" height="96" rx="20"/><circle cx="324" cy="76" r="38"/>
+<path d="M60 70 C60 50 92 46 100 60 C110 42 146 48 142 72 C156 74 156 96 138 96 L66 96 C48 96 46 74 60 70 Z"/>
+<rect x="236" y="120" width="30" height="60"/><polygon points="80,196 200,104 320,196"/><rect x="100" y="196" width="200" height="132"/>
+<rect x="176" y="250" width="48" height="78" rx="6"/><rect x="118" y="220" width="44" height="44"/><rect x="238" y="220" width="44" height="44"/>
+<path class="k" d="M140 220 v44 M118 242 h44 M260 220 v44 M238 242 h44 M60 372 v-36" fill="none" ${S}/><circle cx="60" cy="326" r="14"/><circle cx="60" cy="304" r="12"/><circle cx="82" cy="326" r="12"/><circle cx="38" cy="326" r="12"/><circle cx="60" cy="348" r="12"/>`)},
+{n:'Peixinho',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><path d="M8 330 C80 310 140 340 200 326 C270 310 330 336 392 320 L392 372 Q392 392 372 392 L28 392 Q8 392 8 372 Z"/>
+<path d="M64 330 C40 280 80 250 60 200 C90 240 70 290 96 330 Z"/><path d="M330 326 C318 280 350 260 336 222 C364 256 350 292 360 326 Z"/>
+<polygon points="300,190 362,140 362,240"/><path d="M90 190 C120 120 250 110 306 190 C250 270 120 260 90 190 Z"/>
+<path d="M170 132 C182 160 182 220 170 248 L196 252 C208 222 208 158 196 130 Z"/><path d="M232 140 C242 166 242 214 232 240 L254 230 C262 208 262 172 254 150 Z"/><path d="M190 128 C200 100 236 98 250 124 Z"/>
+<circle cx="132" cy="178" r="16"/><circle class="k" cx="136" cy="178" r="7" fill="#2E2440"/><circle cx="110" cy="96" r="12"/><circle cx="86" cy="64" r="9"/><circle cx="104" cy="36" r="6"/>`)}
+];
+const pageSvg=(p,i)=>`<svg viewBox="0 0 400 400" role="img" aria-label="Desenho para colorir: ${p.n}">${p.s}</svg>`;
+
+/* ---------- navegação ---------- */
+const VIEWS=['home','desenhar','colorir','pintar'];
+function show(id){if(!VIEWS.includes(id))id='home';$$('.view').forEach(v=>v.classList.toggle('on',v.id===id));if(id==='desenhar')requestAnimationFrame(fit);if(location.hash.slice(1)!==id){try{history.replaceState(null,'','#'+id)}catch(e){}}}
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>{pop(440);show(b.dataset.go)}));
+window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
+
+/* ---------- paletas ---------- */
+function palette(el,onPick,startIdx){el.innerHTML=COLORS.map((c,i)=>`<button class="sw${i===startIdx?' on':''}" style="background:${c}" data-i="${i}" aria-label="Cor ${i+1}"></button>`).join('');
+ el.addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;el.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',s===b));onPick(COLORS[+b.dataset.i]);pop(600+ +b.dataset.i*30)})}
+
+/* ---------- desenhar ---------- */
+const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0,dpr=1;
+let strokes=store.get('thur-desenho',[]),cur=null,tool={c:COLORS[7],s:0.025,e:false};
+palette($('#palD'),c=>{tool.c=c;tool.e=false;$('#eraser').classList.remove('on')},7);
+function fit(){const r=cv.parentElement.getBoundingClientRect();if(!r.width)return;dpr=Math.min(window.devicePixelRatio||1,2.5);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);redraw()}
+function line(st,from){const m=Math.min(W,H);ctx.strokeStyle=st.e?'#fff':st.c;ctx.lineWidth=st.s*m;ctx.lineCap='round';ctx.lineJoin='round';const p=st.p;
+ if(p.length===1){ctx.beginPath();ctx.fillStyle=ctx.strokeStyle;ctx.arc(p[0][0]*W,p[0][1]*H,st.s*m/2,0,7);ctx.fill();return}
+ ctx.beginPath();const a=Math.max(0,from-1);ctx.moveTo(p[a][0]*W,p[a][1]*H);for(let i=a+1;i<p.length;i++)ctx.lineTo(p[i][0]*W,p[i][1]*H);ctx.stroke()}
+function redraw(){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);strokes.forEach(s=>line(s,0))}
+const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
+cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);cur={c:tool.c,s:tool.s,e:tool.e,p:[pt(e)]};strokes.push(cur);line(cur,0)});
+cv.addEventListener('pointermove',e=>{if(!cur)return;const n=cur.p.length;(e.getCoalescedEvents?e.getCoalescedEvents():[e]).forEach(ev=>cur.p.push(pt(ev)));line(cur,n)});
+const end=()=>{if(cur){cur.p=cur.p.map(([x,y])=>[+x.toFixed(4),+y.toFixed(4)]);cur=null;if(strokes.length>400)strokes=strokes.slice(-400);store.set('thur-desenho',strokes)}};
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+$('#undo').onclick=()=>{strokes.pop();redraw();store.set('thur-desenho',strokes);pop(330)};
+$('#clear').onclick=()=>ask('Apagar o desenho todo?',()=>{strokes=[];redraw();store.set('thur-desenho',strokes)});
+$$('.size').forEach(b=>b.onclick=()=>{$$('.size').forEach(x=>x.classList.toggle('on',x===b));tool.s=+b.dataset.size;pop(500)});
+$('#eraser').onclick=()=>{tool.e=!tool.e;$('#eraser').classList.toggle('on',tool.e);pop(380)};
+function download(blob,name){try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Imagem salva!')}catch(e){toast('Não deu para salvar aqui.')}}
+$('#save').onclick=()=>{try{cv.toBlob(b=>b&&download(b,'desenho-do-thur.png'),'image/png')}catch(e){toast('Não deu para salvar aqui.')}};
+new ResizeObserver(()=>{if($('#desenhar').classList.contains('on'))fit()}).observe(cv.parentElement);
+
+/* ---------- colorir ---------- */
+$('#gal').innerHTML=PAGES.map((p,i)=>`<button class="card" data-p="${i}">${pageSvg(p,i)}<span>${p.n}</span></button>`).join('');
+$('#gal').addEventListener('click',e=>{const c=e.target.closest('.card');if(c){pop(520);openPage(+c.dataset.p)}});
+let pageIdx=0,fills=[],hist=[],pColor=COLORS[0];
+palette($('#palC'),c=>pColor=c,0);
+function areas(){return $$('#page .r')}
+function openPage(i){pageIdx=i;const p=PAGES[i];$('#pgName').textContent=p.n;$('#page').innerHTML=pageSvg(p,i);
+ const saved=store.get('thur-pinta-'+i,null);fills=areas().map((_,k)=>saved&&saved[k]||'#fff');paint();hist=[];show('pintar')}
+function paint(){areas().forEach((a,k)=>a.setAttribute('fill',fills[k]))}
+$('#page').addEventListener('click',e=>{const a=e.target.closest('.r');if(!a)return;const k=areas().indexOf(a);if(k<0||fills[k]===pColor)return;hist.push(fills.slice());fills[k]=pColor;paint();store.set('thur-pinta-'+pageIdx,fills);pop(700)});
+$('#pUndo').onclick=()=>{if(!hist.length)return;fills=hist.pop();paint();store.set('thur-pinta-'+pageIdx,fills);pop(330)};
+$('#pClear').onclick=()=>ask('Recomeçar este desenho?',()=>{hist.push(fills.slice());fills=fills.map(()=>'#fff');paint();store.set('thur-pinta-'+pageIdx,fills)});
+$('#pPrint').onclick=()=>{$('#print').innerHTML=pageSvg(PAGES[pageIdx],pageIdx);try{window.print()}catch(e){toast('Abra o app instalado para imprimir.')}};
+$$('#gal .card svg .r').forEach(a=>a.setAttribute('fill','#fff'));
+
+/* ---------- início ---------- */
+{const h=location.hash.slice(1);show(h==='pintar'?'colorir':(h||'home'))}
+if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+}
+</script>
+</body>
+</html>
