@@ -356,3 +356,10 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .ptabs{padding:0 14px 8px;flex-wrap:wrap;gap:8px}.ptabs .ico.txt{height:44px;font-size:17px}
 
 .toolrow .ico.tool svg{width:30px;height:30px}
+
+/* poses do Thur */
+.ent .pose{position:absolute;bottom:0;left:50%;transform:translateX(-50%);max-width:none;display:none;pointer-events:none;-webkit-user-drag:none}
+.ent.posed .pose{display:block}
+.ent.posed .im,.ent.posed .boca{visibility:hidden}
+.ent.char.drag.posed>.an{animation:none}
+.fx .nota{font-size:30px;font-weight:800;color:#9B5DE5;text-shadow:0 2px 0 #fff}

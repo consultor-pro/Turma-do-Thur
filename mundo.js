@@ -80,7 +80,31 @@ const FALAS={
 function mk(d){const e=document.createElement('div');e.className='ent '+d.kind;e.dataset.id=d.id;e.dataset.w=d.w;place(e,d.x,d.y,d.w);
   if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;if(d.pitch)e.dataset.pitch=d.pitch;if(d.v)e.dataset.v=d.v;if(d.auto)e.dataset.auto=1;
   let boca='';if(d.boca){const [x,y,w,h,W,H]=d.boca;boca=`<div class="boca" style="left:${x/W*100}%;top:${y/H*100}%;width:${w/W*100}%;height:${h/H*100}%;background-image:url(${d.src});background-size:${W/w*100}% ${H/h*100}%;background-position:${x/(W-w)*100}% ${y/(H-h)*100}%"></div>`}
-  e.innerHTML=`<div class="an"><img class="im" src="${d.src}" alt="" draggable="false">${boca}</div>`;return e}
+  const po=POSES[d.id]?'<img class="pose" alt="" draggable="false">':'';
+  e.innerHTML=`<div class="an"><img class="im" src="${d.src}" alt="" draggable="false">${boca}${po}</div>`;return e}
+/* poses desenhadas (Thur agora; mascotes depois): troca a imagem conforme a ação */
+const POSES={thur:{dir:'img/thur/',ref:445,base:[186,480],p:{surpreso:[213,434],correndo:[292,427],sentado:[240,364],andando:[228,453],pulando:[267,417],joinha:[239,443],cantando:[292,462],acenando:[269,450],pensando:[206,449],deitado:[374,353],apontando:[270,447],bravo:[210,446]}},
+  zuzu:{dir:'img/poses/zuzu-',ref:288,base:[236, 240],p:{feliz:[358,288],correndo:[312,287],sentado:[299,288],pulando:[343,296],joinha:[322,312],cantando:[355,286],pensando:[335,292],amor:[333,282],surpreso:[329,295],deitado:[408,284],espiando:[377,294],bravo:[312,295]}},
+  lelo:{dir:'img/poses/lelo-',ref:318,base:[263, 240],p:{feliz:[350,318],correndo:[292,325],sentado:[345,318],pulando:[343,305],joinha:[327,296],cantando:[338,297],pensando:[301,335],surpreso:[321,338],deitado:[340,291],amor:[373,299],chorando:[298,298],bravo:[295,303]}},
+  pituca:{dir:'img/poses/pituca-',ref:313,base:[246, 240],p:{acenando:[331,319],pulando:[324,304],sentado:[340,316],surpreso:[317,312],pensando:[319,315],amor:[313,326],feliz:[317,313],cantando:[327,320]}},
+  bubu:{dir:'img/poses/bubu-',ref:291,base:[310, 240],p:{espirro:[360,308],bravo:[314,303],chorando:[364,295],surpreso:[334,295],pensando:[327,293],sentado:[382,283],feliz:[360,291],deitado:[382,283]}}};
+const ALIAS={acenando:['acenando','feliz'],andando:['andando','pulando','feliz'],correndo:['correndo','pulando','feliz'],joinha:['joinha','amor','feliz'],apontando:['apontando','espiando','feliz'],bravo:['bravo','surpreso'],deitado:['deitado','sentado'],sentado:['sentado','feliz'],pulando:['pulando','feliz'],cantando:['cantando','feliz'],pensando:['pensando','feliz'],surpreso:['surpreso','feliz']};
+Object.values(POSES).forEach(P=>Object.keys(P.p).forEach(n=>{const i=new Image();i.src=P.dir+n+'.webp'}));
+function setPose(c,name){const P=POSES[c.dataset.id];if(!P)return;const im=c.querySelector('.pose');if(!im)return;
+  if(name&&!P.p[name])name=(ALIAS[name]||[]).find(n=>P.p[n]);
+  if(!name||!P.p[name]){c.classList.remove('posed');c.dataset.pose='';return}
+  const [w]=P.p[name];im.src=P.dir+name+'.webp';im.style.width=(100*(P.base[1]/P.base[0])*(w/P.ref)).toFixed(1)+'%';c.classList.add('posed');c.dataset.pose=name}
+/* pose por um tempo e depois volta para a pose fixa (sentado/deitado) ou para a normal */
+function pose(c,name,ms=1800){if(!c||!POSES[c.dataset.id])return;clearTimeout(c._pt);setPose(c,name);if(ms)c._pt=setTimeout(()=>setPose(c,c._fix||''),ms)}
+function fixPose(c,name){if(!c||!POSES[c.dataset.id])return;c._fix=name||'';clearTimeout(c._pt);setPose(c,c._fix)}
+function walk(c,on){if(!POSES[c.dataset.id])return;clearInterval(c._wk);if(on){let k=0;clearTimeout(c._pt);setPose(c,'correndo');c._wk=setInterval(()=>setPose(c,++k%2?'andando':'correndo'),170)}else setPose(c,c._fix||'')}
+/* de vez em quando o Thur faz alguma coisa sozinho */
+setInterval(()=>{if(!$('#mundo').classList.contains('on')||document.hidden)return;const cs=[...stage.querySelectorAll('.ent.char')].filter(x=>POSES[x.dataset.id]&&!x.classList.contains('seated'));const c=cs[rnd(cs.length)];if(!c||c.classList.contains('drag')||c.dataset.pose||c._fix)return;
+  const r=Math.random();if(r<.34){pose(c,'pensando',2600);say(c,['Hummm... o que vamos fazer agora?','Será que tem bolo na cozinha?','Hummm, deixa eu pensar...'][rnd(3)])}
+  else if(r<.45&&c.dataset.id==='bubu'){pose(c,'espirro',2000);say(c,'Atchiiim! Saiu arco-íris!')}
+  else if(r<.45&&c.dataset.id==='zuzu'){pose(c,'espiando',2200);say(c,'Achou! Eu tava escondidinha!')}
+  else if(r<.67){pose(c,'cantando',3200);say(c,c.dataset.id==='thur'?'Lá lá lá! Eu sou o Thur e adoro brincar!':'Lá lá lá! Que música boa!');for(let i=0;i<4;i++)fx(c,'<span class="nota">♪</span>',{fx:.2,fy:.1,dx:-30-rnd(40),dy:-60-rnd(40),dur:1400,delay:i*400})}
+  else{pose(c,'apontando',2200);say(c,['Olha ali! Vamos brincar?','Olha! Que legal!'][rnd(2)])}},11000);
 /* boca mexendo enquanto o personagem fala */
 document.addEventListener('thur-fala',ev=>{const {who,on}=ev.detail;stage.querySelectorAll('.ent.char').forEach(c=>c.classList.toggle('falando',on&&c.dataset.v===who))});
 function build(key){cur=key;const S=SCENES[key];stage.classList.remove('isnight');stage.querySelectorAll('.ent,.fx').forEach(e=>e.remove());
@@ -95,7 +119,7 @@ function fit(){const w=$('#mwrap').getBoundingClientRect();if(!w.width)return;co
 onShow.mundo=()=>requestAnimationFrame(fit);
 new ResizeObserver(()=>{if($('#mundo').classList.contains('on'))fit()}).observe($('#mwrap'));
 window.openMundo=()=>{build(cur);show('mundo')};
-window.MUNDO={stage,A:(el,kf,opt)=>el.animate(kf,Object.assign({duration:600,easing:'ease-in-out'},opt)),fx:(...a)=>fx(...a),sparkle:c=>sparkle(c),go:k=>{if(cur!==k)build(k)}};
+window.MUNDO={stage,A:(el,kf,opt)=>el.animate(kf,Object.assign({duration:600,easing:'ease-in-out'},opt)),fx:(...a)=>fx(...a),sparkle:c=>sparkle(c),go:k=>{if(cur!==k)build(k)},pose:(c,n,ms)=>pose(c,n,ms)};
 
 /* efeitos */
 const A=(el,kf,opt)=>el.animate(kf,Object.assign({duration:600,easing:'ease-in-out'},opt));
@@ -117,7 +141,7 @@ const ACTS={
   slide(o){const c=seated(o);if(!c){A(an(o),[{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}],{duration:300});boing();return}
     const r=o.getBoundingClientRect();const k=A(an(c),[{transform:'translate(0,0)'},{transform:`translate(${-r.width*.62}px,${r.height*.68}px)`}],{duration:950,easing:'ease-in',fill:'forwards'});tone('sine',900,200,.9,.12);
     k.onfinish=()=>{detach(c);k.cancel();hopEl(an(c),'-25%')}},
-  jump(o){const c=seated(o);A(an(o),[{transform:'scaleY(1)'},{transform:'scaleY(.9)'},{transform:'scaleY(1)'}],{duration:540,iterations:3});if(c)hopEl(an(c),'-110%',3);[0,.54,1.08].forEach(d=>boing(d))},
+  jump(o){const c=seated(o);A(an(o),[{transform:'scaleY(1)'},{transform:'scaleY(.9)'},{transform:'scaleY(1)'}],{duration:540,iterations:3});if(c){hopEl(an(c),'-110%',3);pose(c,'pulando',1700)}[0,.54,1.08].forEach(d=>boing(d))},
   wobble(o){const a=an(o);a.style.transformOrigin='50% 95%';A(a,[{transform:'rotate(0)'},{transform:'rotate(-20deg)'},{transform:'rotate(15deg)'},{transform:'rotate(-10deg)'},{transform:'rotate(6deg)'},{transform:'rotate(-3deg)'},{transform:'rotate(0)'}],{duration:1700});boing();boing(.35)},
   sleep(o){const on=!stage.classList.contains('isnight');night(on);speak(on?'Boa noite!':'Bom dia!');if(on)[0,1,2].forEach(i=>fx(o,'<b class="zzz">Z</b>',{fx:.6+i*.08,fy:.2,dx:30+i*10,dy:-70,delay:i*350,dur:1800}));tone('sine',on?500:300,on?250:600,.4,.1)},
   lamp(o){night(!stage.classList.contains('isnight'));click()},
@@ -138,22 +162,26 @@ const ACTS={
     say(c,c?'Lavando as mãozinhas! Esfrega, esfrega! Pronto, limpinho!':'Água fresquinha! Vamos lavar as mãos!')}
 };
 function act(ent){
-  if(ent.classList.contains('char')){hopEl(an(ent),'-22%');if((LV[ent.dataset.id]||0)>=MAXLV){say(ent,'Preciso ir ao banheiro! Me leva lá, por favor!');return}say(ent,ent.dataset.say);fx(ent,heart,{fy:.05});tone('sine',500,900,.15,.12);return}
+  if(ent.classList.contains('char')){hopEl(an(ent),'-22%');const now=Date.now();ent._taps=(ent._taps||[]).filter(t=>now-t<1300).concat(now);
+    if((LV[ent.dataset.id]||0)>=MAXLV){pose(ent,'surpreso',2000);say(ent,'Preciso ir ao banheiro! Me leva lá, por favor!');return}
+    if(ent._taps.length>=3&&POSES[ent.dataset.id]){ent._taps=[];pose(ent,ent.dataset.id==='thur'?'deitado':'pulando',2400);say(ent,'Hahaha! Para, para! Que cosquinha!');fx(ent,heart,{fy:.3});return}
+    if(ent.dataset.id==='bubu'&&Math.random()<.35){pose(ent,'espirro',1800);say(ent,'Atchiiim!');return}
+    pose(ent,ent.classList.contains('seated')?'joinha':'acenando',1700);say(ent,ent.dataset.say);fx(ent,heart,{fy:.05});tone('sine',500,900,.15,.12);return}
   if(ent.classList.contains('food')){A(an(ent),[{transform:'rotate(0)'},{transform:'rotate(-10deg)'},{transform:'rotate(10deg)'},{transform:'rotate(0)'}],{duration:400});speak(ent.dataset.food);return}
   const f=ACTS[ent.dataset.act];if(f)f(ent)}
 
 /* sentar e comer */
-function detach(ent){const r=ent.getBoundingClientRect(),sr=stage.getBoundingClientRect();stage.appendChild(ent);ent.classList.remove('seated');
+function detach(ent){fixPose(ent,'');const r=ent.getBoundingClientRect(),sr=stage.getBoundingClientRect();stage.appendChild(ent);ent.classList.remove('seated');
   place(ent,(r.left+r.width/2-sr.left)/sr.width*100,Math.min(100,(r.bottom-sr.top)/sr.height*100),+ent.dataset.w)}
-function seat(c,o){const [sx,sy]=o.dataset.seat.split(',').map(Number);an(o).appendChild(c);c.classList.add('seated');c.style.left=sx+'%';c.style.top=sy+'%';c.style.transition='none';c.style.width=(+c.dataset.w*grow(c)/ +o.dataset.w*100)+'%';c.style.zIndex=5;hopEl(an(c),'-20%');pop(760);if(o.dataset.auto)setTimeout(()=>{const f=ACTS[o.dataset.act];if(f&&seated(o)===c)f(o)},500)}
+function seat(c,o){fixPose(c,o.dataset.act==='sleep'?'deitado':'sentado');const [sx,sy]=o.dataset.seat.split(',').map(Number);an(o).appendChild(c);c.classList.add('seated');c.style.left=sx+'%';c.style.top=sy+'%';c.style.transition='none';c.style.width=(+c.dataset.w*grow(c)/ +o.dataset.w*100)+'%';c.style.zIndex=5;hopEl(an(c),'-20%');pop(760);if(o.dataset.auto)setTimeout(()=>{const f=ACTS[o.dataset.act];if(f&&seated(o)===c)f(o)},500)}
 function eat(f,c){const lv=LV[c.dataset.id]||0;
-  if(lv>=MAXLV){A(an(c),[{transform:'translateX(0)'},{transform:'translateX(-8%)'},{transform:'translateX(8%)'},{transform:'translateX(0)'}],{duration:400,iterations:2});say(c,'Não cabe mais nada! Preciso ir ao banheiro!');
+  if(lv>=MAXLV){A(an(c),[{transform:'translateX(0)'},{transform:'translateX(-8%)'},{transform:'translateX(8%)'},{transform:'translateX(0)'}],{duration:400,iterations:2});say(c,'Não cabe mais nada! Preciso ir ao banheiro!');pose(c,POSES[c.dataset.id]&&POSES[c.dataset.id].p.chorando&&Math.random()<.5?'chorando':'bravo',2000);
     A(f,[{transform:'translate(-50%,-100%) scale(1)'},{transform:'translate(-50%,-100%) scale(1.15)'},{transform:'translate(-50%,-100%) scale(1)'}],{duration:300});place(f,+f.dataset.hx,+f.dataset.hy,+f.dataset.w);return}
   const fr=f.getBoundingClientRect(),cr=c.getBoundingClientRect();const dx=cr.left+cr.width/2-(fr.left+fr.width/2),dy=cr.top+cr.height*.45-(fr.top+fr.height/2);
   const k=A(f,[{transform:'translate(-50%,-100%) translate(0px,0px) scale(1)'},{transform:`translate(-50%,-100%) translate(${dx}px,${dy}px) scale(.2)`}],{duration:380,easing:'ease-in',fill:'forwards'});
   k.onfinish=()=>{f.style.visibility='hidden';k.cancel();place(f,+f.dataset.hx,+f.dataset.hy,+f.dataset.w);A(an(c),[{transform:'scale(1,1)'},{transform:'scale(1.06,.92)'},{transform:'scale(1,1)'}],{duration:260,iterations:3});munch();
     LV[c.dataset.id]=lv+1;saveLv();setTimeout(()=>applyLv(c),300);
-    const fl=FALAS[f.dataset.food]||['Nham nham!'];say(c,fl[rnd(fl.length)]);[0,1,2].forEach(i=>fx(c,heart,{fy:.05,delay:i*200}));
+    const fl=FALAS[f.dataset.food]||['Nham nham!'];say(c,fl[rnd(fl.length)]);pose(c,lv+1>=MAXLV?'surpreso':(c.dataset.id!=='thur'&&Math.random()<.5?'amor':'joinha'),2200);[0,1,2].forEach(i=>fx(c,heart,{fy:.05,delay:i*200}));
     if(lv+1>=MAXLV)setTimeout(()=>{say(c,'Ai, que barrigão! Estou cheio! Preciso ir ao banheiro!',true);tone('sine',300,160,.4,.12)},400);
     setTimeout(()=>{f.style.visibility='';A(an(f),[{transform:'scale(0)'},{transform:'scale(1.15)'},{transform:'scale(1)'}],{duration:420})},2600)}}
 
@@ -161,12 +189,12 @@ function eat(f,c){const lv=LV[c.dataset.id]||0;
 stage.addEventListener('pointerdown',e=>{const ent=e.target.closest('.ent');if(!ent||drag)return;e.preventDefault();actx();
   drag={ent,sx:e.clientX,sy:e.clientY,dx:0,dy:0,moved:false,raf:0};try{stage.setPointerCapture(e.pointerId)}catch(x){}});
 stage.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
-  if(!drag.moved){if(Math.hypot(dx,dy)<9)return;drag.moved=true;const ent=drag.ent;if(ent.classList.contains('seated'))detach(ent);ent.classList.add('drag');ent.style.pointerEvents='none';pop(520)}
+  if(!drag.moved){if(Math.hypot(dx,dy)<9)return;drag.moved=true;const ent=drag.ent;if(ent.classList.contains('seated'))detach(ent);ent.classList.add('drag');ent.style.pointerEvents='none';pop(520);if(ent.classList.contains('char'))walk(ent,true)}
   drag.dx=dx;drag.dy=dy;if(!drag.raf)drag.raf=requestAnimationFrame(()=>{if(!drag)return;drag.raf=0;drag.ent.style.translate=`${drag.dx}px ${drag.dy}px`})});
 function drop(e,cancel){if(!drag)return;const d=drag;drag=null;const ent=d.ent;cancelAnimationFrame(d.raf);
   if(!d.moved){if(!cancel)act(ent);return}
   ent.style.translate=`${d.dx}px ${d.dy}px`;const r=ent.getBoundingClientRect(),sr=stage.getBoundingClientRect();
-  const under=cancel?null:document.elementFromPoint(e.clientX,e.clientY);ent.style.pointerEvents='';ent.style.translate='';ent.classList.remove('drag');
+  const under=cancel?null:document.elementFromPoint(e.clientX,e.clientY);ent.style.pointerEvents='';ent.style.translate='';ent.classList.remove('drag');if(ent.classList.contains('char'))walk(ent,false);
   const t=under&&under.closest?under.closest('.ent'):null;
   if(t&&t!==ent&&ent.classList.contains('char')&&t.dataset.seat&&!seated(t)){seat(ent,t);return}
   if(t&&t!==ent&&ent.classList.contains('food')&&t.classList.contains('char')){eat(ent,t);return}
