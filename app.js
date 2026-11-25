@@ -109,10 +109,24 @@ $('#tiles').onclick=e=>{const b=e.target.closest('[data-tile]');if(!b)return;pop
 /* ---------- escolher desenho ---------- */
 const MODE_T={balde:'Colorir',giz:'Giz de cera',respingo:'Respingo',numeros:'Pintar por números',aquarela:'Aquarela'};
 let pickMode='balde';
-function openPicker(mode){pickMode=mode;$('#pickTitle').textContent=MODE_T[mode];
-  const list=SETS[mode].map(n=>({p:PAGES.find(p=>p.n===n),i:PAGES.findIndex(p=>p.n===n)}));
-  $('#pickGal').innerHTML=list.map(({p,i})=>`<button class="card" data-p="${i}">${pageSvg(p)}<span>${p.n}</span></button>`).join('');
+/* Colorir: todos os desenhos, separados por tipo */
+const CATS=(()=>{const c3=window.CATS3||{};const C=[
+  ['Turma',['Zuzu','Lelo','Pituca','Bubu']],
+  ['Bichos',['Cachorro','Coelho','Urso','Gatinho','Dinossauro','Tartaruga','Peixinho','Baleia','Pato','Borboleta','Leão','Elefante','Girafa','Macaco','Porco','Vaca','Galinha','Pintinho','Ovelha','Panda','Pinguim','Coruja','Sapo','Polvo','Caranguejo','Joaninha','Abelha','Caracol','Golfinho','Estrela-do-mar']],
+  ['Veículos',['Carrinho','Carro','Caminhão','Ônibus','Avião','Helicóptero','Moto','Trator','Submarino','Bicicleta','Barco','Trem','Foguete','Balão']],
+  ['Natureza',['Sol','Flor','Arco-íris','Árvore','Chuva','Lua',...(c3['Natureza']||[])]],
+  ['Coisas',[]],['Letras',c3['Letras']||[]],['Números',c3['Números']||[]],['Palavras',c3['Palavras']||[]]];
+  const used=new Set(C.flatMap(([,l])=>l));const seen=new Set();
+  PAGES.forEach(p=>{if(!used.has(p.n)&&!seen.has(p.n)){seen.add(p.n);C[4][1].push(p.n)}});
+  return C.map(([n,l])=>[n,l.filter(x=>PAGES.some(p=>p.n===x))]).filter(([,l])=>l.length)})();
+let pickCat=0;
+function drawPick(names){const list=names.map(n=>({p:PAGES.find(p=>p.n===n),i:PAGES.findIndex(p=>p.n===n)})).filter(x=>x.p);
+  $('#pickGal').innerHTML=list.map(({p,i})=>`<button class="card" data-p="${i}">${pageSvg(p)}<span>${p.n}</span></button>`).join('');$('#pickGal').scrollTop=0}
+function openPicker(mode){pickMode=mode;$('#pickTitle').textContent=MODE_T[mode];const tabs=$('#pickTabs');
+  if(mode==='balde'){tabs.hidden=false;tabs.innerHTML=CATS.map(([n],k)=>`<button class="ico txt${k===pickCat?' on':''}" data-c="${k}">${n}</button>`).join('');drawPick(CATS[pickCat][1])}
+  else{tabs.hidden=true;drawPick(SETS[mode])}
   show('escolher')}
+$('#pickTabs').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;pickCat=+b.dataset.c;pop(480);$$('#pickTabs [data-c]').forEach(x=>x.classList.toggle('on',x===b));drawPick(CATS[pickCat][1])};
 $('#pickGal').onclick=e=>{const c=e.target.closest('.card');if(!c)return;pop(520);const i=+c.dataset.p;if(pickMode==='aquarela')openTela('aquarela',i);else openSvg(pickMode,i)};
 
 /* ---------- pintar sobre o desenho ---------- */
@@ -225,7 +239,10 @@ const tEnd=()=>{if(T.cur){if(tDrawn<T.cur.p.length)renderStroke(T.cur,tDrawn);T.
 cv.addEventListener('pointerup',tEnd);cv.addEventListener('pointercancel',tEnd);
 $('#tUndo').onclick=()=>{T.strokes.pop();redrawT();saveT();pop(330)};
 $('#tClear').onclick=()=>ask('Apagar tudo?',()=>{T.strokes=[];redrawT();saveT()});
-$('#tBack').onclick=()=>{pop(440);if(T.mode==='aquarela')openPicker('aquarela');else show('home')};
+$('#tBack').onclick=async()=>{pop(440);
+  /* saiu do desenho livre: guarda sozinho na galeria */
+  if(T.strokes.length){const url=await telaUrl();dbAdd(url);T.strokes=[];saveT();redrawT();toast('Guardei seu desenho na galeria! 🎨')}
+  if(T.mode==='aquarela')openPicker('aquarela');else show('home')};
 $$('.tsize').forEach(b=>b.onclick=()=>{T.s=+b.dataset.s;$$('.tsize').forEach(x=>x.classList.toggle('on',x===b));T.stamp=-1;syncT();pop(500)});
 $('#tEraser').onclick=()=>{T.e=!T.e;T.stamp=-1;syncT();pop(380)};
 $('#tStamp').onclick=()=>{const r=$('#stampRow');const open=r.style.display!=='flex';r.style.display=open?'flex':'none';if(!open)T.stamp=-1;else if(T.stamp<0)T.stamp=0;T.e=false;syncT();pop(480)};
@@ -271,6 +288,12 @@ $('#xHint').onclick=()=>{X.hint=!X.hint;hl();pop(480)};
 $('#xClear').onclick=()=>ask('Recomeçar este desenho?',()=>{store.del('thur-px-'+X.i);openPixel(X.i)});
 
 /* ---------- revelar ---------- */
+/* revelar: além das fotos da turma, desenhos coloridos */
+(()=>{const pal=['#FF4D4D','#FFD60A','#4FB3F0','#4CC764','#FF85C0','#9B5DE5','#FF9F1C','#8D5B3E'];
+  ['Leão','Girafa','Panda','Golfinho','Dinossauro','Borboleta','Joaninha','Baleia','Carro','Foguete','Trem','Helicóptero','Girassol','Ilha','Planeta Terra','Vulcão','Cogumelo','Castelo','Arco-íris','Robô'].forEach((n,j)=>{const p=PAGES.find(x=>x.n===n);if(!p)return;const pl=PLANS[n];let k=0;
+    let s=pageSvg(p).replace(/fill="#fff"/g,()=>{const c=pl&&pl.p[k]!==undefined?pl.c[pl.p[k]]:pal[(k*3+j)%pal.length];k++;return`fill="${c}"`});
+    s=s.replace('<svg ','<svg width="720" height="720" ').replace('<defs></defs>','<defs><linearGradient id="bgg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BDE6FF"/><stop offset="1" stop-color="#FFF4D2"/></linearGradient></defs><rect width="400" height="400" fill="url(#bgg)"/>');
+    REVEAL.push({n,f:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)})})})();
 $('#revGal').innerHTML=REVEAL.map((r,i)=>`<button class="card" data-r="${i}"><img src="${r.f}" alt="" style="filter:grayscale(1) brightness(1.25) contrast(.7)"><span>${r.n}</span></button>`).join('');
 $('#revGal').onclick=e=>{const c=e.target.closest('.card');if(c){pop(520);openReveal(+c.dataset.r)}};
 const rb=$('#rvBase'),rc=$('#rvCover'),rbx=rb.getContext('2d'),rcx=rc.getContext('2d');
@@ -375,7 +398,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='4.8';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='4.9';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
