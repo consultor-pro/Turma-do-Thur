@@ -181,6 +181,7 @@
   <div class="bar">
     <button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
     <h2>Palavras</h2>
+    <button class="ico" id="wEdit" aria-label="Palavras da família, para os pais escreverem"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26l2-7L21 6l5 5-13 13z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M18 9l5 5" stroke="currentColor" stroke-width="3"/></svg></button>
     <button class="ico" id="wHint" aria-label="Mostrar dica das letras"><svg><use href="#i-bulb"/></svg></button>
     <button class="ico" id="wSay" aria-label="Ouvir a palavra"><svg><use href="#i-sound"/></svg></button>
     <button class="ico" id="wNext" aria-label="Próxima palavra"><svg><use href="#i-next"/></svg></button>
@@ -189,6 +190,12 @@
     <div id="wPic" aria-hidden="true"></div>
     <div class="slots" id="slots"></div>
     <div class="ltiles" id="ltiles"></div>
+  </div>
+  <div class="row wlv" id="wLv">
+    <button class="ico txt" data-lv="facil">Fácil</button>
+    <button class="ico txt" data-lv="medio">Médio</button>
+    <button class="ico txt" data-lv="dificil">Difícil</button>
+    <button class="ico txt" data-lv="familia">Família</button>
   </div>
 </section>
 
@@ -224,6 +231,49 @@
   </div>
 </section>
 
+<!-- GARAGEM -->
+<section id="garagem" class="view" aria-label="Garagem">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Garagem do Thur</h2><span class="sp"></span></div>
+  <div class="gal cars" id="garGal"></div>
+</section>
+<section id="montar" class="view" aria-label="Montar carrinho">
+  <div class="bar">
+    <button class="ico" data-go="garagem" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="cTitle">Montar</h2>
+    <button class="ico" id="cAgain" aria-label="Desmontar e montar de novo"><svg><use href="#i-undo"/></svg></button>
+    <button class="ico go" id="cNext" aria-label="Ir abastecer" hidden><svg><use href="#i-next"/></svg></button>
+  </div>
+  <div class="mstage" id="mStage"></div>
+  <p class="hint">Arraste cada peça para o lugar certo!</p>
+</section>
+<section id="posto" class="view" aria-label="Abastecer">
+  <div class="bar">
+    <button class="ico" data-go="garagem" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2>Posto de gasolina</h2>
+    <div class="gauge" id="gauge" aria-label="Combustível"><i></i></div>
+    <button class="ico go" id="fNext" aria-label="Ir passear" hidden><svg><use href="#i-next"/></svg></button>
+  </div>
+  <div class="scene" id="fScene">
+    <svg id="pump" viewBox="0 0 160 300" aria-hidden="true"><rect x="10" y="20" width="110" height="260" rx="20" fill="#FF4D4D" stroke="#2E2440" stroke-width="6"/><rect x="30" y="50" width="70" height="56" rx="10" fill="#fff" stroke="#2E2440" stroke-width="5"/><path d="M42 92 L65 64" stroke="#FF4D4D" stroke-width="5" stroke-linecap="round"/><circle cx="65" cy="92" r="6" fill="#2E2440"/><rect x="40" y="130" width="50" height="16" rx="6" fill="#FFD60A" stroke="#2E2440" stroke-width="4"/><rect x="0" y="270" width="140" height="22" rx="8" fill="#9A9A9A" stroke="#2E2440" stroke-width="5"/><rect x="118" y="110" width="22" height="40" rx="8" fill="#2E2440"/></svg>
+    <svg id="hose" aria-hidden="true"><path d="" fill="none" stroke="#2E2440" stroke-width="12" stroke-linecap="round"/></svg>
+    <div id="fCar" class="scar"></div>
+    <div id="noz" role="button" aria-label="Mangueira de gasolina"><svg viewBox="0 0 52 52"><path d="M6 14h26l12 10-6 8-10-6H6z" fill="#3D5AFE" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/><rect x="10" y="24" width="12" height="20" rx="4" fill="#2E2440"/></svg></div>
+  </div>
+</section>
+<section id="estrada" class="view" aria-label="Passear">
+  <div class="bar">
+    <button class="ico" data-go="garagem" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2>Passeio</h2>
+    <span class="ecount"><svg viewBox="0 0 32 32" width="30" height="30"><path d="M16 2l4.2 9 9.8 1.2-7.2 6.8 1.9 9.8L16 24 7.3 28.8l1.9-9.8L2 12.2 11.8 11z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/></svg><b id="eCount">0</b>/10</span>
+    <button class="ico" id="eHonk" aria-label="Buzina"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h6l10-6v20l-10-6H5z" fill="currentColor"/><path d="M25 10v12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button>
+    <button class="ico go" id="eJump" aria-label="Pular"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 6v20M8 14l8-8 8 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="scene road" id="eScene">
+    <div class="strip clouds"></div><div class="strip hills"></div><div class="strip trees"></div><div class="strip lane"></div>
+    <div id="eCar" class="ecar"></div>
+  </div>
+</section>
+
 <!-- MUNDINHO -->
 <section id="mundo" class="view" aria-label="Mundinho">
   <div class="bar mbar">
@@ -242,6 +292,16 @@
       <button id="no" class="big2" style="background:#eee" aria-label="Não"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14l20 20M34 14L14 34" stroke="#2E2440" stroke-width="6" stroke-linecap="round"/></svg></button>
       <button id="yes" class="big2" style="background:#4CC764" aria-label="Sim"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 25l9 9 17-19" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
+  </div>
+</div>
+<div class="veil" id="wdlg" role="dialog" aria-modal="true" aria-labelledby="wdT">
+  <div class="dlg wide">
+    <span id="wdT">Palavras da família</span>
+    <p class="small">Escreva uma palavra (até 10 letras), como o nome de alguém da família. A criança monta a palavra com as letras.</p>
+    <input id="wIn" maxlength="10" autocomplete="off" autocapitalize="characters" placeholder="Ex.: MAMÃE" aria-label="Palavra">
+    <div class="row" id="wEmo"></div>
+    <div class="row"><button id="wAdd" class="pbtn go2">Adicionar</button><button id="wPlay" class="pbtn">Brincar com elas</button><button id="wClose" class="pbtn">Fechar</button></div>
+    <div id="wList" class="wlist"></div>
   </div>
 </div>
 <div class="veil" id="done" role="dialog" aria-modal="true" aria-label="Muito bem!">
@@ -267,7 +327,9 @@
 <div id="print"></div>
 
 <script src="data.js"></script>
+<script src="data2.js"></script>
 <script src="app.js"></script>
 <script src="mundo.js"></script>
+<script src="carros.js"></script>
 </body>
 </html>

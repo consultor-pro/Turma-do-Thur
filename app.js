@@ -76,6 +76,7 @@ const every=(key,n)=>{const c=store.get(key,0)+1;store.set(key,c);return c%n===0
 
 /* ---------- menu inicial ---------- */
 const ICON={
+carros:'<path d="M8 40V30q0-4 4-4l8-1 8-9q2-2 5-2h12q3 0 5 2l7 9 3 1q4 1 4 4v10z" fill="#fff"/><path d="M30 18l-6 8h12v-8zM40 18v8h11l-6-8z" fill="#BDE6FF"/><circle cx="20" cy="42" r="8" fill="#2E2440"/><circle cx="48" cy="42" r="8" fill="#2E2440"/><circle cx="20" cy="42" r="3" fill="#FFD60A"/><circle cx="48" cy="42" r="3" fill="#FFD60A"/>',
 mundo:'<path d="M6 40c10-6 18-6 26 0s16 6 26 0v18H6z" fill="#4CC764"/><circle cx="46" cy="16" r="8" fill="#FFD60A"/><path d="M14 40V26l10-8 10 8v14z" fill="#fff"/><path d="M10 28l14-12 14 12" fill="none" stroke="#FF4D4D" stroke-width="4" stroke-linecap="round"/><rect x="20" y="30" width="8" height="10" fill="#8D5B3E"/>',
 balde:'<path d="M12 28l18-16 18 16-18 18z" fill="#fff"/><path d="M12 28h36L30 46z" fill="#FFD60A"/><path d="M52 36c0 6-4 9-4 12a4 4 0 0 0 8 0c0-3-4-6-4-12z" fill="#FFD60A"/>',
 giz:'<path d="M12 52l6-16L44 10l10 10-26 26z" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round"/><path d="M12 52l6-16 10 10z" fill="#FF85C0" stroke="#2E2440" stroke-width="3" stroke-linejoin="round"/><path d="M24 30l10 10" stroke="#2E2440" stroke-width="3"/>',
@@ -89,12 +90,12 @@ respingo:'<path d="M32 10c4 8 12 4 14 12s10 8 6 16-12 6-14 14-12 6-14-2-12-4-10-
 espelho:'<path d="M31 32C24 12 6 10 8 24c1 8 12 10 23 8zM31 34C22 36 10 44 14 52c4 6 14-4 17-14z" fill="#FFD60A"/><path d="M33 32c7-20 25-22 23-8-1 8-12 10-23 8zM33 34c9 2 21 10 17 18-4 6-14-4-17-14z" fill="#FF85C0"/><path d="M32 10v46" stroke="#fff" stroke-width="3" stroke-dasharray="4 4"/>',
 letras:'<text x="32" y="48" text-anchor="middle" font-size="42" font-weight="800" font-family="Baloo 2,sans-serif" fill="#4FB3F0" stroke="#2E2440" stroke-width="2.5" paint-order="stroke">Aa</text>',
 palavras:'<rect x="4" y="20" width="17" height="24" rx="5" fill="#FFD60A"/><rect x="24" y="20" width="17" height="24" rx="5" fill="#fff"/><rect x="44" y="20" width="17" height="24" rx="5" fill="#8FE0A0"/><g font-family="Baloo 2,sans-serif" font-weight="800" font-size="16" text-anchor="middle" fill="#2E2440"><text x="12.5" y="38">S</text><text x="32.5" y="38">O</text><text x="52.5" y="38">L</text></g>'};
-const TILES=[['mundo','Mundinho','#FF9F1C'],['balde','Colorir','#FF4D4D'],['giz','Giz de cera','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['numeros','Pintar por números','#FF9F1C'],['aquarela','Aquarela','#4FB3F0'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2'],['respingo','Respingo','#00A6A6'],['espelho','Espelho','#B8860B'],['letras','Letras','#FFFFFF'],['palavras','Palavras','#FF6F61']];
+const TILES=[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946'],['balde','Colorir','#FF4D4D'],['giz','Giz de cera','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['numeros','Pintar por números','#FF9F1C'],['aquarela','Aquarela','#4FB3F0'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2'],['respingo','Respingo','#00A6A6'],['espelho','Espelho','#B8860B'],['letras','Letras','#FFFFFF'],['palavras','Palavras','#FF6F61']];
 $('#tiles').innerHTML=TILES.map(([id,t,bg])=>`<button class="tile${lum(bg)>.8?' light':''}" style="background:${bg}" data-tile="${id}"><svg viewBox="0 0 64 64" aria-hidden="true">${ICON[id]}</svg>${t}</button>`).join('');
 $('#tiles').onclick=e=>{const b=e.target.closest('[data-tile]');if(!b)return;pop(460);const id=b.dataset.tile;
   if(['balde','giz','respingo','numeros','aquarela'].includes(id))openPicker(id);
   else if(['desenho','brilho','espelho'].includes(id))openTela(id);
-  else if(id==='mundo')window.openMundo&&window.openMundo();else if(id==='pixel')show('pixpick');else if(id==='revelar')show('revpick');else show(id)};
+  else if(id==='mundo')window.openMundo&&window.openMundo();else if(id==='carros')window.openGaragem&&window.openGaragem();else if(id==='pixel')show('pixpick');else if(id==='revelar')show('revpick');else show(id)};
 
 /* ---------- escolher desenho ---------- */
 const MODE_T={balde:'Colorir',giz:'Giz de cera',respingo:'Respingo',numeros:'Pintar por números',aquarela:'Aquarela'};
@@ -312,18 +313,37 @@ onShow.letras=()=>requestAnimationFrame(()=>setLetter(lIdx));
 new ResizeObserver(()=>{if($('#letras').classList.contains('on')&&!tStroke)setLetter(lIdx)}).observe(tcv.parentElement);
 
 /* ---------- palavras ---------- */
-let word=null,wQueue=[],wHint=store.get('thur-dica',true),slots=[];
+let word=null,wQueue=[],wHint=store.get('thur-dica',true),slots=[],wLv=store.get('thur-wlv','medio');
 $('#wHint').classList.toggle('on',wHint);
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
-function newWord(){if(!wQueue.length)wQueue=shuffle(PALAVRAS.slice());word=wQueue.pop();slots=Array(word[0].length).fill(null);const L=word[0].split('').map((c,i)=>({c,i}));let n=0;do{shuffle(L);n++}while(L.map(l=>l.c).join('')===word[0]&&n<20);
-  $('#wPic').textContent=word[1];$('#ltiles').innerHTML=L.map(l=>`<button class="lt" data-t="${l.i}" aria-label="Letra ${l.c}">${l.c}</button>`).join('');renderSlots();setTimeout(()=>speak(word[0].toLowerCase()),350)}
-function renderSlots(){$('#slots').innerHTML=slots.map((t,i)=>{const c=t===null?(wHint?word[0][i]:''):word[0][t];return`<button class="slot${t!==null?' full':''}" data-s="${i}" aria-label="Espaço ${i+1}">${c}</button>`}).join('')}
-$('#ltiles').onclick=e=>{const b=e.target.closest('.lt');if(!b||b.classList.contains('used'))return;const k=slots.indexOf(null);if(k<0)return;const t=+b.dataset.t;slots[k]=t;b.classList.add('used');speak(word[0][t].toLowerCase());pop(640);renderSlots();if(!slots.includes(null))wCheck()};
+const fam=()=>store.get('thur-familia',[]);
+function wPool(){if(wLv==='familia')return fam();return PALAVRAS.filter(([w])=>{const n=[...w].length;return wLv==='facil'?n<=3:wLv==='medio'?n===4:n>=5})}
+function syncLv(){$$('#wLv .ico').forEach(b=>b.classList.toggle('on',b.dataset.lv===wLv))}
+function newWord(){if(!wQueue.length){const p=wPool();if(!p.length){if(wLv==='familia'){openWD();return}}wQueue=shuffle(p.slice())}
+  word=wQueue.pop();const letters=[...word[0]];slots=Array(letters.length).fill(null);const L=letters.map((c,i)=>({c,i}));let n=0;do{shuffle(L);n++}while(L.map(l=>l.c).join('')===word[0]&&n<20);
+  $('#wPic').textContent=word[1]||'⭐';$('#ltiles').innerHTML=L.map(l=>`<button class="lt" data-t="${l.i}" aria-label="Letra ${l.c}">${l.c}</button>`).join('');renderSlots();setTimeout(()=>speak(word[0].toLowerCase()),350)}
+const wl=i=>[...word[0]][i];
+function renderSlots(){$('#slots').innerHTML=slots.map((t,i)=>{const c=t===null?(wHint?wl(i):''):wl(t);return`<button class="slot${t!==null?' full':''}" data-s="${i}" aria-label="Espaço ${i+1}">${c}</button>`}).join('')}
+$('#ltiles').onclick=e=>{const b=e.target.closest('.lt');if(!b||b.classList.contains('used'))return;const k=slots.indexOf(null);if(k<0)return;const t=+b.dataset.t;slots[k]=t;b.classList.add('used');speak(wl(t).toLowerCase());pop(640);renderSlots();if(!slots.includes(null))wCheck()};
 $('#slots').onclick=e=>{const s=e.target.closest('.slot');if(!s)return;const i=+s.dataset.s,t=slots[i];if(t===null)return;slots[i]=null;$(`.lt[data-t="${t}"]`).classList.remove('used');pop(380);renderSlots()};
-function wCheck(){const got=slots.map(t=>word[0][t]).join('');if(got===word[0]){$$('.slot').forEach(s=>s.classList.add('ok'));party();speak(word[0].toLowerCase()+'! Muito bem!');if(every('thur-cnt-w',3))setTimeout(()=>complete(null,newWord),1500);else setTimeout(newWord,2600)}
-  else{const box=$('#slots');box.classList.add('shake');pop(200);setTimeout(()=>{box.classList.remove('shake');slots.forEach((t,i)=>{if(t!==null&&word[0][t]!==word[0][i]){$(`.lt[data-t="${t}"]`).classList.remove('used');slots[i]=null}});renderSlots()},450)}}
+function wCheck(){const got=slots.map(t=>wl(t)).join('');if(got===word[0]){$$('.slot').forEach(s=>s.classList.add('ok'));party();speak(word[0].toLowerCase()+'! Muito bem!');if(every('thur-cnt-w',3))setTimeout(()=>complete(null,newWord),1500);else setTimeout(newWord,2600)}
+  else{const box=$('#slots');box.classList.add('shake');pop(200);setTimeout(()=>{box.classList.remove('shake');slots.forEach((t,i)=>{if(t!==null&&wl(t)!==wl(i)){$(`.lt[data-t="${t}"]`).classList.remove('used');slots[i]=null}});renderSlots()},450)}}
 $('#wSay').onclick=()=>{if(word)speak(word[0].toLowerCase())};$('#wNext').onclick=()=>{pop(520);newWord()};
 $('#wHint').onclick=()=>{wHint=!wHint;store.set('thur-dica',wHint);$('#wHint').classList.toggle('on',wHint);renderSlots();pop(480)};
+$('#wLv').onclick=e=>{const b=e.target.closest('[data-lv]');if(!b)return;wLv=b.dataset.lv;store.set('thur-wlv',wLv);wQueue=[];syncLv();pop(480);newWord()};
+syncLv();
+/* palavras da família (os pais escrevem) */
+const EMOS=['⭐','❤️','🏠','👨','👩','👧','👦','👶','👵','👴','🐶','🐱','⚽','🚗','🎂','🌈'];let wEmo='⭐';
+$('#wEmo').innerHTML=EMOS.map(e=>`<button class="emo${e===wEmo?' on':''}" data-e="${e}" aria-label="Figura">${e}</button>`).join('');
+$('#wEmo').onclick=e=>{const b=e.target.closest('.emo');if(!b)return;wEmo=b.dataset.e;$$('#wEmo .emo').forEach(x=>x.classList.toggle('on',x===b))};
+function renderWL(){const l=$('#wList');l.innerHTML='';fam().forEach(([w,e],i)=>{const c=document.createElement('span');c.className='wchip';c.textContent=e+' '+w;const x=document.createElement('button');x.textContent='✕';x.setAttribute('aria-label','Apagar '+w);x.onclick=()=>{const f=fam();f.splice(i,1);store.set('thur-familia',f);renderWL()};c.appendChild(x);l.appendChild(c)})}
+function openWD(){renderWL();$('#wIn').value='';$('#wdlg').classList.add('on');setTimeout(()=>{try{$('#wIn').focus()}catch(e){}},100)}
+$('#wEdit').onclick=()=>{pop(480);openWD()};
+$('#wClose').onclick=()=>{$('#wdlg').classList.remove('on')};
+function addW(){const w=$('#wIn').value.normalize('NFC').toUpperCase().replace(/[^A-ZÀ-ÖØ-Ý]/g,'').slice(0,10);if(w.length<2){toast('Escreva uma palavra com pelo menos 2 letras.');return false}const f=fam();if(!f.some(x=>x[0]===w))f.push([w,wEmo]);store.set('thur-familia',f);$('#wIn').value='';renderWL();pop(700);return true}
+$('#wAdd').onclick=addW;
+$('#wIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addW()}});
+$('#wPlay').onclick=()=>{if($('#wIn').value.trim())addW();if(!fam().length){toast('Adicione pelo menos uma palavra.');return}$('#wdlg').classList.remove('on');wLv='familia';store.set('thur-wlv',wLv);wQueue=[];syncLv();newWord()};
 onShow.palavras=()=>{if(!word)newWord()};
 
 /* ---------- para os pais ---------- */
@@ -336,9 +356,9 @@ $('#clrArt').onclick=()=>ask('Apagar todas as artes da galeria?',()=>{dbClear();
 $('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st');toast('Adesivos zerados.')});
 $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.keys(localStorage).filter(k=>/^thur-(s|t|px)-/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}toast('Pinturas em andamento apagadas.')});
 
-window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound};
+window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete};
 /* ---------- início ---------- */
-{const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick'].includes(h)?h:'home',false)}
+{const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
 if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
 }
