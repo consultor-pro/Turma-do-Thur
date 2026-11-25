@@ -95,7 +95,7 @@ respingo:'<path d="M32 10c4 8 12 4 14 12s10 8 6 16-12 6-14 14-12 6-14-2-12-4-10-
 espelho:'<path d="M31 32C24 12 6 10 8 24c1 8 12 10 23 8zM31 34C22 36 10 44 14 52c4 6 14-4 17-14z" fill="#FFD60A"/><path d="M33 32c7-20 25-22 23-8-1 8-12 10-23 8zM33 34c9 2 21 10 17 18-4 6-14-4-17-14z" fill="#FF85C0"/><path d="M32 10v46" stroke="#fff" stroke-width="3" stroke-dasharray="4 4"/>',
 letras:'<text x="32" y="48" text-anchor="middle" font-size="42" font-weight="800" font-family="Baloo 2,sans-serif" fill="#4FB3F0" stroke="#2E2440" stroke-width="2.5" paint-order="stroke">Aa</text>',
 palavras:'<rect x="4" y="20" width="17" height="24" rx="5" fill="#FFD60A"/><rect x="24" y="20" width="17" height="24" rx="5" fill="#fff"/><rect x="44" y="20" width="17" height="24" rx="5" fill="#8FE0A0"/><g font-family="Baloo 2,sans-serif" font-weight="800" font-size="16" text-anchor="middle" fill="#2E2440"><text x="12.5" y="38">S</text><text x="32.5" y="38">O</text><text x="52.5" y="38">L</text></g>'};
-const TILES=[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946'],['balde','Colorir','#FF4D4D'],['giz','Giz de cera','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['numeros','Pintar por números','#FF9F1C'],['aquarela','Aquarela','#4FB3F0'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2'],['respingo','Respingo','#00A6A6'],['espelho','Espelho','#B8860B'],['letras','Letras','#FFFFFF'],['palavras','Palavras','#FF6F61']];
+const TILES=[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946'],['balde','Colorir','#FF4D4D'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['numeros','Pintar por números','#FF9F1C'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2'],['espelho','Espelho','#B8860B'],['letras','Letras','#FFFFFF'],['palavras','Palavras','#FF6F61']];
 $('#tiles').innerHTML=TILES.map(([id,t,bg])=>`<button class="tile${lum(bg)>.8?' light':''}" style="background:${bg}" data-tile="${id}"><svg viewBox="0 0 64 64" aria-hidden="true">${ICON[id]}</svg>${t}</button>`).join('');
 $('#tiles').onclick=e=>{const b=e.target.closest('[data-tile]');if(!b)return;pop(460);const id=b.dataset.tile;
   if(['balde','giz','respingo','numeros','aquarela'].includes(id))openPicker(id);
@@ -149,7 +149,7 @@ function clipFor(s,a){const id='c'+Date.now().toString(36)+rnd(1e6).toString(36)
   const g=document.createElementNS(NS,'g');g.setAttribute('clip-path',`url(#${id})`);g.setAttribute('pointer-events','none');
   const ol=a.cloneNode();ol.setAttribute('class','o');ol.setAttribute('fill','none');ol.removeAttribute('data-n');ol.setAttribute('pointer-events','none');a.after(g);g.after(ol);return g}
 $('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const el=document.elementFromPoint(e.clientX,e.clientY);const a=el&&el.closest?el.closest('.r'):null;if(!a)return;e.preventDefault();
-  if(P.mode==='balde'){const f=paintOf(s,P.color);if(a.getAttribute('fill')===f)return;snap();a.setAttribute('fill',f);saveP();pop(700);return}
+  if(P.mode==='balde'){const f=paintOf(s,P.color);if(a.getAttribute('fill')===f)return;snap();a.setAttribute('fill',f);saveP();pop(700);checkBalde(s);return}
   if(P.mode==='numeros'){if(a.dataset.n===undefined||a.dataset.f)return;if(+a.dataset.n!==P.num){a.classList.remove('bad');void a.getBBox();a.classList.add('bad');pop(200);return}
     snap();a.setAttribute('fill',PLANS[PAGES[P.i].n].c[P.num]);a.dataset.f='1';const t=s.querySelector(`.num[data-k="${a.dataset.k}"]`);if(t)t.remove();saveP();pop(720);markNumDone();
     if(!s.querySelector('.r[data-n]:not([data-f])'))setTimeout(finishSvg,500);return}
@@ -169,6 +169,8 @@ $('#pBack').onclick=()=>{pop(440);openPicker(P.mode)};
 $('#pPrint').onclick=()=>{const pr=$('#print');pr.innerHTML=pageSvg(PAGES[P.i]);if(P.mode==='numeros'){pr.style.cssText='display:block;position:fixed;left:-9999px;top:0;width:800px;height:800px';addNums(pr.querySelector('svg'),PAGES[P.i]);pr.style.cssText=''}try{window.print()}catch(e){toast('Abra o app instalado para imprimir.')}};
 function svgToUrl(svg,size=900){return new Promise(res=>{const c=svg.cloneNode(true);c.setAttribute('width',size);c.setAttribute('height',size);c.setAttribute('xmlns',NS);c.querySelectorAll('.nums').forEach(n=>n.remove());
   const str=new XMLSerializer().serializeToString(c);const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=cv.height=size;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,size,size);x.drawImage(im,0,0,size,size);res(cv.toDataURL('image/jpeg',.88))};im.onerror=()=>res(null);im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(str)})}
+/* terminou de pintar tudo: parabéns e guarda na galeria sozinho */
+let bDone=false;function checkBalde(s){if(bDone)return;const left=[...s.querySelectorAll('.r')].filter(r=>(r.getAttribute('fill')||'').toLowerCase()==='#fff').length;if(!left){bDone=true;setTimeout(()=>{finishSvg().finally(()=>bDone=false)},600)}}
 async function finishSvg(){const url=await svgToUrl(svgEl());store.del(pKey());complete(url,()=>openPicker(P.mode))}
 $('#pDone').onclick=()=>{pop(600);finishSvg()};
 
@@ -301,14 +303,18 @@ function setLetter(i){const it=lItems();lIdx=(i+it.length)%it.length;const ch=it
   for(const c of[mk,um]){c.width=Math.ceil(tW*K);c.height=Math.ceil(tH*K)}const m=mk.getContext('2d');m.font=glyphFont(tFs*K);m.textAlign='center';m.textBaseline='middle';m.fillStyle='#000';m.fillText(ch,mk.width/2,y*K)}
 function tLine(c,p,from,w,k){c.lineCap='round';c.lineJoin='round';c.lineWidth=w*k;c.beginPath();const a=Math.max(0,from-1);c.moveTo(p[a][0]*k,p[a][1]*k);if(p.length===1)c.lineTo(p[0][0]*k+.1,p[0][1]*k);for(let i=a+1;i<p.length;i++)c.lineTo(p[i][0]*k,p[i][1]*k);c.stroke()}
 const lPt=e=>{const r=tcv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
-function lDraw(from){const w=tFs*.12;tctx.strokeStyle=lColor;tLine(tctx,tStroke,from,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,tStroke,from,w,K)}
+function lDraw(from){const w=tFs*.13;tctx.strokeStyle=lColor;tLine(tctx,tStroke,from,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,tStroke,from,w,K)}
 tcv.addEventListener('pointerdown',e=>{e.preventDefault();tcv.setPointerCapture(e.pointerId);tStroke=[lPt(e)];lDraw(0);lDrawn=1});
 let lDrawn=0,lRaf=0;
 tcv.addEventListener('pointermove',e=>{if(!tStroke)return;evs(e).forEach(ev=>tStroke.push(lPt(ev)));if(!lRaf)lRaf=requestAnimationFrame(()=>{lRaf=0;if(tStroke){lDraw(lDrawn);lDrawn=tStroke.length}})});
 const lEnd=()=>{if(!tStroke)return;if(lDrawn<tStroke.length)lDraw(lDrawn);tStroke=null;lCheck()};tcv.addEventListener('pointerup',lEnd);tcv.addEventListener('pointercancel',lEnd);
 function lCheck(){if(lDone||!mk.width)return;const a=mk.getContext('2d').getImageData(0,0,mk.width,mk.height).data,b=um.getContext('2d').getImageData(0,0,um.width,um.height).data;let L=0,both=0,U=0;
   for(let i=3;i<a.length;i+=4){const l=a[i]>100,u=b[i]>100;if(l)L++;if(u)U++;if(l&&u)both++}
-  if(L&&both/L>.55&&both/U>.33){lDone=true;$('#lStars').innerHTML='<svg viewBox="0 0 100 100" width="55%" height="55%" aria-hidden="true"><polygon points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round" opacity=".9"/></svg>';party();const it=lItems()[lIdx];speak('Muito bem! '+(lSet==='num'?it[1]:it[0].toUpperCase()+' de '+it[1]));
+  /* mais difícil: cobrir quase toda a letra, pouco rabisco fora, e todas as partes da letra precisam estar pintadas */
+  const W=mk.width,H=mk.height,G=5,cl=new Array(G*G).fill(0),cb=new Array(G*G).fill(0);
+  for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2){const i=(y*W+x)*4+3;if(a[i]>100){const c=Math.min(G-1,Math.floor(x/W*G))+G*Math.min(G-1,Math.floor(y/H*G));cl[c]++;if(b[i]>100)cb[c]++}}
+  const tot=cl.reduce((p,q)=>p+q,0);const parts=cl.every((n,c)=>n<tot*.02||cb[c]/n>.7);
+  if(L&&both/L>.8&&both/U>.45&&parts){lDone=true;$('#lStars').innerHTML='<svg viewBox="0 0 100 100" width="55%" height="55%" aria-hidden="true"><polygon points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round" opacity=".9"/></svg>';party();const it=lItems()[lIdx];speak('Muito bem! '+(lSet==='num'?it[1]:it[0].toUpperCase()+' de '+it[1]));
     if(every('thur-cnt-l',3))setTimeout(()=>complete(null,null),1600)}}
 function sayLetter(){const it=lItems()[lIdx];speak(lSet==='num'?it[1]:it[0].toUpperCase()+', de '+it[1])}
 $('#lNext').onclick=()=>{pop(520);setLetter(lIdx+1);sayLetter()};$('#lPrev').onclick=()=>{pop(520);setLetter(lIdx-1);sayLetter()};
@@ -365,7 +371,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='4.5';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='4.6';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
