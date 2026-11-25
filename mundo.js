@@ -29,8 +29,11 @@ const SCENES={
     {id:'urso',w:7,x:31,y:93,act:'hop'}],
     chars:[[52,88],[40,90],[60,92],[68,86],[27,84]]},
   cozinha:{n:'Cozinha',bg:'img/mundo/cozinha.jpg',items:[
-    {id:'maca',w:5,x:30,y:66,food:'maçã'},{id:'banana',w:6,x:37,y:65,food:'banana'},{id:'uva',w:5,x:44,y:66,food:'uva'},{id:'melancia',w:6.5,x:51,y:65,food:'melancia'},
-    {id:'cupcake',w:5,x:58,y:66,food:'bolinho'},{id:'leite',w:4,x:64,y:66,food:'leite'},{id:'biscoito',w:5,x:70,y:66,food:'biscoito'},{id:'cenoura',w:5,x:77,y:66,food:'cenoura'}],
+    {id:'maca',w:4.2,x:27,y:50,food:'maçã'},{id:'banana',w:5,x:32,y:50,food:'banana'},{id:'uva',w:4.2,x:37.5,y:50,food:'uva'},
+    {id:'cupcake',w:4.2,x:72,y:50,food:'bolinho'},{id:'leite',w:3.4,x:76.5,y:50,food:'leite'},{id:'biscoito',w:4.2,x:81,y:50,food:'biscoito'},{id:'cenoura',w:4.2,x:86,y:50,food:'cenoura'},
+    {id:'panela',src:O+'panela.svg',w:7.5,x:93,y:47,act:'cook'},
+    {id:'arroz',src:O+'arroz.svg',w:7.5,x:33,y:67,food:'arroz'},{id:'feijao',src:O+'feijao.svg',w:7,x:41,y:67,food:'feijão'},{id:'carne',src:O+'carne.svg',w:7.5,x:49,y:67,food:'carne'},
+    {id:'macarrao',src:O+'macarrao.svg',w:7.5,x:57,y:67,food:'macarrão'},{id:'salada',src:O+'salada.svg',w:7,x:65,y:67,food:'salada'},{id:'melancia',w:6,x:73,y:66,food:'melancia'}],
     chars:[[91,99],[13,99],[27,99],[73,99],[50,99]]},
   banheiro:{n:'Banheiro',bg:'img/mundo/banheiro.svg',thumb:'img/mundo/banheiro.svg',items:[
     {id:'vaso',src:O+'vaso.svg',w:12,x:30,y:93,seat:[50,52],act:'flush',auto:1},
@@ -68,6 +71,11 @@ const FALAS={
   'bolinho':['Bolinho com cereja! Nham nham, que gostosura!','Bolinho! Fiquei com o nariz de glacê!'],
   'leite':['Leitinho! Olha meu bigode branco!','Glub, glub, glub! Leite quentinho!'],
   'biscoito':['Biscoito! Croc, croc, croc! Caiu farelo!','Biscoito com gotinhas! Que crocante!'],
+  'arroz':['Arroz soltinho! Cada grãozinho fazendo cosquinha!','Arroz branquinho! Parece nuvem de comer!'],
+  'feijão':['Feijão! Fiquei forte igual um super-herói!','Feijãozinho caldoso! Hummm, que cheiro bom!'],
+  'carne':['Carne! Nhac, nhac! Mastiga bem, mastiga bem!','Carninha! Agora eu tenho músculo! Olha meu braço!'],
+  'macarrão':['Macarrão! Fluuup! Puxei um fio comprido!','Macarrão com molho! Fiquei com bigode vermelho!'],
+  'salada':['Salada! Crec, crec! Verdinha e fresquinha!','Alface e tomate! Virei um coelho saudável!'],
   'cenoura':['Cenoura! Agora eu enxergo no escuro!','Cenourinha! Crunch, crunch! Igual um coelhinho!']};
 function mk(d){const e=document.createElement('div');e.className='ent '+d.kind;e.dataset.id=d.id;e.dataset.w=d.w;place(e,d.x,d.y,d.w);
   if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;if(d.pitch)e.dataset.pitch=d.pitch;if(d.v)e.dataset.v=d.v;if(d.auto)e.dataset.auto=1;
@@ -75,6 +83,7 @@ function mk(d){const e=document.createElement('div');e.className='ent '+d.kind;e
 function build(key){cur=key;const S=SCENES[key];stage.classList.remove('isnight');stage.querySelectorAll('.ent,.fx').forEach(e=>e.remove());
   stage.querySelector('.sbg').src=S.bg;$('#mTitle').textContent=S.n;
   S.items.forEach(it=>stage.appendChild(mk({src:O+it.id+'.webp',...it,kind:it.food?'food':'obj'})));
+  $('#mCook').hidden=key!=='cozinha';
   CH.forEach((c,i)=>{const e=mk({...c,kind:'char',x:S.chars[i][0],y:S.chars[i][1]});stage.appendChild(e);applyLv(e,false)});
   $$('#scenes .scn').forEach(b=>b.classList.toggle('on',b.dataset.s===key))}
 $('#scenes').innerHTML=Object.entries(SCENES).map(([k,s])=>`<button class="scn" data-s="${k}" aria-label="${s.n}"><img src="${s.thumb||'img/bg-'+k+'.jpg'}" alt=""></button>`).join('');
@@ -83,6 +92,7 @@ function fit(){const w=$('#mwrap').getBoundingClientRect();if(!w.width)return;co
 onShow.mundo=()=>requestAnimationFrame(fit);
 new ResizeObserver(()=>{if($('#mundo').classList.contains('on'))fit()}).observe($('#mwrap'));
 window.openMundo=()=>{build(cur);show('mundo')};
+window.MUNDO={stage,A:(el,kf,opt)=>el.animate(kf,Object.assign({duration:600,easing:'ease-in-out'},opt)),fx:(...a)=>fx(...a),sparkle:c=>sparkle(c),go:k=>{if(cur!==k)build(k)}};
 
 /* efeitos */
 const A=(el,kf,opt)=>el.animate(kf,Object.assign({duration:600,easing:'ease-in-out'},opt));
@@ -111,6 +121,7 @@ const ACTS={
   bau(o){A(an(o),[{transform:'rotate(0)'},{transform:'rotate(-4deg)'},{transform:'rotate(4deg)'},{transform:'rotate(0)'}],{duration:400,iterations:2});['#FFD60A','#FF85C0','#4FB3F0','#4CC764','#FF9F1C','#9B5DE5'].forEach((c,i)=>fx(o,sparkle(c),{fy:.2,dx:rnd(140)-70,dy:-80-rnd(60),delay:i*70}));[0,.1,.2].forEach(d=>tone('sine',700+d*2000,1400,.15,.08,d))},
   drum(o){A(an(o),[{transform:'scale(1)'},{transform:'scale(.93,1.04)'},{transform:'scale(1)'}],{duration:220,iterations:3});drum();drum(.22);drum(.44)},
   hop(o){hopEl(an(o),'-60%');boing()},
+  cook(o){A(an(o),[{transform:'rotate(0)'},{transform:'rotate(-6deg)'},{transform:'rotate(6deg)'},{transform:'rotate(0)'}],{duration:360});window.openCook&&window.openCook()},
   quack(o){A(an(o),[{transform:'rotate(0)'},{transform:'rotate(-12deg)'},{transform:'rotate(10deg)'},{transform:'rotate(0)'}],{duration:500});tone('square',700,500,.12,.06);tone('square',650,450,.14,.06,.16);say(null,'Quém, quém!')},
   flush(o){const c=seated(o);
     const swirl=()=>{for(let i=0;i<8;i++)fx(o,'<span class="ball" style="background:#8FD3F5"></span>',{fx:.3+Math.random()*.4,fy:.5,dx:rnd(80)-40,dy:-40-rnd(50),dur:800,delay:i*60});tone('sine',900,120,1.1,.12)};
