@@ -1,5 +1,5 @@
-const CACHE = 'turma-thur-v1';
-const FILES = ['./', './index.html', './manifest.json', './thur.png', './icon-192.png', './icon-512.png'];
+const CACHE = 'turma-thur-v2';
+const FILES = ['./', './index.html', './manifest.json', './thur.png', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
