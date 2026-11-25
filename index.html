@@ -14,422 +14,248 @@
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
-<style>
-/* VOICE: alegre, barulhento de cor, feito para dedinhos de 2 a 6 anos
-   IDEA: um estojo de lápis de cor aberto sobre a mesa
-   PICTURE: o Thur grande na entrada; a folha branca é o centro de tudo
-   COLOUR and TYPE: amarelo-sol dominante, lilás, azul e verde de apoio, Baloo 2
-   LAYOUT: tela cheia, botões gigantes, paleta embaixo, quase nada de texto */
-:root{color-scheme:light;--sol:#FFD60A;--lilas:#9B5DE5;--ceu:#4FB3F0;--verde:#4CC764;--ink:#2E2440;--papel:#FFF7EC;--sombra:#E9DCC6}
-*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overscroll-behavior:none}
-body{background:var(--papel);color:var(--ink);font:600 17px/1.4 'Baloo 2',system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation;background:none}
-button:focus-visible{outline:4px solid var(--ceu);outline-offset:3px}
-.view{position:fixed;inset:0;display:none;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-.view.on{display:flex}
-#home{background:var(--sol);overflow:auto}
-.hero{flex:1;display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,56px);padding:20px;flex-wrap:wrap}
-.hero img{height:min(40vh,400px);width:auto;filter:drop-shadow(0 10px 0 rgba(0,0,0,.12))}
-.menu{display:flex;flex-direction:column;gap:14px;width:min(460px,100%)}
-.menu h1{margin:0;font-weight:800;font-size:clamp(36px,7vw,60px);line-height:1;text-align:center}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.big{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:28px;font-size:clamp(22px,4.6vw,30px);font-weight:800;box-shadow:0 8px 0 rgba(0,0,0,.18);transition:transform .1s}
-.big:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.18)}
-.big svg{width:60px;height:60px}
-.b1{background:var(--lilas);color:#fff}.b2{background:#fff}.b3{background:var(--ceu);color:#fff}.b4{background:var(--verde);color:#fff}
-.bar{display:flex;align-items:center;gap:10px;padding:10px 14px}
-.bar h2{margin:0;font-weight:800;font-size:26px;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ico{width:58px;height:58px;border-radius:20px;display:grid;place-items:center;background:#fff;box-shadow:0 5px 0 var(--sombra);flex:none}
-.ico:active{transform:translateY(3px);box-shadow:0 2px 0 var(--sombra)}
-.ico svg{width:30px;height:30px}
-.ico.on{background:var(--ink);color:#fff;box-shadow:0 5px 0 #000}
-.paper{flex:1;margin:0 14px;background:#fff;border-radius:28px;box-shadow:0 6px 0 var(--sombra);position:relative;overflow:hidden}
-canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
-#page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;touch-action:none}
-#page svg{width:100%;height:100%;touch-action:none}
-.tools{display:flex;flex-direction:column;gap:8px;padding:10px 14px 14px}
-.pal{display:flex;gap:12px;overflow-x:auto;padding:8px 8px 10px;scrollbar-width:none}
-.pal::-webkit-scrollbar{display:none}
-.sw{width:54px;height:54px;border-radius:50%;flex:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 0 0 3px #fff;transition:transform .12s}
-.sw.on{transform:scale(1.18);box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 0 0 4px var(--ink)}
-.row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
-.dot{display:block;border-radius:50%;background:currentColor}
-.sep{width:2px;height:40px;background:var(--sombra);border-radius:2px}
-.txt{width:auto;min-width:84px;padding:0 14px;font-size:24px;font-weight:800;white-space:nowrap}
-#gal{flex:1;overflow:auto;padding:6px 14px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;align-content:start}
-.card{background:#fff;border-radius:24px;padding:10px;box-shadow:0 6px 0 var(--sombra);display:flex;flex-direction:column;align-items:center;font-size:19px;font-weight:800}
-.card:active{transform:translateY(4px);box-shadow:0 2px 0 var(--sombra)}
-.card svg{width:100%;aspect-ratio:1;height:auto}
-.cap{display:flex;align-items:center;justify-content:center;gap:12px;padding:0 14px 8px;font-size:26px;font-weight:800}
-.cap .pic{font-size:44px;line-height:1}
-.stars{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
-#wordBox{flex:1;margin:0 14px 14px;background:#fff;border-radius:28px;box-shadow:0 6px 0 var(--sombra);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,28px);padding:16px;overflow:hidden}
-#wPic{font-size:clamp(90px,20vh,150px);line-height:1}
-.slots,.tiles{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.slot,.tile{width:clamp(50px,14vw,76px);height:clamp(60px,16vw,86px);border-radius:18px;display:grid;place-items:center;font-size:clamp(32px,9vw,48px);font-weight:800;line-height:1}
-.slot{background:#F4EFE6;border:3px dashed #D9CCB6;color:#CDBFA8}
-.slot.full{border-style:solid;background:#fff;color:var(--ink);border-color:var(--ceu)}
-.slot.ok{border-color:var(--verde);background:#EAF9EC}
-.tile{background:var(--sol);box-shadow:0 6px 0 #D8B100;color:var(--ink)}
-.tile:active{transform:translateY(4px);box-shadow:0 2px 0 #D8B100}
-.tile.used{visibility:hidden}
-.shake{animation:sh .4s}
-@keyframes sh{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
-#party{position:fixed;inset:0;pointer-events:none;z-index:8;overflow:hidden}
-#party i{position:absolute;top:-30px;width:14px;height:20px;border-radius:4px;animation:fall 1.6s ease-in forwards}
-@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
-.veil{position:fixed;inset:0;background:rgba(46,36,64,.5);display:none;align-items:center;justify-content:center;z-index:9}
-.veil.on{display:flex}
-.dlg{background:#fff;border-radius:32px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:18px;width:min(340px,90vw);text-align:center;font-size:24px;font-weight:800}
-.dlg .row button{width:92px;height:92px;border-radius:28px;display:grid;place-items:center;box-shadow:0 6px 0 rgba(0,0,0,.18)}
-.dlg svg{width:48px;height:48px}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,40px);opacity:0;background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:18px;transition:.25s;z-index:10;max-width:90vw;text-align:center}
-#toast.on{opacity:1;transform:translate(-50%,0)}
-#print{display:none}
-@media print{body{overflow:visible}.view,.veil,#toast,#party{display:none!important}#print{display:block}#print svg{width:100%;height:auto}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media (max-width:600px){.bar h2{font-size:21px}.ico{width:50px;height:50px}.ico svg{width:26px;height:26px}.sw{width:46px;height:46px}.hero img{height:30vh}.txt{font-size:20px;padding:0 12px}}
-</style>
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-back" viewBox="0 0 32 32"><path d="M20 6L10 16l10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 32 32"><path d="M12 6l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-undo" viewBox="0 0 32 32"><path d="M10 12h11a7 7 0 0 1 0 14h-6M10 12l5-5M10 12l5 5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-trash" viewBox="0 0 32 32"><path d="M7 9h18M13 9V6h6v3M9 9l1.5 17h11L23 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-save" viewBox="0 0 32 32"><path d="M16 5v15M10 14l6 6 6-6M7 26h18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 32 32"><path d="M6 17l7 7L26 9" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-print" viewBox="0 0 32 32"><path d="M9 12V5h14v7M9 22H6V12h20v10h-3M10 18h12v9H10z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></symbol>
   <symbol id="i-sound" viewBox="0 0 32 32"><path d="M5 12h5l7-6v20l-7-6H5z" fill="currentColor"/><path d="M21 11a6 6 0 0 1 0 10M24 7a11 11 0 0 1 0 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
-  <symbol id="i-next" viewBox="0 0 32 32"><path d="M12 6l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-prev" viewBox="0 0 32 32"><path d="M20 6L10 16l10 10" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-tap" viewBox="0 0 32 32"><path d="M8 14l9-9 9 9-9 9z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M8 14h18l-9 9z" fill="currentColor"/><path d="M27 20c0 3-2 5-2 6a2 2 0 0 0 4 0c0-1-2-3-2-6z" fill="currentColor"/></symbol>
-  <symbol id="i-crayon" viewBox="0 0 32 32"><path d="M6 26l3-9L22 4l6 6-13 13z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M6 26l3-9 6 6z" fill="currentColor"/></symbol>
   <symbol id="i-bulb" viewBox="0 0 32 32"><path d="M16 4a8 8 0 0 0-5 14v4h10v-4a8 8 0 0 0-5-14zM12 26h8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-eraser" viewBox="0 0 32 32"><path d="M6 20l10-12 10 8-8 10h-7z" fill="#FF85C0" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 26h15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-frame" viewBox="0 0 32 32"><rect x="4" y="5" width="24" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 22l6-7 4 4 3-3 4 6z" fill="currentColor"/><circle cx="21" cy="11" r="2.5" fill="currentColor"/></symbol>
+  <symbol id="i-star" viewBox="0 0 32 32"><path d="M16 3l4 8.5 9.3 1.2-6.8 6.4 1.8 9.2L16 23.8 7.7 28.3l1.8-9.2-6.8-6.4 9.3-1.2z" fill="currentColor"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 32 32"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M6.8 25.2l2.8-2.8M22.4 9.6l2.8-2.8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+  <symbol id="i-tap" viewBox="0 0 32 32"><path d="M8 14l9-9 9 9-9 9z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M8 14h18l-9 9z" fill="currentColor"/><path d="M27 20c0 3-2 5-2 6a2 2 0 0 0 4 0c0-1-2-3-2-6z" fill="currentColor"/></symbol>
+  <symbol id="i-stamp" viewBox="0 0 32 32"><path d="M12 4h8v8l4 3v4H8v-4l4-3z" fill="currentColor"/><rect x="6" y="22" width="20" height="5" rx="2" fill="currentColor"/></symbol>
 </svg>
 
+<!-- INÍCIO -->
 <section id="home" class="view on" aria-label="Início">
-  <div class="hero">
-    <img src="thur.png" alt="Thur, sorrindo, de camisa xadrez">
-    <div class="menu">
-      <h1>Turma do Thur</h1>
-      <div class="grid">
-        <button class="big b1" data-go="desenhar"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 50l4-14L42 12a6 6 0 0 1 9 9L27 45z" fill="#FFD60A" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/><path d="M14 50l4-14 9 9z" fill="#F4C9A0" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/></svg>Desenhar</button>
-        <button class="big b2" data-go="colorir"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="22" cy="24" r="12" fill="#FF4D4D"/><circle cx="42" cy="24" r="12" fill="#4FB3F0"/><circle cx="32" cy="42" r="12" fill="#4CC764"/></svg>Colorir</button>
-        <button class="big b3" data-go="letras"><svg viewBox="0 0 64 64" aria-hidden="true"><text x="32" y="50" text-anchor="middle" font-size="46" font-weight="800" font-family="Baloo 2, sans-serif" fill="#fff" stroke="#2E2440" stroke-width="3" paint-order="stroke">Aa</text></svg>Letras</button>
-        <button class="big b4" data-go="palavras"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="18" width="17" height="24" rx="5" fill="#FFD60A" stroke="#2E2440" stroke-width="3"/><rect x="24" y="18" width="17" height="24" rx="5" fill="#fff" stroke="#2E2440" stroke-width="3"/><rect x="44" y="18" width="17" height="24" rx="5" fill="#FF85C0" stroke="#2E2440" stroke-width="3"/></svg>Palavras</button>
+  <header class="hbar">
+    <img src="img/logo.jpg" alt="" class="hlogo">
+    <h1>Turma do Thur</h1>
+    <button class="ico" data-go="galeria" aria-label="Galeria de arte"><svg><use href="#i-frame"/></svg></button>
+    <button class="ico" data-go="adesivos" aria-label="Meus adesivos"><svg><use href="#i-star"/></svg></button>
+    <button class="ico" data-go="pais" aria-label="Para os pais"><svg><use href="#i-gear"/></svg></button>
+  </header>
+  <div class="hmain">
+    <div class="hero">
+      <img src="img/thur.png" alt="Thur, de camisa xadrez" class="hthur">
+      <div class="hpets"><img src="img/pets/zuzu.png" alt="Zuzu"><img src="img/pets/lelo.png" alt="Lelo"><img src="img/pets/pituca.png" alt="Pituca"><img src="img/pets/bubu.png" alt="Bubu"></div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+  </div>
+</section>
+
+<!-- ESCOLHER DESENHO -->
+<section id="escolher" class="view" aria-label="Escolher desenho">
+  <div class="bar">
+    <button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="pickTitle">Escolha um desenho</h2>
+    <span class="sp"></span>
+  </div>
+  <div class="gal" id="pickGal"></div>
+</section>
+
+<!-- PINTAR SOBRE O DESENHO (balde, giz, respingo, números) -->
+<section id="pintar" class="view" aria-label="Pintar">
+  <div class="bar">
+    <button class="ico" id="pBack" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="pTitle">Pintar</h2>
+    <button class="ico" id="pUndo" aria-label="Desfazer"><svg><use href="#i-undo"/></svg></button>
+    <button class="ico" id="pPrint" aria-label="Imprimir folha para colorir"><svg><use href="#i-print"/></svg></button>
+    <button class="ico" id="pClear" aria-label="Recomeçar"><svg><use href="#i-trash"/></svg></button>
+    <button class="ico go" id="pDone" aria-label="Pronto! Guardar na galeria"><svg><use href="#i-ok"/></svg></button>
+  </div>
+  <div class="work">
+    <div class="paper"><div id="page"></div><img class="peek" alt=""></div>
+    <div class="tools">
+      <div class="pal" id="palP" role="group" aria-label="Cores"></div>
+      <div class="row" id="texRow">
+        <button class="ico tex on" data-tex="liso" aria-label="Cor lisa"><span class="dot" style="width:24px;height:24px;background:#9B5DE5"></span></button>
+        <button class="ico tex" data-tex="giz" aria-label="Textura de giz de cera"><span class="dot tx-giz"></span></button>
+        <button class="ico tex" data-tex="brilho" aria-label="Purpurina"><span class="dot tx-brilho"></span></button>
+      </div>
+      <div class="row" id="sizeRow">
+        <button class="ico psize on" data-w="10" aria-label="Fino"><span class="dot" style="width:12px;height:12px"></span></button>
+        <button class="ico psize" data-w="22" aria-label="Grosso"><span class="dot" style="width:24px;height:24px"></span></button>
       </div>
     </div>
   </div>
 </section>
 
-<section id="desenhar" class="view" aria-label="Desenhar">
+<!-- TELA LIVRE (desenhar, brilho, espelho, aquarela) -->
+<section id="tela" class="view" aria-label="Desenhar">
   <div class="bar">
-    <button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
-    <h2>Desenhar</h2>
-    <button class="ico" id="undo" aria-label="Desfazer"><svg><use href="#i-undo"/></svg></button>
-    <button class="ico" id="save" aria-label="Salvar imagem"><svg><use href="#i-save"/></svg></button>
-    <button class="ico" id="clear" aria-label="Apagar tudo"><svg><use href="#i-trash"/></svg></button>
+    <button class="ico" id="tBack" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="tTitle">Desenhar</h2>
+    <button class="ico" id="tUndo" aria-label="Desfazer"><svg><use href="#i-undo"/></svg></button>
+    <button class="ico" id="tClear" aria-label="Apagar tudo"><svg><use href="#i-trash"/></svg></button>
+    <button class="ico go" id="tDone" aria-label="Pronto! Guardar na galeria"><svg><use href="#i-ok"/></svg></button>
   </div>
-  <div class="paper"><canvas id="cv" class="full" aria-label="Folha para desenhar"></canvas></div>
-  <div class="tools">
-    <div class="pal" id="palD" role="group" aria-label="Cores"></div>
-    <div class="row">
-      <button class="ico size" data-size="0.012" aria-label="Pincel fino"><span class="dot" style="width:10px;height:10px"></span></button>
-      <button class="ico size on" data-size="0.025" aria-label="Pincel médio"><span class="dot" style="width:18px;height:18px"></span></button>
-      <button class="ico size" data-size="0.05" aria-label="Pincel grosso"><span class="dot" style="width:28px;height:28px"></span></button>
-      <button class="ico" id="eraser" aria-label="Borracha"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 20l10-12 10 8-8 10h-7z" fill="#FF85C0" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 26h15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button>
+  <div class="work">
+    <div class="paper" id="tPaper"><canvas id="cv" class="full"></canvas><div id="aquaOver"></div><div id="mirLines"></div><img class="peek" alt=""></div>
+    <div class="tools">
+      <div class="pal" id="palT" role="group" aria-label="Cores"></div>
+      <div class="row" id="stampRow"></div>
+      <div class="row">
+        <button class="ico tsize" data-s="0.014" aria-label="Fino"><span class="dot" style="width:10px;height:10px"></span></button>
+        <button class="ico tsize on" data-s="0.028" aria-label="Médio"><span class="dot" style="width:18px;height:18px"></span></button>
+        <button class="ico tsize" data-s="0.055" aria-label="Grosso"><span class="dot" style="width:28px;height:28px"></span></button>
+        <button class="ico" id="tEraser" aria-label="Borracha"><svg><use href="#i-eraser"/></svg></button>
+        <button class="ico" id="tStamp" aria-label="Carimbos dos bichinhos"><svg><use href="#i-stamp"/></svg></button>
+        <button class="ico" id="tRainbow" aria-label="Arco-íris"><span class="dot rbdot"></span></button>
+        <button class="ico txt" id="tMir" aria-label="Trocar espelho">2×</button>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="colorir" class="view" aria-label="Escolher desenho para colorir">
+<!-- PIXEL -->
+<section id="pixel" class="view" aria-label="Pixel por números">
   <div class="bar">
-    <button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
-    <h2>Escolha um desenho</h2>
-    <span style="width:58px"></span>
+    <button class="ico" data-go="pixpick" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="xTitle">Pixel</h2>
+    <button class="ico" id="xHint" aria-label="Mostrar onde vai a cor escolhida"><svg><use href="#i-bulb"/></svg></button>
+    <button class="ico" id="xClear" aria-label="Recomeçar"><svg><use href="#i-trash"/></svg></button>
   </div>
-  <div id="gal"></div>
-</section>
-
-<section id="pintar" class="view" aria-label="Colorir">
-  <div class="bar">
-    <button class="ico" data-go="colorir" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
-    <h2 id="pgName">Colorir</h2>
-    <button class="ico" id="pUndo" aria-label="Desfazer"><svg><use href="#i-undo"/></svg></button>
-    <button class="ico" id="pPrint" aria-label="Imprimir folha para colorir"><svg><use href="#i-print"/></svg></button>
-    <button class="ico" id="pClear" aria-label="Recomeçar"><svg><use href="#i-trash"/></svg></button>
-  </div>
-  <div class="paper"><div id="page"></div></div>
-  <div class="tools">
-    <div class="pal" id="palC" role="group" aria-label="Cores"></div>
-    <div class="row">
-      <button class="ico mode on" data-mode="tap" aria-label="Tocar para pintar a área inteira"><svg><use href="#i-tap"/></svg></button>
-      <button class="ico mode" data-mode="risco" aria-label="Rabiscar com o dedo dentro do desenho"><svg><use href="#i-crayon"/></svg></button>
-      <span class="sep" aria-hidden="true"></span>
-      <button class="ico psize on" data-w="10" aria-label="Rabisco fino"><span class="dot" style="width:12px;height:12px"></span></button>
-      <button class="ico psize" data-w="22" aria-label="Rabisco grosso"><span class="dot" style="width:24px;height:24px"></span></button>
+  <div class="work">
+    <div class="paper"><div id="pxWrap"><div id="pxGrid"></div></div><img class="peek" alt=""></div>
+    <div class="tools">
+      <canvas id="pxPrev" width="110" height="110" aria-label="Como vai ficar"></canvas>
+      <div class="pal" id="palX" role="group" aria-label="Cores numeradas"></div>
     </div>
   </div>
 </section>
+<section id="pixpick" class="view" aria-label="Escolher pixel">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Pixel por números</h2><span class="sp"></span></div>
+  <div class="gal" id="pixGal"></div>
+</section>
 
+<!-- REVELAR -->
+<section id="revelar" class="view" aria-label="Revelar">
+  <div class="bar">
+    <button class="ico" data-go="revpick" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="rTitle">Revelar</h2>
+    <button class="ico" id="rAgain" aria-label="Começar de novo"><svg><use href="#i-undo"/></svg></button>
+  </div>
+  <div class="work"><div class="paper" id="rPaper"><canvas id="rvBase" class="full"></canvas><canvas id="rvCover" class="full"></canvas><img class="peek" alt=""></div></div>
+  <p class="hint">Esfregue o dedo para descobrir as cores!</p>
+</section>
+<section id="revpick" class="view" aria-label="Escolher imagem para revelar">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Revelar</h2><span class="sp"></span></div>
+  <div class="gal" id="revGal"></div>
+</section>
+
+<!-- LETRAS -->
 <section id="letras" class="view" aria-label="Escrever letras">
   <div class="bar">
     <button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
-    <button class="ico" id="lPrev" aria-label="Letra anterior"><svg><use href="#i-prev"/></svg></button>
-    <h2 id="lTitle">Letras</h2>
+    <button class="ico" id="lPrev" aria-label="Letra anterior"><svg><use href="#i-back"/></svg></button>
+    <h2 id="lTitle">A</h2>
     <button class="ico" id="lNext" aria-label="Próxima letra"><svg><use href="#i-next"/></svg></button>
     <button class="ico" id="lClear" aria-label="Escrever de novo"><svg><use href="#i-trash"/></svg></button>
   </div>
   <div class="cap"><span class="pic" id="lPic" aria-hidden="true"></span><span id="lWord"></span><button class="ico" id="lSay" aria-label="Ouvir"><svg><use href="#i-sound"/></svg></button></div>
-  <div class="paper"><canvas id="tcv" class="full" aria-label="Cubra a letra com o dedo"></canvas><div class="stars" id="lStars"></div></div>
-  <div class="tools">
-    <div class="pal" id="palL" role="group" aria-label="Cores"></div>
-    <div class="row">
-      <button class="ico lset txt on" data-set="up" aria-label="Letras maiúsculas">ABC</button>
-      <button class="ico lset txt" data-set="low" aria-label="Letras minúsculas">abc</button>
-      <button class="ico lset txt" data-set="num" aria-label="Números">123</button>
+  <div class="work">
+    <div class="paper"><canvas id="tcv" class="full"></canvas><div class="stars" id="lStars"></div></div>
+    <div class="tools">
+      <div class="pal" id="palL" role="group" aria-label="Cores"></div>
+      <div class="row">
+        <button class="ico lset txt on" data-set="up" aria-label="Letras maiúsculas">ABC</button>
+        <button class="ico lset txt" data-set="low" aria-label="Letras minúsculas">abc</button>
+        <button class="ico lset txt" data-set="num" aria-label="Números">123</button>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- PALAVRAS -->
 <section id="palavras" class="view" aria-label="Formar palavras">
   <div class="bar">
     <button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
     <h2>Palavras</h2>
-    <button class="ico on" id="wHint" aria-label="Mostrar dica das letras"><svg><use href="#i-bulb"/></svg></button>
+    <button class="ico" id="wHint" aria-label="Mostrar dica das letras"><svg><use href="#i-bulb"/></svg></button>
     <button class="ico" id="wSay" aria-label="Ouvir a palavra"><svg><use href="#i-sound"/></svg></button>
     <button class="ico" id="wNext" aria-label="Próxima palavra"><svg><use href="#i-next"/></svg></button>
   </div>
   <div id="wordBox">
     <div id="wPic" aria-hidden="true"></div>
     <div class="slots" id="slots"></div>
-    <div class="tiles" id="tiles"></div>
+    <div class="ltiles" id="ltiles"></div>
   </div>
 </section>
 
+<!-- GALERIA -->
+<section id="galeria" class="view" aria-label="Galeria de arte">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Galeria de arte</h2><span class="sp"></span></div>
+  <div class="gal wall" id="artGal"></div>
+</section>
+
+<!-- ADESIVOS -->
+<section id="adesivos" class="view" aria-label="Meus adesivos">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2 id="stTitle">Meus adesivos</h2><span class="sp"></span></div>
+  <div class="album" id="album"></div>
+</section>
+
+<!-- PAIS -->
+<section id="pais" class="view" aria-label="Para os pais">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Para os pais</h2><span class="sp"></span></div>
+  <div class="pbox" id="gate">
+    <p>Esta área é para adultos. Quanto é <b id="gq"></b>?</p>
+    <div class="row" id="gopts"></div>
+  </div>
+  <div class="pbox" id="panel" hidden>
+    <label class="opt"><input type="checkbox" id="cfgSom"> Sons dos botões</label>
+    <label class="opt"><input type="checkbox" id="cfgVoz"> Voz que fala as letras e palavras</label>
+    <div class="row left">
+      <button class="pbtn" id="clrArt">Apagar a galeria</button>
+      <button class="pbtn" id="clrSt">Zerar adesivos</button>
+      <button class="pbtn" id="clrWip">Apagar pinturas em andamento</button>
+    </div>
+    <p class="small">Para instalar: no Android, abra no Chrome e toque em "Instalar app". No iPhone, abra no Safari, toque em Compartilhar e depois em "Adicionar à Tela de Início". Depois de instalado, funciona sem internet.</p>
+    <p class="small">Tudo fica guardado só neste aparelho. Nenhuma informação da criança é enviada para a internet.</p>
+  </div>
+</section>
+
+<!-- sobreposições -->
 <div class="veil" id="veil" role="dialog" aria-modal="true" aria-labelledby="dlgT">
-  <div class="dlg">
-    <span id="dlgT">Apagar tudo?</span>
+  <div class="dlg"><span id="dlgT">Apagar tudo?</span>
     <div class="row">
-      <button id="no" style="background:#eee" aria-label="Não"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14l20 20M34 14L14 34" stroke="#2E2440" stroke-width="6" stroke-linecap="round"/></svg></button>
-      <button id="yes" style="background:#4CC764" aria-label="Sim"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 25l9 9 17-19" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="no" class="big2" style="background:#eee" aria-label="Não"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14l20 20M34 14L14 34" stroke="#2E2440" stroke-width="6" stroke-linecap="round"/></svg></button>
+      <button id="yes" class="big2" style="background:#4CC764" aria-label="Sim"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 25l9 9 17-19" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
 </div>
-<div id="party"></div>
+<div class="veil" id="done" role="dialog" aria-modal="true" aria-label="Muito bem!">
+  <div class="dlg wide">
+    <div class="frame"><img id="doneImg" alt="Sua arte"></div>
+    <div id="doneSt" class="donest"></div>
+    <span id="doneT">Que lindo!</span>
+    <button id="doneOk" class="big2" style="background:#4CC764" aria-label="Continuar"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 25l9 9 17-19" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+</div>
+<div class="veil" id="viewer" role="dialog" aria-modal="true" aria-label="Arte">
+  <div class="dlg wide">
+    <div class="frame"><img id="viewImg" alt="Arte guardada"></div>
+    <div class="row">
+      <button id="viewSave" class="big2" style="background:#4FB3F0;color:#fff" aria-label="Salvar no aparelho"><svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 5v15M10 14l6 6 6-6M7 26h18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="viewClose" class="big2" style="background:#eee" aria-label="Fechar"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14l20 20M34 14L14 34" stroke="#2E2440" stroke-width="6" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+</div>
+<div id="rb" aria-hidden="true"></div>
+<div id="party" aria-hidden="true"></div>
 <div id="toast" role="status"></div>
 <div id="print"></div>
 
-<script>
-{
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const COLORS=['#FF4D4D','#FF9F1C','#FFD60A','#4CC764','#8FE0A0','#4FB3F0','#3D5AFE','#9B5DE5','#FF85C0','#F4C9A0','#8D5B3E','#2B2B2B','#FFFFFF'];
-let toastT;
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
-let ac;
-function pop(f){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(f||520,ac.currentTime);o.frequency.exponentialRampToValueAtTime((f||520)*1.8,ac.currentTime+.12);g.gain.setValueAtTime(.18,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.18);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.2)}catch(e){}}
-function speak(t){try{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=.85;u.pitch=1.15;const v=s.getVoices().find(v=>/pt[-_]BR/i.test(v.lang));if(v)u.voice=v;s.speak(u)}catch(e){}}
-function party(){const p=$('#party');p.innerHTML='';for(let i=0;i<40;i++){const c=document.createElement('i');c.style.left=Math.random()*100+'vw';c.style.background=COLORS[i%12];c.style.animationDelay=Math.random()*.5+'s';p.appendChild(c)}[660,880,1100].forEach((f,i)=>setTimeout(()=>pop(f),i*120));setTimeout(()=>p.innerHTML='',2400)}
-let askCb=null;
-function ask(text,cb){$('#dlgT').textContent=text;askCb=cb;$('#veil').classList.add('on')}
-$('#no').onclick=()=>$('#veil').classList.remove('on');
-$('#yes').onclick=()=>{$('#veil').classList.remove('on');askCb&&askCb()};
-function palette(el,onPick,startIdx){el.innerHTML=COLORS.map((c,i)=>`<button class="sw${i===startIdx?' on':''}" style="background:${c}" data-i="${i}" aria-label="Cor ${i+1}"></button>`).join('');
- el.addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;el.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',s===b));onPick(COLORS[+b.dataset.i]);pop(600+ +b.dataset.i*30)})}
-const evs=e=>e.getCoalescedEvents?e.getCoalescedEvents():[e];
-
-/* ---------- desenhos para colorir (cada .r é uma área que pinta) ---------- */
-const SW=w=>`stroke="#2E2440" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;const S=SW(5);
-const R=d=>d.replace(/<(path|circle|ellipse|rect|polygon)\b(?![^>]*class="k")/g,'<$1 class="r" fill="#fff" '+S);
-const band=(x,y,o,i)=>`<path d="M${x-o} ${y} A${o} ${o} 0 0 1 ${x+o} ${y} L${x+i} ${y} A${i} ${i} 0 0 0 ${x-i} ${y} Z"/>`;
-const star=(cx,cy,Ro,Ri)=>{let p=[];for(let k=0;k<10;k++){const a=Math.PI/5*k-Math.PI/2,r=k%2?Ri:Ro;p.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1))}return`<polygon points="${p.join(' ')}"/>`};
-const rays=()=>{let s='';for(let k=0;k<10;k++){const a=Math.PI/5*k,P=(r,d)=>(200+r*Math.cos(a+d)).toFixed(1)+','+(200+r*Math.sin(a+d)).toFixed(1);s+=`<polygon points="${P(104,-.17)} ${P(178,0)} ${P(104,.17)}"/>`}return s};
-const petals=()=>{let s='';for(let k=0;k<6;k++)s+=`<ellipse cx="200" cy="96" rx="30" ry="50" transform="rotate(${k*60} 200 150)"/>`;return s};
-const PAGES=[
-{n:'Zuzu',s:R(`<ellipse cx="150" cy="80" rx="26" ry="66" transform="rotate(-12 150 80)"/><ellipse cx="292" cy="150" rx="26" ry="66" transform="rotate(64 292 150)"/>
-<path d="M200 100 C290 100 310 190 304 266 C298 346 252 368 200 368 C148 368 102 346 96 266 C90 190 110 100 200 100 Z"/><ellipse cx="200" cy="300" rx="58" ry="46"/>
-<ellipse cx="166" cy="376" rx="28" ry="15"/><ellipse cx="234" cy="376" rx="28" ry="15"/>
-<path class="k" d="M300 320 C360 318 368 236 334 222 C314 214 302 236 316 246" fill="none" ${SW(9)}/>${star(316,224,26,11)}
-<path class="k" d="M136 214 q20 -20 40 0" fill="none" ${SW(7)}/><ellipse class="k" cx="238" cy="212" rx="24" ry="29" fill="#2E2440"/><circle class="k" cx="246" cy="202" r="8" fill="#fff"/>
-<path class="k" d="M164 250 Q200 290 236 250 Z" fill="#2E2440" ${S}/><path d="M190 262 Q194 296 210 296 Q224 296 222 262 Z"/>`)},
-{n:'Lelo',s:R(`<path class="k" d="M200 160 C198 128 206 108 220 98" fill="none" ${SW(7)}/><circle cx="224" cy="86" r="18"/>
-<path d="M200 156 C318 156 352 244 344 292 C336 344 270 352 200 352 C130 352 64 344 56 292 C48 244 82 156 200 156 Z"/>
-<ellipse cx="46" cy="290" rx="16" ry="24" transform="rotate(20 46 290)"/><ellipse cx="354" cy="290" rx="16" ry="24" transform="rotate(-20 354 290)"/>
-<ellipse cx="150" cy="358" rx="30" ry="14"/><ellipse cx="250" cy="358" rx="30" ry="14"/>
-<path class="k" d="M98 214 q18 -12 36 -2 M266 212 q18 -10 36 2" fill="none" ${S}/><circle class="k" cx="118" cy="240" r="12" fill="#2E2440"/><circle class="k" cx="282" cy="240" r="12" fill="#2E2440"/>
-<path class="k" d="M126 266 Q200 344 274 266 Z" fill="#2E2440" ${S}/><rect x="176" y="266" width="22" height="24" rx="4"/><rect x="202" y="266" width="22" height="24" rx="4"/>`)},
-{n:'Pituca',s:R(`<path class="k" d="M168 120 C162 100 174 88 166 72 C158 58 170 48 164 36 M232 120 C238 100 226 86 236 72 C244 60 236 50 244 38" fill="none" ${S}/>
-<path d="M160 40 C140 24 140 6 156 6 C162 6 166 12 166 14 C166 12 170 6 176 6 C192 6 190 24 160 40 Z"/>${star(246,34,24,10)}
-<ellipse cx="96" cy="140" rx="18" ry="32" transform="rotate(-35 96 140)"/><ellipse cx="304" cy="140" rx="18" ry="32" transform="rotate(35 304 140)"/>
-<ellipse cx="160" cy="300" rx="20" ry="30" transform="rotate(30 160 300)"/><ellipse cx="240" cy="300" rx="20" ry="30" transform="rotate(-30 240 300)"/>
-<circle cx="200" cy="200" r="100"/><ellipse cx="128" cy="232" rx="18" ry="11"/><ellipse cx="272" cy="232" rx="18" ry="11"/>
-<path class="k" d="M140 166 l26 14 l-26 14 M260 166 l-26 14 l26 14" fill="none" ${SW(7)}/>
-<path class="k" d="M156 212 Q200 280 244 212 Z" fill="#2E2440" ${S}/><ellipse cx="200" cy="248" rx="20" ry="11"/>`)},
-{n:'Bubu',s:R(`<path d="M120 330 C60 330 48 262 96 244 C74 190 136 158 170 184 C184 124 284 124 294 182 C340 168 380 212 354 254 C394 272 382 330 324 330 Z"/>
-${band(320,110,48,36)}${band(320,110,36,24)}${band(320,110,24,12)}
-<ellipse cx="170" cy="340" rx="28" ry="14"/><ellipse cx="270" cy="340" rx="28" ry="14"/><ellipse cx="150" cy="292" rx="16" ry="10"/><ellipse cx="306" cy="292" rx="16" ry="10"/>
-<path class="k" d="M164 254 Q180 236 196 254 M260 254 Q276 236 292 254" fill="none" ${SW(7)}/><path class="k" d="M210 286 q9 11 18 0 q9 11 18 0" fill="none" ${S}/>`)},
-{n:'Sol',s:R(`${rays()}<circle cx="200" cy="200" r="96"/><ellipse cx="150" cy="226" rx="16" ry="10"/><ellipse cx="250" cy="226" rx="16" ry="10"/>
-<circle class="k" cx="166" cy="186" r="11" fill="#2E2440"/><circle class="k" cx="234" cy="186" r="11" fill="#2E2440"/><path class="k" d="M160 236 Q200 270 240 236" fill="none" ${SW(7)}/>`)},
-{n:'Flor',s:R(`<path d="M192 210 L208 210 L210 316 L190 316 Z"/><path d="M200 280 C160 240 120 250 112 272 C140 292 176 292 200 280 Z"/><path d="M204 256 C240 214 282 222 290 244 C262 266 226 268 204 256 Z"/>
-${petals()}<circle cx="200" cy="150" r="38"/><polygon points="120,316 280,316 260,392 140,392"/><rect x="110" y="304" width="180" height="26" rx="8"/>
-<circle class="k" cx="188" cy="144" r="5" fill="#2E2440"/><circle class="k" cx="212" cy="144" r="5" fill="#2E2440"/><path class="k" d="M186 160 Q200 172 214 160" fill="none" ${SW(4)}/>`)},
-{n:'Borboleta',s:R(`<path d="M196 190 C150 80 50 70 54 150 C58 200 120 212 196 200 Z"/><path d="M204 190 C250 80 350 70 346 150 C342 200 280 212 204 200 Z"/>
-<path d="M196 206 C130 214 80 260 110 300 C140 330 186 280 196 230 Z"/><path d="M204 206 C270 214 320 260 290 300 C260 330 214 280 204 230 Z"/>
-<circle cx="110" cy="146" r="22"/><circle cx="290" cy="146" r="22"/><circle cx="140" cy="270" r="14"/><circle cx="260" cy="270" r="14"/>
-<ellipse cx="200" cy="216" rx="14" ry="74"/><path class="k" d="M194 146 C186 116 170 100 158 92 M206 146 C214 116 230 100 242 92" fill="none" ${S}/><circle cx="156" cy="90" r="9"/><circle cx="244" cy="90" r="9"/>`)},
-{n:'Carrinho',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><rect x="8" y="290" width="384" height="102" rx="20"/>
-<path d="M120 170 L160 116 L262 116 L300 170 Z"/><path d="M50 176 Q50 166 62 166 L340 166 Q356 166 356 182 L356 248 Q356 260 344 260 L58 260 Q46 260 46 248 Z"/>
-<path d="M142 166 L170 128 L206 128 L206 166 Z"/><path d="M218 166 L218 128 L254 128 L280 166 Z"/><rect x="330" y="186" width="22" height="20" rx="6"/>
-<circle cx="120" cy="264" r="38"/><circle cx="284" cy="264" r="38"/><circle cx="120" cy="264" r="15"/><circle cx="284" cy="264" r="15"/>
-<path class="k" d="M40 340 h50 M150 340 h50 M260 340 h50" fill="none" ${SW(8)}/>`)},
-{n:'Maçã',s:R(`<path d="M200 120 C150 80 70 100 74 200 C78 300 150 360 200 334 C250 360 322 300 326 200 C330 100 250 80 200 120 Z"/>
-<rect x="192" y="60" width="16" height="60" rx="6"/><path d="M210 94 C230 50 286 50 300 70 C276 104 236 108 210 94 Z"/><ellipse cx="128" cy="186" rx="14" ry="30" transform="rotate(20 128 186)"/>
-<circle class="k" cx="168" cy="216" r="10" fill="#2E2440"/><circle class="k" cx="232" cy="216" r="10" fill="#2E2440"/><path class="k" d="M172 250 Q200 276 228 250" fill="none" ${SW(6)}/>`)},
-{n:'Foguete',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/>${star(70,70,22,9)}${star(330,110,18,7)}${star(80,300,16,6)}${star(340,320,20,8)}
-<path d="M176 300 C170 330 186 360 200 380 C214 360 230 330 224 300 Z"/><polygon points="160,240 112,300 160,290"/><polygon points="240,240 288,300 240,290"/>
-<path d="M160 290 L160 140 C160 100 180 70 200 46 C220 70 240 100 240 140 L240 290 Z"/><path d="M164 120 C172 90 186 66 200 50 C214 66 228 90 236 120 Z"/>
-<circle cx="200" cy="186" r="26"/><rect x="170" y="250" width="60" height="18" rx="6"/>`)},
-{n:'Arco-íris',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/>${band(200,280,170,146)}${band(200,280,146,122)}${band(200,280,122,98)}${band(200,280,98,74)}${band(200,280,74,50)}
-<path d="M20 300 C20 270 56 262 70 280 C80 256 120 258 122 286 C142 286 146 316 124 318 L36 318 C18 318 14 302 20 300 Z"/><path d="M278 300 C278 270 314 262 328 280 C338 256 378 258 380 286 C392 290 392 316 376 318 L294 318 C276 318 272 302 278 300 Z"/>
-<circle cx="70" cy="70" r="30"/>`)},
-{n:'Gatinho',s:R(`<path d="M300 300 C360 300 380 240 350 210 C340 200 326 212 336 226 C350 250 330 276 300 276 Z"/>
-<ellipse cx="200" cy="300" rx="100" ry="76"/><polygon points="116,120 132,40 184,92"/><polygon points="284,120 268,40 216,92"/><polygon points="132,108 140,66 168,94"/><polygon points="268,108 260,66 232,94"/>
-<circle cx="200" cy="170" r="90"/><ellipse cx="150" cy="370" rx="30" ry="16"/><ellipse cx="250" cy="370" rx="30" ry="16"/>
-<ellipse class="k" cx="166" cy="160" rx="12" ry="16" fill="#2E2440"/><ellipse class="k" cx="234" cy="160" rx="12" ry="16" fill="#2E2440"/><polygon points="190,190 210,190 200,202"/>
-<path class="k" d="M200 202 q-10 14 -24 8 M200 202 q10 14 24 8 M110 186 h46 M112 204 l44 -6 M290 186 h-46 M288 204 l-44 -6" fill="none" ${SW(4)}/>`)},
-{n:'Casinha',s:R(`<rect x="8" y="8" width="384" height="300" rx="20"/><rect x="8" y="296" width="384" height="96" rx="20"/><circle cx="324" cy="76" r="38"/>
-<path d="M60 70 C60 50 92 46 100 60 C110 42 146 48 142 72 C156 74 156 96 138 96 L66 96 C48 96 46 74 60 70 Z"/>
-<rect x="236" y="120" width="30" height="60"/><polygon points="80,196 200,104 320,196"/><rect x="100" y="196" width="200" height="132"/>
-<rect x="176" y="250" width="48" height="78" rx="6"/><rect x="118" y="220" width="44" height="44"/><rect x="238" y="220" width="44" height="44"/>
-<path class="k" d="M140 220 v44 M118 242 h44 M260 220 v44 M238 242 h44 M60 372 v-36" fill="none" ${S}/><circle cx="60" cy="326" r="14"/><circle cx="60" cy="304" r="12"/><circle cx="82" cy="326" r="12"/><circle cx="38" cy="326" r="12"/><circle cx="60" cy="348" r="12"/>`)},
-{n:'Peixinho',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><path d="M8 330 C80 310 140 340 200 326 C270 310 330 336 392 320 L392 372 Q392 392 372 392 L28 392 Q8 392 8 372 Z"/>
-<path d="M64 330 C40 280 80 250 60 200 C90 240 70 290 96 330 Z"/><path d="M330 326 C318 280 350 260 336 222 C364 256 350 292 360 326 Z"/>
-<polygon points="300,190 362,140 362,240"/><path d="M90 190 C120 120 250 110 306 190 C250 270 120 260 90 190 Z"/>
-<path d="M170 132 C182 160 182 220 170 248 L196 252 C208 222 208 158 196 130 Z"/><path d="M232 140 C242 166 242 214 232 240 L254 230 C262 208 262 172 254 150 Z"/><path d="M190 128 C200 100 236 98 250 124 Z"/>
-<circle cx="132" cy="178" r="16"/><circle class="k" cx="136" cy="178" r="7" fill="#2E2440"/><circle cx="110" cy="96" r="12"/><circle cx="86" cy="64" r="9"/><circle cx="104" cy="36" r="6"/>`)}
-];
-const pageSvg=p=>`<svg viewBox="0 0 400 400" role="img" aria-label="Desenho para colorir: ${p.n}"><defs></defs>${p.s}</svg>`;
-
-/* ---------- navegação ---------- */
-const VIEWS=['home','desenhar','colorir','pintar','letras','palavras'];
-let word=null,lIdx=0;
-function show(id){if(!VIEWS.includes(id))id='home';$$('.view').forEach(v=>v.classList.toggle('on',v.id===id));
- if(id==='desenhar')requestAnimationFrame(fit);if(id==='letras')requestAnimationFrame(()=>setLetter(lIdx));if(id==='palavras'&&!word)newWord();
- if(location.hash.slice(1)!==id){try{history.replaceState(null,'','#'+id)}catch(e){}}}
-$$('[data-go]').forEach(b=>b.addEventListener('click',()=>{pop(440);show(b.dataset.go)}));
-window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
-
-/* ---------- desenhar livre ---------- */
-const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0,dpr=1;
-let strokes=store.get('thur-desenho',[]),cur=null,tool={c:COLORS[7],s:0.025,e:false};
-palette($('#palD'),c=>{tool.c=c;tool.e=false;$('#eraser').classList.remove('on')},7);
-function fit(){const r=cv.parentElement.getBoundingClientRect();if(!r.width)return;dpr=Math.min(window.devicePixelRatio||1,2.5);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);redraw()}
-function line(st,from){const m=Math.min(W,H);ctx.strokeStyle=st.e?'#fff':st.c;ctx.lineWidth=st.s*m;ctx.lineCap='round';ctx.lineJoin='round';const p=st.p;
- if(p.length===1){ctx.beginPath();ctx.fillStyle=ctx.strokeStyle;ctx.arc(p[0][0]*W,p[0][1]*H,st.s*m/2,0,7);ctx.fill();return}
- ctx.beginPath();const a=Math.max(0,from-1);ctx.moveTo(p[a][0]*W,p[a][1]*H);for(let i=a+1;i<p.length;i++)ctx.lineTo(p[i][0]*W,p[i][1]*H);ctx.stroke()}
-function redraw(){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);strokes.forEach(s=>line(s,0))}
-const ptOf=(el,e)=>{const r=el.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
-cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);cur={c:tool.c,s:tool.s,e:tool.e,p:[ptOf(cv,e)]};strokes.push(cur);line(cur,0)});
-cv.addEventListener('pointermove',e=>{if(!cur)return;const n=cur.p.length;evs(e).forEach(ev=>cur.p.push(ptOf(cv,ev)));line(cur,n)});
-const end=()=>{if(cur){cur.p=cur.p.map(([x,y])=>[+x.toFixed(4),+y.toFixed(4)]);cur=null;if(strokes.length>400)strokes=strokes.slice(-400);store.set('thur-desenho',strokes)}};
-cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
-$('#undo').onclick=()=>{strokes.pop();redraw();store.set('thur-desenho',strokes);pop(330)};
-$('#clear').onclick=()=>ask('Apagar o desenho todo?',()=>{strokes=[];redraw();store.set('thur-desenho',strokes)});
-$$('.size').forEach(b=>b.onclick=()=>{$$('.size').forEach(x=>x.classList.toggle('on',x===b));tool.s=+b.dataset.size;pop(500)});
-$('#eraser').onclick=()=>{tool.e=!tool.e;$('#eraser').classList.toggle('on',tool.e);pop(380)};
-function download(blob,name){try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Imagem salva!')}catch(e){toast('Não deu para salvar aqui.')}}
-$('#save').onclick=()=>{try{cv.toBlob(b=>b&&download(b,'desenho-do-thur.png'),'image/png')}catch(e){toast('Não deu para salvar aqui.')}};
-new ResizeObserver(()=>{if($('#desenhar').classList.contains('on'))fit()}).observe(cv.parentElement);
-
-/* ---------- colorir: tocar ou rabiscar dentro da área ---------- */
-$('#gal').innerHTML=PAGES.map((p,i)=>`<button class="card" data-p="${i}">${pageSvg(p)}<span>${p.n}</span></button>`).join('');
-$('#gal').addEventListener('click',e=>{const c=e.target.closest('.card');if(c){pop(520);openPage(+c.dataset.p)}});
-let pageIdx=0,hist=[],pColor=COLORS[0],pMode='tap',pW=10,clipN=0,scrib=null;
-palette($('#palC'),c=>pColor=c,0);
-const svgEl=()=>$('#page svg');
-function saveP(){store.set('thur-pg2-'+pageIdx,svgEl().innerHTML)}
-function snap(){hist.push(svgEl().innerHTML);if(hist.length>30)hist.shift()}
-function openPage(i){pageIdx=i;const p=PAGES[i];$('#pgName').textContent=p.n;$('#page').innerHTML=pageSvg(p);
- const saved=store.get('thur-pg2-'+i,null);if(saved)svgEl().innerHTML=saved;clipN=svgEl().querySelectorAll('clipPath').length;hist=[];show('pintar')}
-const toSvg=(s,e)=>{const p=s.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(s.getScreenCTM().inverse())};
-const NS='http://www.w3.org/2000/svg';
-$('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const el=document.elementFromPoint(e.clientX,e.clientY);const a=el&&el.closest?el.closest('.r'):null;if(!a)return;e.preventDefault();
- if(pMode==='tap'){if(a.getAttribute('fill')===pColor)return;snap();a.setAttribute('fill',pColor);saveP();pop(700);return}
- snap();const id='c'+(++clipN)+Date.now().toString(36);const cp=document.createElementNS(NS,'clipPath');cp.id=id;const sh=a.cloneNode();sh.removeAttribute('class');cp.appendChild(sh);s.querySelector('defs').appendChild(cp);
- const g=document.createElementNS(NS,'g');g.setAttribute('clip-path',`url(#${id})`);g.setAttribute('pointer-events','none');
- const path=document.createElementNS(NS,'path');const q=toSvg(s,e);const d=`M${q.x.toFixed(1)} ${q.y.toFixed(1)} l0.1 0`;path.setAttribute('d',d);
- path.setAttribute('fill','none');path.setAttribute('stroke',pColor);path.setAttribute('stroke-width',pW);path.setAttribute('stroke-linecap','round');path.setAttribute('stroke-linejoin','round');g.appendChild(path);
- const ol=a.cloneNode();ol.setAttribute('class','o');ol.setAttribute('fill','none');ol.setAttribute('pointer-events','none');
- a.after(g);g.after(ol);scrib={s,path,d};try{$('#page').setPointerCapture(e.pointerId)}catch(x){}});
-$('#page').addEventListener('pointermove',e=>{if(!scrib)return;evs(e).forEach(ev=>{const q=toSvg(scrib.s,ev);scrib.d+=` L${q.x.toFixed(1)} ${q.y.toFixed(1)}`});scrib.path.setAttribute('d',scrib.d)});
-const pEnd=()=>{if(scrib){scrib=null;saveP()}};
-$('#page').addEventListener('pointerup',pEnd);$('#page').addEventListener('pointercancel',pEnd);
-$('#pUndo').onclick=()=>{if(!hist.length)return;svgEl().innerHTML=hist.pop();saveP();pop(330)};
-$('#pClear').onclick=()=>ask('Recomeçar este desenho?',()=>{snap();$('#page').innerHTML=pageSvg(PAGES[pageIdx]);saveP()});
-$('#pPrint').onclick=()=>{$('#print').innerHTML=pageSvg(PAGES[pageIdx]);try{window.print()}catch(e){toast('Abra o app instalado para imprimir.')}};
-function setMode(m){pMode=m;$$('.mode').forEach(x=>x.classList.toggle('on',x.dataset.mode===m));$$('.psize').forEach(x=>x.style.opacity=m==='risco'?1:.35)}
-$$('.mode').forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);pop(480)});
-$$('.psize').forEach(b=>b.onclick=()=>{pW=+b.dataset.w;$$('.psize').forEach(x=>x.classList.toggle('on',x===b));setMode('risco');pop(500)});
-setMode('tap');
-
-/* ---------- letras: cobrir o traçado ---------- */
-const LETRAS=[['A','Abelha','🐝'],['B','Bola','⚽'],['C','Casa','🏠'],['D','Dado','🎲'],['E','Elefante','🐘'],['F','Foca','🦭'],['G','Gato','🐱'],['H','Hipopótamo','🦛'],['I','Ilha','🏝️'],['J','Jacaré','🐊'],['K','Kiwi','🥝'],['L','Leão','🦁'],['M','Macaco','🐒'],['N','Navio','🚢'],['O','Ovo','🥚'],['P','Pato','🦆'],['Q','Queijo','🧀'],['R','Rato','🐭'],['S','Sol','☀️'],['T','Tartaruga','🐢'],['U','Uva','🍇'],['V','Vaca','🐄'],['W','Waffle','🧇'],['X','Xícara','☕'],['Y','Yoga','🧘'],['Z','Zebra','🦓']];
-const NUMS=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove'];
-let lSet='up',lColor=COLORS[5],tW=0,tH=0,tStroke=null,lDone=false,tFs=200;
-const tcv=$('#tcv'),tctx=tcv.getContext('2d'),mk=document.createElement('canvas'),um=document.createElement('canvas');const K=0.25;
-palette($('#palL'),c=>lColor=c,5);
-const lItems=()=>lSet==='num'?NUMS.map((n,i)=>[String(i),n,'']):LETRAS.map(l=>[lSet==='low'?l[0].toLowerCase():l[0],l[1],l[2]]);
-const glyphFont=px=>`800 ${px}px "Baloo 2", "Arial Rounded MT Bold", Arial, sans-serif`;
-function setLetter(i){const it=lItems();lIdx=(i+it.length)%it.length;const ch=it[lIdx][0];lDone=false;$('#lStars').innerHTML='';
- $('#lTitle').textContent=ch;$('#lPic').textContent=it[lIdx][2];$('#lWord').textContent=lSet==='num'?it[lIdx][1]:it[lIdx][1];
- const r=tcv.parentElement.getBoundingClientRect();if(!r.width)return;const d=Math.min(window.devicePixelRatio||1,2.5);tW=r.width;tH=r.height;tcv.width=tW*d;tcv.height=tH*d;tctx.setTransform(d,0,0,d,0,0);
- tFs=Math.min(tH*0.9,tW*0.85);tctx.fillStyle='#fff';tctx.fillRect(0,0,tW,tH);
- tctx.font=glyphFont(tFs);tctx.textAlign='center';tctx.textBaseline='middle';const y=tH/2+tFs*0.06;
- tctx.fillStyle='#EFE8FA';tctx.fillText(ch,tW/2,y);tctx.setLineDash([2,14]);tctx.lineCap='round';tctx.lineWidth=6;tctx.strokeStyle='#B9A6E8';tctx.strokeText(ch,tW/2,y);tctx.setLineDash([]);
- for(const c of[mk,um]){c.width=Math.ceil(tW*K);c.height=Math.ceil(tH*K)}const m=mk.getContext('2d');m.font=glyphFont(tFs*K);m.textAlign='center';m.textBaseline='middle';m.fillStyle='#000';m.fillText(ch,mk.width/2,y*K)}
-function tLine(c,p,from,w,k){c.lineCap='round';c.lineJoin='round';c.lineWidth=w*k;c.beginPath();const a=Math.max(0,from-1);c.moveTo(p[a][0]*k,p[a][1]*k);if(p.length===1)c.lineTo(p[0][0]*k+.1,p[0][1]*k);for(let i=a+1;i<p.length;i++)c.lineTo(p[i][0]*k,p[i][1]*k);c.stroke()}
-const tPt=e=>{const r=tcv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
-function tDraw(from){const w=tFs*0.12;tctx.strokeStyle=lColor;tLine(tctx,tStroke,from,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,tStroke,from,w,K)}
-tcv.addEventListener('pointerdown',e=>{e.preventDefault();tcv.setPointerCapture(e.pointerId);tStroke=[tPt(e)];tDraw(0)});
-tcv.addEventListener('pointermove',e=>{if(!tStroke)return;const n=tStroke.length;evs(e).forEach(ev=>tStroke.push(tPt(ev)));tDraw(n)});
-const tEnd=()=>{if(!tStroke)return;tStroke=null;check()};
-tcv.addEventListener('pointerup',tEnd);tcv.addEventListener('pointercancel',tEnd);
-function check(){if(lDone||!mk.width)return;const a=mk.getContext('2d').getImageData(0,0,mk.width,mk.height).data,b=um.getContext('2d').getImageData(0,0,um.width,um.height).data;
- let L=0,both=0,U=0;for(let i=3;i<a.length;i+=4){const l=a[i]>100,u=b[i]>100;if(l)L++;if(u)U++;if(l&&u)both++}
- if(L&&both/L>0.55&&both/U>0.33){lDone=true;$('#lStars').innerHTML='<svg viewBox="0 0 100 100" width="55%" height="55%" aria-hidden="true"><polygon points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round" opacity=".9"/></svg>';party();const it=lItems()[lIdx];speak('Muito bem! '+(lSet==='num'?it[1]:it[0].toUpperCase()+' de '+it[1]))}}
-function sayLetter(){const it=lItems()[lIdx];speak(lSet==='num'?it[1]:it[0].toUpperCase()+', de '+it[1])}
-$('#lNext').onclick=()=>{pop(520);setLetter(lIdx+1);sayLetter()};$('#lPrev').onclick=()=>{pop(520);setLetter(lIdx-1);sayLetter()};
-$('#lClear').onclick=()=>{pop(330);setLetter(lIdx)};
-$('#lSay').onclick=sayLetter;
-$$('.lset').forEach(b=>b.onclick=()=>{lSet=b.dataset.set;$$('.lset').forEach(x=>x.classList.toggle('on',x===b));pop(480);setLetter(0);sayLetter()});
-new ResizeObserver(()=>{if($('#letras').classList.contains('on')&&!tStroke)setLetter(lIdx)}).observe(tcv.parentElement);
-
-/* ---------- palavras: montar com as letras ---------- */
-const PALAVRAS=[['SOL','☀️'],['LUA','🌙'],['UVA','🍇'],['OVO','🥚'],['PATO','🦆'],['GATO','🐱'],['BOLA','⚽'],['CASA','🏠'],['BOLO','🎂'],['SAPO','🐸'],['VACA','🐄'],['DADO','🎲'],['FLOR','🌸'],['PEIXE','🐟'],['MALA','🧳'],['PIPOCA','🍿']];
-let wQueue=[],wHint=store.get('thur-dica',true),slots=[];
-$('#wHint').classList.toggle('on',wHint);
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function newWord(){if(!wQueue.length)wQueue=shuffle(PALAVRAS.slice());word=wQueue.pop();slots=Array(word[0].length).fill(null);
- const letters=word[0].split('').map((c,i)=>({c,i}));let n=0;do{shuffle(letters);n++}while(letters.map(l=>l.c).join('')===word[0]&&n<20);
- $('#wPic').textContent=word[1];$('#tiles').innerHTML=letters.map(l=>`<button class="tile" data-t="${l.i}" aria-label="Letra ${l.c}">${l.c}</button>`).join('');renderSlots();setTimeout(()=>speak(word[0].toLowerCase()),250)}
-function renderSlots(){$('#slots').innerHTML=slots.map((t,i)=>{const c=t===null?(wHint?word[0][i]:''):word[0][t];return`<button class="slot${t!==null?' full':''}" data-s="${i}" aria-label="Espaço ${i+1}">${c}</button>`}).join('')}
-$('#tiles').addEventListener('click',e=>{const b=e.target.closest('.tile');if(!b||b.classList.contains('used'))return;const k=slots.indexOf(null);if(k<0)return;
- const t=+b.dataset.t;slots[k]=t;b.classList.add('used');speak(word[0][t].toLowerCase());pop(640);renderSlots();if(!slots.includes(null))wCheck()});
-$('#slots').addEventListener('click',e=>{const s=e.target.closest('.slot');if(!s)return;const i=+s.dataset.s,t=slots[i];if(t===null)return;slots[i]=null;$(`.tile[data-t="${t}"]`).classList.remove('used');pop(380);renderSlots()});
-function wCheck(){const got=slots.map(t=>word[0][t]).join('');if(got===word[0]){$$('.slot').forEach(s=>s.classList.add('ok'));party();speak(word[0].toLowerCase()+'! Muito bem!');setTimeout(newWord,2600)}
- else{const box=$('#slots');box.classList.add('shake');pop(200);setTimeout(()=>{box.classList.remove('shake');slots.forEach((t,i)=>{if(t!==null&&word[0][t]!==word[0][i]){$(`.tile[data-t="${t}"]`).classList.remove('used');slots[i]=null}});renderSlots()},450)}}
-$('#wSay').onclick=()=>{if(word)speak(word[0].toLowerCase())};
-$('#wNext').onclick=()=>{pop(520);newWord()};
-$('#wHint').onclick=()=>{wHint=!wHint;store.set('thur-dica',wHint);$('#wHint').classList.toggle('on',wHint);renderSlots();pop(480)};
-
-/* ---------- início ---------- */
-{const h=location.hash.slice(1);show(h==='pintar'?'colorir':(h||'home'))}
-try{speechSynthesis.getVoices()}catch(e){}
-if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
-}
-</script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
