@@ -4,11 +4,11 @@
 const {$,$$,show,pop,speak,actx,cfg,rnd,onShow}=window.TH;
 const O='img/mundo/obj/';
 const CH=[
-  {id:'thur',v:'thur',boca:[47,136,54,24,186,480],src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!',pitch:1.1},
-  {id:'zuzu',v:'zuzu',boca:[80,149,64,44,236,240],src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!',pitch:1.6},
-  {id:'lelo',v:'lelo',boca:[78,129,106,50,263,240],src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!',pitch:.75},
-  {id:'pituca',v:'pituca',boca:[86,142,76,48,246,240],src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!',pitch:1.9},
-  {id:'bubu',v:'bubu',boca:[113,139,44,46,310,240],src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!',pitch:1.4}];
+  {id:'thur',v:'thur',boca:[47,136,54,24,186,480],src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur! E esses são os meus amigos, os Bolelecos!',pitch:1.1},
+  {id:'zuzu',v:'zuzu',boca:[80,149,64,44,236,240],src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu, da turma dos Bolelecos!',pitch:1.6},
+  {id:'lelo',v:'lelo',boca:[78,129,106,50,263,240],src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo, da turma dos Bolelecos!',pitch:.75},
+  {id:'pituca',v:'pituca',boca:[86,142,76,48,246,240],src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca, da turma dos Bolelecos!',pitch:1.9},
+  {id:'bubu',v:'bubu',boca:[113,139,44,46,310,240],src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu, da turma dos Bolelecos!',pitch:1.4}];
 const SCENES={
   parque:{n:'Parque',bg:'img/mundo/parque.jpg',items:[
     {id:'cavalinho',w:15,x:14,y:82,seat:[54,42],act:'rock'},

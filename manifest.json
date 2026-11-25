@@ -1,7 +1,7 @@
 {
   "name": "Turma do Thur",
   "short_name": "Turma do Thur",
-  "description": "Desenhar e colorir com o Thur e seus bichinhos.",
+  "description": "Desenhar, colorir e aprender com o Thur e os Bolelecos.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "fullscreen",

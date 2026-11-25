@@ -127,7 +127,7 @@ const MODE_T={balde:'Colorir',giz:'Giz de cera',respingo:'Respingo',numeros:'Pin
 let pickMode='balde';
 /* Colorir: todos os desenhos, separados por tipo */
 const CATS=(()=>{const c3=window.CATS3||{};const C=[
-  ['Turma',['Zuzu','Lelo','Pituca','Bubu']],
+  ['Bolelecos',['Zuzu','Lelo','Pituca','Bubu']],
   ['Bichos',['Cachorro','Coelho','Urso','Gatinho','Dinossauro','Tartaruga','Peixinho','Baleia','Pato','Borboleta','Leão','Elefante','Girafa','Macaco','Porco','Vaca','Galinha','Pintinho','Ovelha','Panda','Pinguim','Coruja','Sapo','Polvo','Caranguejo','Joaninha','Abelha','Caracol','Golfinho','Estrela-do-mar']],
   ['Veículos',['Carrinho','Carro','Caminhão','Ônibus','Avião','Helicóptero','Moto','Trator','Submarino','Bicicleta','Barco','Trem','Foguete','Balão']],
   ['Natureza',['Sol','Flor','Arco-íris','Árvore','Chuva','Lua',...(c3['Natureza']||[])]],
@@ -424,7 +424,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.2';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.2.1';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}

@@ -363,3 +363,5 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .ent.posed .im,.ent.posed .boca{visibility:hidden}
 .ent.char.drag.posed>.an{animation:none}
 .fx .nota{font-size:30px;font-weight:800;color:#9B5DE5;text-shadow:0 2px 0 #fff}
+
+.hbar h1 .hsub{display:block;font-size:.5em;line-height:1;opacity:.75;font-weight:700}
