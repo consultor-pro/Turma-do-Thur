@@ -100,3 +100,63 @@ const LETRAS=[['A','Abelha','🐝'],['B','Bola','⚽'],['C','Casa','🏠'],['D',
 const NUMS=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove'];
 const PALAVRAS=[['SOL','☀️'],['LUA','🌙'],['UVA','🍇'],['OVO','🥚'],['PATO','🦆'],['GATO','🐱'],['BOLA','⚽'],['CASA','🏠'],['BOLO','🎂'],['SAPO','🐸'],['VACA','🐄'],['DADO','🎲'],['FLOR','🌸'],['PEIXE','🐟'],['MALA','🧳'],['PIPOCA','🍿']];
 const STICKERS=['🍎','🍓','🍉','🍌','🍦','🧁','🍭','🎈','🎨','🖍️','⭐','🌈','🦄','🐶','🐱','🐰','🦊','🐼','🐸','🐥','🦋','🐞','🚀','🚗','🚂','⚽','🎸','👑','💎','🌻'];
+
+/* ---------- desenhos novos (versão 3) ---------- */
+PAGES.push(
+{n:'Cachorro',s:R(`<path d="M282 300 C330 290 350 250 342 222 C338 210 324 214 326 226 C330 250 310 270 282 274 Z"/><ellipse cx="200" cy="300" rx="90" ry="70"/><ellipse cx="150" cy="362" rx="28" ry="18"/><ellipse cx="250" cy="362" rx="28" ry="18"/>
+<rect x="148" y="236" width="104" height="20" rx="10"/><circle cx="200" cy="268" r="12"/><circle cx="200" cy="168" r="84"/>
+<ellipse cx="120" cy="170" rx="28" ry="60" transform="rotate(18 120 170)"/><ellipse cx="280" cy="170" rx="28" ry="60" transform="rotate(-18 280 170)"/><ellipse cx="242" cy="132" rx="26" ry="22"/><ellipse cx="200" cy="206" rx="42" ry="30"/>
+<ellipse class="k" cx="200" cy="192" rx="15" ry="10" fill="#2E2440"/><circle class="k" cx="164" cy="160" r="10" fill="#2E2440"/><circle class="k" cx="236" cy="160" r="10" fill="#2E2440"/><path class="k" d="M200 202 v12 M184 220 q16 12 32 0" fill="none" ${S}/>`)},
+{n:'Coelho',s:R(`<ellipse cx="165" cy="80" rx="22" ry="62" transform="rotate(-8 165 80)"/><ellipse cx="235" cy="80" rx="22" ry="62" transform="rotate(8 235 80)"/><ellipse cx="165" cy="84" rx="10" ry="42" transform="rotate(-8 165 84)"/><ellipse cx="235" cy="84" rx="10" ry="42" transform="rotate(8 235 84)"/>
+<ellipse cx="200" cy="300" rx="82" ry="76"/><ellipse cx="200" cy="318" rx="46" ry="46"/><ellipse cx="148" cy="370" rx="34" ry="16"/><ellipse cx="252" cy="370" rx="34" ry="16"/><circle cx="200" cy="178" r="72"/>
+<ellipse cx="158" cy="204" rx="14" ry="9"/><ellipse cx="242" cy="204" rx="14" ry="9"/><polygon points="190,190 210,190 200,202"/><rect x="191" y="214" width="18" height="16" rx="3"/>
+<circle class="k" cx="172" cy="168" r="9" fill="#2E2440"/><circle class="k" cx="228" cy="168" r="9" fill="#2E2440"/><path class="k" d="M200 202 q-10 12 -20 6 M200 202 q10 12 20 6" fill="none" ${SW(4)}/>`)},
+{n:'Tartaruga',s:R(`<ellipse cx="110" cy="306" rx="26" ry="18"/><ellipse cx="290" cy="306" rx="26" ry="18"/><ellipse cx="140" cy="334" rx="24" ry="16"/><ellipse cx="260" cy="334" rx="24" ry="16"/><polygon points="64,296 30,306 66,312"/>
+<path d="M318 286 C330 250 336 230 330 210 L370 214 C376 236 360 270 340 296 Z"/><circle cx="352" cy="206" r="34"/><path d="M80 300 C80 170 320 170 320 300 Z"/>
+<polygon points="170,226 230,226 250,262 230,296 170,296 150,262"/><path d="M146 262 L166 226 C130 232 104 256 96 290 L140 296 Z"/><path d="M254 262 L234 226 C270 232 296 256 304 290 L260 296 Z"/>
+<path d="M70 300 L330 300 Q330 318 312 318 L88 318 Q70 318 70 300 Z"/><circle class="k" cx="362" cy="198" r="7" fill="#2E2440"/><path class="k" d="M346 218 q10 8 20 0" fill="none" ${SW(4)}/>`)},
+{n:'Pato',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><path d="M8 300 C70 286 120 312 200 298 C280 284 330 310 392 296 L392 372 Q392 392 372 392 L28 392 Q8 392 8 372 Z"/>
+<polygon points="70,240 112,260 96,290"/><ellipse cx="200" cy="280" rx="118" ry="62"/><ellipse cx="200" cy="276" rx="62" ry="32" transform="rotate(-8 200 276)"/><circle cx="292" cy="170" r="56"/>
+<path d="M336 170 C366 166 384 176 384 186 C384 196 362 202 334 196 Z"/><circle class="k" cx="300" cy="156" r="8" fill="#2E2440"/><ellipse cx="270" cy="186" rx="12" ry="7"/>`)},
+{n:'Urso',s:R(`<circle cx="134" cy="96" r="32"/><circle cx="266" cy="96" r="32"/><circle cx="134" cy="96" r="15"/><circle cx="266" cy="96" r="15"/>
+<ellipse cx="108" cy="290" rx="28" ry="46" transform="rotate(30 108 290)"/><ellipse cx="292" cy="290" rx="28" ry="46" transform="rotate(-30 292 290)"/><circle cx="140" cy="368" r="30"/><circle cx="260" cy="368" r="30"/>
+<ellipse cx="200" cy="302" rx="94" ry="80"/><ellipse cx="200" cy="314" rx="54" ry="50"/><circle cx="200" cy="160" r="80"/><ellipse cx="200" cy="192" rx="38" ry="28"/>
+<polygon points="200,250 160,234 160,266"/><polygon points="200,250 240,234 240,266"/><circle cx="200" cy="250" r="10"/>
+<circle class="k" cx="168" cy="150" r="9" fill="#2E2440"/><circle class="k" cx="232" cy="150" r="9" fill="#2E2440"/><ellipse class="k" cx="200" cy="182" rx="12" ry="8" fill="#2E2440"/><path class="k" d="M200 190 v10 M188 204 q12 10 24 0" fill="none" ${SW(4)}/>`)},
+{n:'Baleia',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><path d="M8 320 C80 300 140 334 200 318 C270 300 330 330 392 314 L392 372 Q392 392 372 392 L28 392 Q8 392 8 372 Z"/>
+<path d="M60 240 C60 150 180 124 260 152 C300 166 320 200 330 228 L362 190 C372 180 388 186 382 202 L362 250 L386 290 C392 306 374 312 362 300 L330 266 C310 320 230 340 160 330 C100 322 60 290 60 240 Z"/>
+<path d="M78 268 C120 318 230 328 300 280 C250 300 140 300 78 268 Z"/><ellipse cx="148" cy="246" rx="16" ry="10"/>
+<path class="k" d="M150 130 C140 100 120 90 110 70 M150 130 C160 100 180 90 190 70 M150 130 V80" fill="none" ${S}/><circle cx="106" cy="62" r="10"/><circle cx="194" cy="62" r="10"/><circle cx="150" cy="70" r="10"/>
+<circle class="k" cx="122" cy="214" r="9" fill="#2E2440"/><path class="k" d="M100 240 q20 14 40 4" fill="none" ${SW(5)}/>`)},
+{n:'Dinossauro',s:R(`<polygon points="92,232 112,190 132,226"/><polygon points="132,214 154,170 176,210"/><polygon points="176,208 198,166 220,208"/><polygon points="98,300 14,250 112,256"/>
+<rect x="118" y="310" width="38" height="66" rx="14"/><rect x="204" y="310" width="38" height="66" rx="14"/><ellipse cx="180" cy="280" rx="102" ry="70"/><ellipse cx="186" cy="300" rx="62" ry="32"/>
+<path d="M232 244 C252 204 250 152 262 120 C270 92 302 82 332 88 C364 94 374 122 362 142 C352 158 328 162 302 158 C294 192 292 232 282 262 Z"/>
+<circle class="k" cx="330" cy="114" r="8" fill="#2E2440"/><path class="k" d="M318 140 q16 8 32 -4" fill="none" ${SW(4)}/>`)},
+{n:'Sorvete',s:R(`<polygon points="146,206 254,206 200,376"/><circle cx="168" cy="186" r="50"/><circle cx="234" cy="186" r="50"/><circle cx="200" cy="124" r="52"/><circle cx="200" cy="62" r="17"/>
+<path class="k" d="M160 240 L230 300 M170 270 L215 312 M240 240 L170 300 M230 270 L185 312 M200 46 C204 32 214 24 224 20" fill="none" ${SW(4)}/>
+<circle class="k" cx="184" cy="118" r="6" fill="#2E2440"/><circle class="k" cx="216" cy="118" r="6" fill="#2E2440"/><path class="k" d="M186 136 q14 12 28 0" fill="none" ${SW(4)}/>`)},
+{n:'Bolo',s:R(`<ellipse cx="200" cy="362" rx="156" ry="22"/><rect x="88" y="268" width="224" height="92" rx="14"/><path d="M88 282 Q88 268 102 268 L298 268 Q312 268 312 282 L312 298 Q302 312 292 298 Q282 284 270 302 Q258 316 246 300 Q234 286 222 304 Q210 318 198 300 Q186 286 174 304 Q162 318 150 300 Q138 286 126 302 Q112 316 100 300 Q90 290 88 298 Z"/>
+<rect x="128" y="190" width="144" height="80" rx="12"/><path d="M128 202 Q128 190 140 190 L260 190 Q272 190 272 202 L272 214 Q262 226 252 212 Q242 200 230 216 Q218 228 206 212 Q194 200 182 216 Q170 228 158 212 Q146 200 136 214 Q128 222 128 214 Z"/>
+<rect x="192" y="134" width="16" height="56" rx="5"/><path d="M200 96 C214 112 214 126 200 132 C186 126 186 112 200 96 Z"/><circle cx="150" cy="182" r="12"/><circle cx="250" cy="182" r="12"/>`)},
+{n:'Balão',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><path d="M40 330 C40 306 70 300 82 314 C90 294 124 296 126 318 C142 318 146 342 128 344 L54 344 C36 344 34 330 40 330 Z"/><path d="M272 110 C272 86 302 80 314 94 C322 74 356 76 358 98 C374 98 378 122 360 124 L286 124 C268 124 266 110 272 110 Z"/>
+<path d="M200 40 C290 40 330 110 320 170 C310 230 250 268 232 290 L168 290 C150 268 90 230 80 170 C70 110 110 40 200 40 Z"/><path d="M200 40 C168 80 162 220 182 290 L218 290 C238 220 232 80 200 40 Z"/>
+<path class="k" d="M172 290 L180 330 M228 290 L220 330" fill="none" ${S}/><rect x="168" y="330" width="64" height="46" rx="6"/>`)},
+{n:'Barco',s:R(`<rect x="8" y="8" width="384" height="384" rx="20"/><circle cx="330" cy="70" r="34"/><path d="M8 300 C70 286 130 312 200 298 C270 284 330 310 392 296 L392 372 Q392 392 372 392 L28 392 Q8 392 8 372 Z"/>
+<rect x="196" y="80" width="8" height="186"/><polygon points="208,92 208,240 306,240"/><polygon points="192,116 192,240 116,240"/><polygon points="204,80 240,92 204,104"/>
+<path d="M76 262 L324 262 L292 324 L108 324 Z"/><circle cx="150" cy="292" r="12"/><circle cx="200" cy="292" r="12"/><circle cx="250" cy="292" r="12"/>`)},
+{n:'Trem',s:R(`<circle cx="170" cy="70" r="20"/><circle cx="200" cy="50" r="24"/><circle cx="236" cy="38" r="18"/>
+<rect x="156" y="128" width="32" height="72" rx="4"/><rect x="148" y="116" width="48" height="16" rx="4"/><rect x="40" y="128" width="104" height="20" rx="6"/><rect x="50" y="146" width="84" height="66" rx="6"/><rect x="66" y="160" width="52" height="36" rx="6"/>
+<rect x="46" y="206" width="170" height="84" rx="10"/><rect x="230" y="216" width="130" height="74" rx="10"/><rect x="250" y="230" width="36" height="30" rx="5"/><rect x="302" y="230" width="36" height="30" rx="5"/><polygon points="20,290 46,250 46,290"/>
+<circle cx="88" cy="304" r="26"/><circle cx="170" cy="304" r="26"/><circle cx="264" cy="304" r="22"/><circle cx="328" cy="304" r="22"/><circle cx="88" cy="304" r="9"/><circle cx="170" cy="304" r="9"/>
+<path class="k" d="M10 340 H390 M216 260 H230" fill="none" ${SW(6)}/>`)}
+);
+PLANS['Sorvete']={c:['#F4C9A0','#FF85C0','#8D5B3E','#FFF3C4','#FF4D4D'],p:[0,1,2,3,4]};
+PLANS['Balão']={c:['#BDE6FF','#FFFFFF','#FF4D4D','#FFD60A','#8D5B3E'],p:[0,1,1,2,3,4]};
+/* cada atividade tem a sua coleção de desenhos */
+const SETS={
+ balde:['Zuzu','Lelo','Pituca','Bubu','Cachorro','Coelho','Urso','Gatinho','Dinossauro'],
+ giz:['Casinha','Carrinho','Barco','Trem','Foguete','Balão','Arco-íris','Tartaruga'],
+ respingo:['Sol','Maçã','Sorvete','Bolo','Peixinho','Baleia','Pato','Coelho'],
+ aquarela:['Flor','Borboleta','Arco-íris','Baleia','Balão','Peixinho','Sol'],
+ numeros:['Sol','Maçã','Sorvete','Balão','Pituca','Flor','Peixinho','Casinha']
+};
