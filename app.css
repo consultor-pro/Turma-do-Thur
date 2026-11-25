@@ -271,3 +271,9 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .pedal svg{width:55%;height:55%}
 .pedal.down{transform:translateY(6px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
 #gasP{right:16px;background:#4CC764}#brkP{left:16px;background:#FF4D4D}
+
+.ent .need{position:absolute;left:50%;top:-14%;width:42%;max-width:46px;aspect-ratio:1;transform:translate(-50%,-100%);animation:needb .8s ease-in-out infinite alternate;pointer-events:none;z-index:2}
+@keyframes needb{to{transform:translate(-50%,-115%) scale(1.08)}}
+.ent.apertado>.an{animation:aperto .5s ease-in-out infinite alternate}
+@keyframes aperto{to{transform:translateX(3%) rotate(2deg)}}
+.fx .bub{display:block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0 25%,rgba(190,230,255,.7) 26% 100%);border:2px solid #9ED6F0}

@@ -4,11 +4,11 @@
 const {$,$$,show,pop,speak,actx,cfg,rnd,onShow}=window.TH;
 const O='img/mundo/obj/';
 const CH=[
-  {id:'thur',src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!'},
-  {id:'zuzu',src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!'},
-  {id:'lelo',src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!'},
-  {id:'pituca',src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!'},
-  {id:'bubu',src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!'}];
+  {id:'thur',src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!',pitch:1.1},
+  {id:'zuzu',src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!',pitch:1.6},
+  {id:'lelo',src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!',pitch:.75},
+  {id:'pituca',src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!',pitch:1.9},
+  {id:'bubu',src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!',pitch:1.4}];
 const SCENES={
   parque:{n:'Parque',bg:'img/mundo/parque.jpg',items:[
     {id:'cavalinho',w:15,x:14,y:82,seat:[54,42],act:'rock'},
@@ -31,7 +31,12 @@ const SCENES={
   cozinha:{n:'Cozinha',bg:'img/mundo/cozinha.jpg',items:[
     {id:'maca',w:5,x:30,y:66,food:'maçã'},{id:'banana',w:6,x:37,y:65,food:'banana'},{id:'uva',w:5,x:44,y:66,food:'uva'},{id:'melancia',w:6.5,x:51,y:65,food:'melancia'},
     {id:'cupcake',w:5,x:58,y:66,food:'bolinho'},{id:'leite',w:4,x:64,y:66,food:'leite'},{id:'biscoito',w:5,x:70,y:66,food:'biscoito'},{id:'cenoura',w:5,x:77,y:66,food:'cenoura'}],
-    chars:[[91,99],[13,99],[27,99],[73,99],[50,99]]}
+    chars:[[91,99],[13,99],[27,99],[73,99],[50,99]]},
+  banheiro:{n:'Banheiro',bg:'img/mundo/banheiro.svg',thumb:'img/mundo/banheiro.svg',items:[
+    {id:'vaso',src:O+'vaso.svg',w:12,x:30,y:93,seat:[50,52],act:'flush',auto:1},
+    {id:'pia',src:O+'pia.svg',w:13,x:51,y:78,seat:[50,112],act:'wash',auto:1},
+    {id:'patinho',src:O+'patinho.svg',w:6,x:68,y:94,act:'quack'}],
+    chars:[[84,99],[12,99],[72,98],[93,96],[60,99]]}
 };
 const stage=$('#stage');let cur='parque',drag=null;
 
@@ -44,16 +49,35 @@ const click=()=>tone('square',1400,900,.05,.06);
 const munch=()=>[0,.18,.36].forEach(d=>tone('triangle',300,180,.08,.12,d));
 
 /* montar cena */
-function place(e,x,y,w){e.style.left=x+'%';e.style.top=y+'%';e.style.width=w+'%';e.style.zIndex=Math.round(y*10)}
+function place(e,x,y,w){e.style.left=x+'%';e.style.top=y+'%';e.style.width=(e.classList.contains('char')?w*grow(e):w)+'%';e.style.zIndex=Math.round(y*10)}
+/* barriga cheia: cada comida deixa o personagem maior; o banheiro volta ao normal */
+const LV=Object.assign({thur:0,zuzu:0,lelo:0,pituca:0,bubu:0},(()=>{try{return JSON.parse(localStorage.getItem('thur-barriga'))||{}}catch(e){return{}}})());
+const MAXLV=4,grow=e=>1+.15*(LV[e.dataset.id]||0);
+const saveLv=()=>{try{localStorage.setItem('thur-barriga',JSON.stringify(LV))}catch(e){}};
+function applyLv(c,anim=true){c.style.transition=anim?'width .5s cubic-bezier(.3,1.6,.6,1)':'none';
+  if(c.classList.contains('seated')){const o=c.closest('.ent.obj');if(o)c.style.width=(+c.dataset.w*grow(c)/ +o.dataset.w*100)+'%'}else c.style.width=(+c.dataset.w*grow(c))+'%';
+  let b=c.querySelector(':scope > .need');const full=(LV[c.dataset.id]||0)>=MAXLV;
+  if(full&&!b){b=document.createElement('div');b.className='need';b.innerHTML='<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="18" fill="#fff" stroke="#2E2440" stroke-width="3"/><path d="M12 14h16v6c0 6-4 9-8 9s-8-3-8-9z" fill="#BDE6FF" stroke="#2E2440" stroke-width="2.5"/><rect x="11" y="10" width="18" height="5" rx="2" fill="#fff" stroke="#2E2440" stroke-width="2.5"/></svg>';c.appendChild(b)}
+  if(!full&&b)b.remove();c.classList.toggle('apertado',full)}
+function say(c,t,queue){if(!cfg.voz)return;try{const s=speechSynthesis;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=.95;u.pitch=Math.min(2,+(c&&c.dataset.pitch)||1.1);const v=s.getVoices().find(v=>/pt[-_]BR/i.test(v.lang));if(v)u.voice=v;s.speak(u)}catch(e){}}
+const FALAS={
+  'maçã':['Maçã crocante! Crec, crec, crec!','Hummm, maçã vermelhinha! Que delícia!'],
+  'banana':['Banana! Uh uh, ah ah! Virei macaquinho!','Bananinha docinha! Escorregou na boca!'],
+  'uva':['Uvinha! Ploc, ploc, ploc! Estourou na boca!','Uva roxinha! Fiquei com a língua roxa!'],
+  'melancia':['Melancia gigante! Escorreu no queixo!','Melancia! Cuspi uma sementinha! Ptuu!'],
+  'bolinho':['Bolinho com cereja! Nham nham, que gostosura!','Bolinho! Fiquei com o nariz de glacê!'],
+  'leite':['Leitinho! Olha meu bigode branco!','Glub, glub, glub! Leite quentinho!'],
+  'biscoito':['Biscoito! Croc, croc, croc! Caiu farelo!','Biscoito com gotinhas! Que crocante!'],
+  'cenoura':['Cenoura! Agora eu enxergo no escuro!','Cenourinha! Crunch, crunch! Igual um coelhinho!']};
 function mk(d){const e=document.createElement('div');e.className='ent '+d.kind;e.dataset.id=d.id;e.dataset.w=d.w;place(e,d.x,d.y,d.w);
-  if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;
+  if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;if(d.pitch)e.dataset.pitch=d.pitch;if(d.auto)e.dataset.auto=1;
   e.innerHTML=`<div class="an"><img class="im" src="${d.src}" alt="" draggable="false"></div>`;return e}
 function build(key){cur=key;const S=SCENES[key];stage.classList.remove('isnight');stage.querySelectorAll('.ent,.fx').forEach(e=>e.remove());
   stage.querySelector('.sbg').src=S.bg;$('#mTitle').textContent=S.n;
-  S.items.forEach(it=>stage.appendChild(mk({...it,kind:it.food?'food':'obj',src:O+it.id+'.webp'})));
-  CH.forEach((c,i)=>stage.appendChild(mk({...c,kind:'char',x:S.chars[i][0],y:S.chars[i][1]})));
+  S.items.forEach(it=>stage.appendChild(mk({src:O+it.id+'.webp',...it,kind:it.food?'food':'obj'})));
+  CH.forEach((c,i)=>{const e=mk({...c,kind:'char',x:S.chars[i][0],y:S.chars[i][1]});stage.appendChild(e);applyLv(e,false)});
   $$('#scenes .scn').forEach(b=>b.classList.toggle('on',b.dataset.s===key))}
-$('#scenes').innerHTML=Object.entries(SCENES).map(([k,s])=>`<button class="scn" data-s="${k}" aria-label="${s.n}"><img src="img/bg-${k}.jpg" alt=""></button>`).join('');
+$('#scenes').innerHTML=Object.entries(SCENES).map(([k,s])=>`<button class="scn" data-s="${k}" aria-label="${s.n}"><img src="${s.thumb||'img/bg-'+k+'.jpg'}" alt=""></button>`).join('');
 $('#scenes').onclick=e=>{const b=e.target.closest('.scn');if(!b||b.dataset.s===cur)return;pop(480);build(b.dataset.s)};
 function fit(){const w=$('#mwrap').getBoundingClientRect();if(!w.width)return;const sw=Math.min(w.width-16,(w.height-16)*16/9);stage.style.width=sw+'px';stage.style.height=sw*9/16+'px'}
 onShow.mundo=()=>requestAnimationFrame(fit);
@@ -86,21 +110,37 @@ const ACTS={
   lamp(o){night(!stage.classList.contains('isnight'));click()},
   bau(o){A(an(o),[{transform:'rotate(0)'},{transform:'rotate(-4deg)'},{transform:'rotate(4deg)'},{transform:'rotate(0)'}],{duration:400,iterations:2});['#FFD60A','#FF85C0','#4FB3F0','#4CC764','#FF9F1C','#9B5DE5'].forEach((c,i)=>fx(o,sparkle(c),{fy:.2,dx:rnd(140)-70,dy:-80-rnd(60),delay:i*70}));[0,.1,.2].forEach(d=>tone('sine',700+d*2000,1400,.15,.08,d))},
   drum(o){A(an(o),[{transform:'scale(1)'},{transform:'scale(.93,1.04)'},{transform:'scale(1)'}],{duration:220,iterations:3});drum();drum(.22);drum(.44)},
-  hop(o){hopEl(an(o),'-60%');boing()}
+  hop(o){hopEl(an(o),'-60%');boing()},
+  quack(o){A(an(o),[{transform:'rotate(0)'},{transform:'rotate(-12deg)'},{transform:'rotate(10deg)'},{transform:'rotate(0)'}],{duration:500});tone('square',700,500,.12,.06);tone('square',650,450,.14,.06,.16);say(null,'Quém, quém!')},
+  flush(o){const c=seated(o);
+    const swirl=()=>{for(let i=0;i<8;i++)fx(o,'<span class="ball" style="background:#8FD3F5"></span>',{fx:.3+Math.random()*.4,fy:.5,dx:rnd(80)-40,dy:-40-rnd(50),dur:800,delay:i*60});tone('sine',900,120,1.1,.12)};
+    if(!c){swirl();say(null,'Vrummmm! Descarga!');return}
+    const lv=LV[c.dataset.id]||0;
+    if(!lv){say(c,'Agora não estou com vontade!');return}
+    A(an(c),[{transform:'translateY(0)'},{transform:'translateY(-4%) scale(1.03,.97)'},{transform:'translateY(0)'}],{duration:400,iterations:3});
+    setTimeout(()=>{tone('sine',500,90,.35,.18);LV[c.dataset.id]=0;saveLv();applyLv(c);say(c,'Ufa! Que alívio! Agora a descarga!');fx(c,sparkle('#FFD60A'),{fy:.1})},1300);
+    setTimeout(()=>{swirl();say(c,'Não esquece de lavar as mãozinhas!',true)},2700)},
+  wash(o){const c=seated(o);for(let i=0;i<14;i++)fx(o,'<span class="bub"></span>',{fx:.2+Math.random()*.6,fy:.25,dx:rnd(120)-60,dy:-50-rnd(70),dur:1200,delay:i*90});tone('sine',600,900,.2,.06);tone('sine',700,1000,.2,.06,.3);
+    say(c,c?'Lavando as mãozinhas! Esfrega, esfrega! Pronto, limpinho!':'Água fresquinha! Vamos lavar as mãos!')}
 };
 function act(ent){
-  if(ent.classList.contains('char')){hopEl(an(ent),'-22%');speak(ent.dataset.say);fx(ent,heart,{fy:.05});tone('sine',500,900,.15,.12);return}
+  if(ent.classList.contains('char')){hopEl(an(ent),'-22%');if((LV[ent.dataset.id]||0)>=MAXLV){say(ent,'Preciso ir ao banheiro! Me leva lá, por favor!');return}say(ent,ent.dataset.say);fx(ent,heart,{fy:.05});tone('sine',500,900,.15,.12);return}
   if(ent.classList.contains('food')){A(an(ent),[{transform:'rotate(0)'},{transform:'rotate(-10deg)'},{transform:'rotate(10deg)'},{transform:'rotate(0)'}],{duration:400});speak(ent.dataset.food);return}
   const f=ACTS[ent.dataset.act];if(f)f(ent)}
 
 /* sentar e comer */
 function detach(ent){const r=ent.getBoundingClientRect(),sr=stage.getBoundingClientRect();stage.appendChild(ent);ent.classList.remove('seated');
   place(ent,(r.left+r.width/2-sr.left)/sr.width*100,Math.min(100,(r.bottom-sr.top)/sr.height*100),+ent.dataset.w)}
-function seat(c,o){const [sx,sy]=o.dataset.seat.split(',').map(Number);an(o).appendChild(c);c.classList.add('seated');c.style.left=sx+'%';c.style.top=sy+'%';c.style.width=(+c.dataset.w/ +o.dataset.w*100)+'%';c.style.zIndex=5;hopEl(an(c),'-20%');pop(760)}
-function eat(f,c){const fr=f.getBoundingClientRect(),cr=c.getBoundingClientRect();const dx=cr.left+cr.width/2-(fr.left+fr.width/2),dy=cr.top+cr.height*.45-(fr.top+fr.height/2);
+function seat(c,o){const [sx,sy]=o.dataset.seat.split(',').map(Number);an(o).appendChild(c);c.classList.add('seated');c.style.left=sx+'%';c.style.top=sy+'%';c.style.transition='none';c.style.width=(+c.dataset.w*grow(c)/ +o.dataset.w*100)+'%';c.style.zIndex=5;hopEl(an(c),'-20%');pop(760);if(o.dataset.auto)setTimeout(()=>{const f=ACTS[o.dataset.act];if(f&&seated(o)===c)f(o)},500)}
+function eat(f,c){const lv=LV[c.dataset.id]||0;
+  if(lv>=MAXLV){A(an(c),[{transform:'translateX(0)'},{transform:'translateX(-8%)'},{transform:'translateX(8%)'},{transform:'translateX(0)'}],{duration:400,iterations:2});say(c,'Não cabe mais nada! Preciso ir ao banheiro!');
+    A(f,[{transform:'translate(-50%,-100%) scale(1)'},{transform:'translate(-50%,-100%) scale(1.15)'},{transform:'translate(-50%,-100%) scale(1)'}],{duration:300});place(f,+f.dataset.hx,+f.dataset.hy,+f.dataset.w);return}
+  const fr=f.getBoundingClientRect(),cr=c.getBoundingClientRect();const dx=cr.left+cr.width/2-(fr.left+fr.width/2),dy=cr.top+cr.height*.45-(fr.top+fr.height/2);
   const k=A(f,[{transform:'translate(-50%,-100%) translate(0px,0px) scale(1)'},{transform:`translate(-50%,-100%) translate(${dx}px,${dy}px) scale(.2)`}],{duration:380,easing:'ease-in',fill:'forwards'});
   k.onfinish=()=>{f.style.visibility='hidden';k.cancel();place(f,+f.dataset.hx,+f.dataset.hy,+f.dataset.w);A(an(c),[{transform:'scale(1,1)'},{transform:'scale(1.06,.92)'},{transform:'scale(1,1)'}],{duration:260,iterations:3});munch();
-    speak(c.dataset.id==='thur'?'Nham nham! Que delícia!':'Nham nham! Obrigado!');[0,1,2].forEach(i=>fx(c,heart,{fy:.05,delay:i*200}));
+    LV[c.dataset.id]=lv+1;saveLv();setTimeout(()=>applyLv(c),300);
+    const fl=FALAS[f.dataset.food]||['Nham nham!'];say(c,fl[rnd(fl.length)]);[0,1,2].forEach(i=>fx(c,heart,{fy:.05,delay:i*200}));
+    if(lv+1>=MAXLV)setTimeout(()=>{say(c,'Ai, que barrigão! Estou cheio! Preciso ir ao banheiro!',true);tone('sine',300,160,.4,.12)},400);
     setTimeout(()=>{f.style.visibility='';A(an(f),[{transform:'scale(0)'},{transform:'scale(1.15)'},{transform:'scale(1)'}],{duration:420})},2600)}}
 
 /* arrastar */

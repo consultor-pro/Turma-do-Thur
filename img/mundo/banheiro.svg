@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+<defs>
+<pattern id="t" width="80" height="80" patternUnits="userSpaceOnUse"><rect width="80" height="80" fill="#CDEFFF"/><rect x="2" y="2" width="76" height="76" rx="8" fill="#E4F7FF"/></pattern>
+<pattern id="f" width="120" height="120" patternUnits="userSpaceOnUse"><rect width="120" height="120" fill="#FFFFFF"/><rect width="60" height="60" fill="#BFE3F5"/><rect x="60" y="60" width="60" height="60" fill="#BFE3F5"/></pattern>
+<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FDcFF"/><stop offset="1" stop-color="#E6F8FF"/></linearGradient>
+</defs>
+<rect width="1600" height="600" fill="url(#t)"/>
+<rect y="560" width="1600" height="50" fill="#FFFFFF"/><rect y="600" width="1600" height="12" fill="#9ED6F0"/>
+<path d="M0 612 L1600 612 L1600 900 L0 900 Z" fill="url(#f)"/>
+<rect y="612" width="1600" height="288" fill="#FFFFFF" opacity=".25"/>
+<g transform="translate(640 90)"><rect width="320" height="250" rx="24" fill="#fff" stroke="#2E2440" stroke-width="8"/><rect x="18" y="18" width="284" height="214" rx="16" fill="url(#g)"/><path d="M40 200 L120 120 M70 210 L170 110" stroke="#fff" stroke-width="14" stroke-linecap="round" opacity=".7"/></g>
+<g transform="translate(1250 150)"><rect x="-20" y="0" width="200" height="16" rx="8" fill="#B8C4CC" stroke="#2E2440" stroke-width="6"/><path d="M20 16 h120 v220 q-60 24 -120 0 z" fill="#FF85C0" stroke="#2E2440" stroke-width="8" stroke-linejoin="round"/><rect x="20" y="180" width="120" height="22" fill="#fff" opacity=".7"/></g>
+<g transform="translate(120 230)"><rect x="0" y="0" width="190" height="16" rx="8" fill="#C98B4E" stroke="#2E2440" stroke-width="6"/><circle cx="40" cy="-22" r="22" fill="#FFD60A" stroke="#2E2440" stroke-width="6"/><rect x="90" y="-56" width="34" height="56" rx="8" fill="#4FB3F0" stroke="#2E2440" stroke-width="6"/><rect x="134" y="-40" width="30" height="40" rx="8" fill="#9B5DE5" stroke="#2E2440" stroke-width="6"/></g>
+<g transform="translate(1440 470)"><path d="M0 140 L60 140 L70 60 L-10 60 Z" fill="#FF9F1C" stroke="#2E2440" stroke-width="7" stroke-linejoin="round"/><path d="M30 60 C0 20 -10 -20 10 -40 M30 60 C40 0 60 -30 80 -30 M30 60 C20 10 40 -40 30 -70" fill="none" stroke="#4CC764" stroke-width="16" stroke-linecap="round"/></g>
+<ellipse cx="820" cy="760" rx="300" ry="60" fill="#FFF3C4" opacity=".9"/>
+</svg>
