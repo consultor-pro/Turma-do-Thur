@@ -275,6 +275,21 @@
   </div>
 </section>
 
+<section id="pista" class="view" aria-label="Pista">
+  <div class="bar">
+    <button class="ico" data-go="garagem" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
+    <h2 id="pTitle2">Pista</h2>
+    <span class="ecount"><svg viewBox="0 0 32 32" width="30" height="30"><path d="M16 2l4.2 9 9.8 1.2-7.2 6.8 1.9 9.8L16 24 7.3 28.8l1.9-9.8L2 12.2 11.8 11z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/></svg><b id="psCount">0</b>/<span id="psTot">0</span></span>
+    <button class="ico" id="pRestart" aria-label="Começar a corrida de novo"><svg><use href="#i-undo"/></svg></button>
+  </div>
+  <div class="ppaper" id="pPaper">
+    <canvas id="pcv" aria-label="Pista de corrida"></canvas>
+    <button class="pedal" id="brkP" aria-label="Freio"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="7" width="18" height="18" rx="4" fill="#fff"/></svg></button>
+    <button class="pedal" id="gasP" aria-label="Acelerar"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 6l14 10-14 10z" fill="#fff"/></svg></button>
+  </div>
+  <p class="rot" style="color:var(--ink)">Vire o aparelho de lado para correr melhor</p>
+</section>
+
 <!-- MUNDINHO -->
 <section id="mundo" class="view" aria-label="Mundinho">
   <div class="bar mbar">
@@ -303,6 +318,15 @@
     <div class="row" id="wEmo"></div>
     <div class="row"><button id="wAdd" class="pbtn go2">Adicionar</button><button id="wPlay" class="pbtn">Brincar com elas</button><button id="wClose" class="pbtn">Fechar</button></div>
     <div id="wList" class="wlist"></div>
+  </div>
+</div>
+<div class="veil" id="parab" role="dialog" aria-modal="true" aria-labelledby="pbT">
+  <div class="dlg wide">
+    <div class="pbt" id="pbT">Parabéns!</div>
+    <div class="pbcar" id="pbCar"></div>
+    <span class="pbs" id="pbS"></span>
+    <div class="pbst" id="pbSt" hidden></div>
+    <div class="row" id="pbB"></div>
   </div>
 </div>
 <div class="veil" id="done" role="dialog" aria-modal="true" aria-label="Muito bem!">

@@ -220,7 +220,7 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 /* garagem e carrinhos */
 #garagem,#montar{background-image:url(img/bg-quarto.jpg)}
 .gal.cars{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
-.card.car svg{aspect-ratio:700/340}
+.card.car svg{aspect-ratio:700/380}
 .mstage{flex:1;margin:0 14px;border-radius:28px;background:linear-gradient(#FFE9C2 0 62%,#F2C27E 62%);box-shadow:0 6px 0 var(--sombra);overflow:hidden;min-height:0;touch-action:none}
 .mstage svg{width:100%;height:100%;display:block;touch-action:none}
 .mstage .part{cursor:grab}
@@ -249,3 +249,25 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .estar{position:absolute;left:0;top:0;width:48px;height:48px;will-change:transform;pointer-events:none}
 .estar svg{width:100%;height:100%}
 .ecount{display:flex;align-items:center;gap:4px;font-size:22px;font-weight:800;background:#fff;border-radius:999px;padding:4px 12px 4px 6px;box-shadow:0 4px 0 var(--sombra)}
+
+/* parabéns e pista */
+#parab .dlg{gap:10px;position:relative;overflow:hidden}
+#parab .dlg::before{content:"";position:absolute;left:50%;top:38%;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(#FFF6C8 0 10deg,#fff 10deg 20deg);animation:rays 12s linear infinite;z-index:0}
+#parab .dlg>*{position:relative;z-index:1}
+@keyframes rays{to{transform:rotate(360deg)}}
+.pbt{font:800 clamp(44px,10vw,70px)/1 'Baloo 2',sans-serif;-webkit-text-stroke:6px #fff;paint-order:stroke fill;display:flex;justify-content:center;flex-wrap:wrap}
+.pbt span{display:inline-block;animation:jumpL .8s ease-in-out infinite alternate}
+@keyframes jumpL{to{transform:translateY(-10px) rotate(-4deg)}}
+.pbcar{width:min(380px,80vw);animation:carhop .9s ease-in-out infinite}
+.pbcar svg{width:100%;height:auto;display:block}
+@keyframes carhop{50%{transform:translateY(-10px)}}
+.pbs{font-size:22px}
+.pbst{font-size:56px;line-height:1;animation:pop .6s}
+.pbtn.bigb{font-size:24px;padding:14px 26px}
+#pista{background-image:url(img/bg-parque.jpg)}
+.ppaper{flex:1;margin:0 14px 14px;border-radius:28px;overflow:hidden;position:relative;min-height:0;touch-action:none;box-shadow:0 6px 0 rgba(0,0,0,.15)}
+#pcv{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.pedal{position:absolute;bottom:12px;width:clamp(64px,min(14vw,24vh),120px);height:clamp(64px,min(14vw,24vh),120px);border-radius:28px;display:grid;place-items:center;box-shadow:0 8px 0 rgba(0,0,0,.25);touch-action:none;user-select:none}
+.pedal svg{width:55%;height:55%}
+.pedal.down{transform:translateY(6px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+#gasP{right:16px;background:#4CC764}#brkP{left:16px;background:#FF4D4D}

@@ -356,11 +356,11 @@ $('#clrArt').onclick=()=>ask('Apagar todas as artes da galeria?',()=>{dbClear();
 $('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st');toast('Adesivos zerados.')});
 $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.keys(localStorage).filter(k=>/^thur-(s|t|px)-/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}toast('Pinturas em andamento apagadas.')});
 
-window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete};
+window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award};
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='4.1';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='4.2';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
