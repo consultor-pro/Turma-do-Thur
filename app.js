@@ -131,7 +131,7 @@ $('#pickGal').onclick=e=>{const c=e.target.closest('.card');if(!c)return;pop(520
 
 /* ---------- pintar sobre o desenho ---------- */
 const NS='http://www.w3.org/2000/svg';
-const P={mode:'balde',i:0,color:COLORS[0],num:0,tex:'liso',w:10,hist:[],scrib:null};
+const P={mode:'balde',tool:'balde',i:0,color:COLORS[0],num:0,tex:'liso',w:22,hist:[],scrib:null};
 const svgEl=()=>$('#page svg');
 const pKey=()=>`thur-s-${P.mode}-${P.i}`;
 const saveP=()=>store.set(pKey(),svgEl().innerHTML);
@@ -156,18 +156,20 @@ function openSvg(mode,i){Object.assign(P,{mode,i,hist:[],scrib:null});const page
   if(mode==='numeros'){P.num=0;palette($('#palP'),PLANS[page.n].c,(i)=>{P.num=i},0,true);markNumDone()}
   else palette($('#palP'),COLORS,(i,c)=>{P.color=c},COLORS.indexOf(P.color));
   $('#texRow').style.display=(mode==='balde'||mode==='giz'||mode==='respingo')?'':'none';
-  $('#sizeRow').style.display=mode==='giz'?'':'none';
+  $('#toolRow').style.display=mode==='balde'?'':'none';syncTool();
   peek($('#pintar'));show('pintar')}
 onShow.pintar=()=>{if(P.needNums){P.needNums=false;addNums(svgEl(),PAGES[P.i]);saveP();markNumDone()}};
 function markNumDone(){if(P.mode!=='numeros')return;const s=svgEl();const plan=PLANS[PAGES[P.i].n];plan.c.forEach((_,n)=>{const left=s.querySelectorAll(`.r[data-n="${n}"]:not([data-f])`).length;const b=$(`#palP .sw[data-i="${n}"]`);if(b)b.classList.toggle('gone',left===0)})}
 $$('#texRow .tex').forEach(b=>b.onclick=()=>{P.tex=b.dataset.tex;$$('#texRow .tex').forEach(x=>x.classList.toggle('on',x===b));pop(480)});
+function syncTool(){const giz=P.mode==='giz'||(P.mode==='balde'&&P.tool==='giz');$('#sizeRow').style.display=giz?'':'none';$$('#toolRow .tool').forEach(x=>x.classList.toggle('on',x.dataset.tool===P.tool))}
+$$('#toolRow .tool').forEach(b=>b.onclick=()=>{P.tool=b.dataset.tool;syncTool();pop(480);speak(P.tool==='giz'?'Rabisque com o dedo dentro da linha!':'Toque para pintar tudo!')});
 $$('#sizeRow .psize').forEach(b=>b.onclick=()=>{P.w=+b.dataset.w;$$('#sizeRow .psize').forEach(x=>x.classList.toggle('on',x===b));pop(500)});
 const toSvg=(s,e)=>{const p=s.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(s.getScreenCTM().inverse())};
 function clipFor(s,a){const id='c'+Date.now().toString(36)+rnd(1e6).toString(36);const cp=document.createElementNS(NS,'clipPath');cp.id=id;const sh=a.cloneNode();sh.removeAttribute('class');sh.removeAttribute('data-n');sh.removeAttribute('data-k');cp.appendChild(sh);s.querySelector('defs').appendChild(cp);
   const g=document.createElementNS(NS,'g');g.setAttribute('clip-path',`url(#${id})`);g.setAttribute('pointer-events','none');
   const ol=a.cloneNode();ol.setAttribute('class','o');ol.setAttribute('fill','none');ol.removeAttribute('data-n');ol.setAttribute('pointer-events','none');a.after(g);g.after(ol);return g}
 $('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const el=document.elementFromPoint(e.clientX,e.clientY);const a=el&&el.closest?el.closest('.r'):null;if(!a)return;e.preventDefault();
-  if(P.mode==='balde'){const f=paintOf(s,P.color);if(a.getAttribute('fill')===f)return;snap();a.setAttribute('fill',f);saveP();pop(700);checkBalde(s);return}
+  if(P.mode==='balde'&&P.tool!=='giz'){const f=paintOf(s,P.color);if(a.getAttribute('fill')===f)return;snap();a.setAttribute('fill',f);saveP();pop(700);checkBalde(s);return}
   if(P.mode==='numeros'){if(a.dataset.n===undefined||a.dataset.f)return;if(+a.dataset.n!==P.num){a.classList.remove('bad');void a.getBBox();a.classList.add('bad');pop(200);return}
     snap();a.setAttribute('fill',PLANS[PAGES[P.i].n].c[P.num]);a.dataset.f='1';const t=s.querySelector(`.num[data-k="${a.dataset.k}"]`);if(t)t.remove();saveP();pop(720);markNumDone();
     if(!s.querySelector('.r[data-n]:not([data-f])'))setTimeout(finishSvg,500);return}
@@ -177,9 +179,17 @@ $('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const
     splashSound();const t0=performance.now();const step=t=>{const k=Math.max(0,Math.min(1,(t-t0)/520));c.setAttribute('r',(560*(1-Math.pow(1-k,3))).toFixed(1));if(k<1)requestAnimationFrame(step);else saveP()};requestAnimationFrame(step);return}
   /* giz */
   snap();const g=clipFor(s,a);const path=document.createElementNS(NS,'path');const d=`M${q.x.toFixed(1)} ${q.y.toFixed(1)} l0.1 0`;path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',paintOf(s,P.color));path.setAttribute('stroke-width',P.w);path.setAttribute('stroke-linecap','round');path.setAttribute('stroke-linejoin','round');g.appendChild(path);
-  P.scrib={s,path,d};try{$('#page').setPointerCapture(e.pointerId)}catch(x){}});
+  P.scrib={s,path,d,a,g};try{$('#page').setPointerCapture(e.pointerId)}catch(x){}});
 $('#page').addEventListener('pointermove',e=>{const sc=P.scrib;if(!sc)return;evs(e).forEach(ev=>{const q=toSvg(sc.s,ev);sc.d+=` L${q.x.toFixed(1)} ${q.y.toFixed(1)}`});if(!sc.raf)sc.raf=requestAnimationFrame(()=>{sc.raf=0;sc.path.setAttribute('d',sc.d)})});
-const pEnd=()=>{if(P.scrib){P.scrib.path.setAttribute('d',P.scrib.d);P.scrib=null;saveP()}};
+const pEnd=()=>{if(P.scrib){const sc=P.scrib;sc.path.setAttribute('d',sc.d);P.scrib=null;if(P.mode==='balde')covCheck(sc);saveP();if(P.mode==='balde')checkBalde(sc.s)}};
+/* rabisco: a parte conta como pintada quando o rabisco cobre quase toda ela */
+function covCheck(sc){const a=sc.a;if(a.dataset.cov)return;try{const s=sc.s,b=a.getBBox(),toA=a.getCTM().inverse().multiply(s.getCTM());
+  const all=[];for(let n=a.nextElementSibling;n&&(n.matches('g[clip-path]')||n.classList.contains('o'));n=n.nextElementSibling)if(n.matches('g[clip-path]'))all.push(...n.querySelectorAll('path'));
+  const R=a.getBoundingClientRect();
+  let tot=0,hit=0;const pt=s.createSVGPoint(),inv=s.getScreenCTM().inverse();
+  for(let i=0;i<14;i++)for(let j=0;j<14;j++){pt.x=R.left+R.width*(i+.5)/14;pt.y=R.top+R.height*(j+.5)/14;const q=pt.matrixTransform(inv);const qa=q.matrixTransform(toA);
+    if(!a.isPointInFill(qa))continue;tot++;for(const p of all){if(p.isPointInStroke(q)){hit++;break}}}
+  if(tot&&hit/tot>.82){a.dataset.cov='1';pop(880)}}catch(e){}}
 $('#page').addEventListener('pointerup',pEnd);$('#page').addEventListener('pointercancel',pEnd);
 $('#pUndo').onclick=()=>{if(!P.hist.length)return;svgEl().innerHTML=P.hist.pop();saveP();markNumDone();pop(330)};
 $('#pClear').onclick=()=>ask('Recomeçar este desenho?',()=>{snap();freshPage();saveP();markNumDone()});
@@ -188,7 +198,7 @@ $('#pPrint').onclick=()=>{const pr=$('#print');pr.innerHTML=pageSvg(PAGES[P.i]);
 function svgToUrl(svg,size=900){return new Promise(res=>{const c=svg.cloneNode(true);c.setAttribute('width',size);c.setAttribute('height',size);c.setAttribute('xmlns',NS);c.querySelectorAll('.nums').forEach(n=>n.remove());
   const str=new XMLSerializer().serializeToString(c);const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=cv.height=size;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,size,size);x.drawImage(im,0,0,size,size);res(cv.toDataURL('image/jpeg',.88))};im.onerror=()=>res(null);im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(str)})}
 /* terminou de pintar tudo: parabéns e guarda na galeria sozinho */
-let bDone=false;function checkBalde(s){if(bDone)return;const left=[...s.querySelectorAll('.r')].filter(r=>(r.getAttribute('fill')||'').toLowerCase()==='#fff').length;if(!left){bDone=true;setTimeout(()=>{finishSvg().finally(()=>bDone=false)},600)}}
+let bDone=false;function checkBalde(s){if(bDone)return;const left=[...s.querySelectorAll('.r')].filter(r=>(r.getAttribute('fill')||'').toLowerCase()==='#fff'&&!r.dataset.cov).length;if(!left){bDone=true;setTimeout(()=>{finishSvg().finally(()=>bDone=false)},600)}}
 async function finishSvg(){const url=await svgToUrl(svgEl());store.del(pKey());complete(url,()=>openPicker(P.mode))}
 $('#pDone').onclick=()=>{pop(600);finishSvg()};
 
@@ -398,7 +408,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='4.9.1';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.0';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}

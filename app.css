@@ -354,3 +354,5 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .picard.lock .pisky{filter:saturate(.85)}
 
 .ptabs{padding:0 14px 8px;flex-wrap:wrap;gap:8px}.ptabs .ico.txt{height:44px;font-size:17px}
+
+.toolrow .ico.tool svg{width:30px;height:30px}
