@@ -185,7 +185,7 @@ function mDrop(){const d=M.drag;if(!d)return;M.drag=null;cancelAnimationFrame(d.
     clank();speak(M.parts[+g.dataset.k][1]);M.left--;if(!M.left)setTimeout(finishBuild,450)}
   else{setT(g,g._slot.x,g._slot.y,g._slot.s,true);pop(300)}}
 $('#mStage').addEventListener('pointerup',mDrop);$('#mStage').addEventListener('pointercancel',mDrop);
-function finishBuild(){svgM().querySelector('.ghost').style.display='none';honk();setTimeout(()=>window.CARROS.afterBuild(),700);
+function finishBuild(){svgM().querySelector('.ghost').style.display='none';honk();setTimeout(()=>window.CARROS.afterBuild(TH.award('car:'+M.v.id)),700);
   const s=svgM();s.classList.add('built');const d=done();if(!d.includes(M.v.id)){d.push(M.v.id);store().set('thur-carros',d)}$('#cNext').hidden=false}
 $('#cNext').onclick=()=>{pop(600);openPosto()};
 $('#cAgain').onclick=()=>{pop(330);openMontar(M.i)};
@@ -240,7 +240,7 @@ function parabens(title,sub,svg,buttons,sticker){$('#pbT').innerHTML=[...title].
   $('#parab').classList.add('on');party();setTimeout(party,900);fanfare();speak(title+' '+sub)}
 $('#pbB').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;$('#parab').classList.remove('on');pop(600);pBtns[+b.dataset.i][1]()};
 window.CARROS.parabens=parabens;
-window.CARROS.afterBuild=()=>parabens('Parabéns!','Você montou o '+M.v.n.toLowerCase()+'!',carSvg(M.v),[['Escolher a pista',()=>window.CARROS.openPistas()],['Garagem',()=>show('garagem')]]);
+window.CARROS.afterBuild=st=>parabens('Parabéns!','Você montou o '+M.v.n.toLowerCase()+'!',carSvg(M.v),[['Escolher a pista',()=>window.CARROS.openPistas()],['Garagem',()=>show('garagem')]],st);
 
 /* pista: o carro anda sobre morros e rampas */
 const pcv=$('#pcv'),px=pcv.getContext('2d');
@@ -289,7 +289,7 @@ function tick(t){if(!S.on)return;if(!$('#pista').classList.contains('on')){S.on=
   S.spin+=S.v*dt;
   if(S.eng&&cfg.som)try{S.eng.o.frequency.setTargetAtTime(55+S.v*.25,actx().currentTime,.1)}catch(e){}
   S.stars.forEach(s=>{if(!s.got&&Math.abs(s.x-S.x)<70&&Math.abs(s.y-(S.y-60))<90){s.got=true;S.got++;$('#psCount').textContent=S.got;const w=window.CARROS.ls.get('thur-estrelas',0)+1;window.CARROS.ls.set('thur-estrelas',w);TH.pop(900)}});
-  if(!S.done&&S.x>=END){S.done=true;S.gas=false;engine(false);setTimeout(()=>{const st=TH.award();parabens('Parabéns!',`Você pegou ${S.got} estrelas! Agora você tem ${window.CARROS.ls.get('thur-estrelas',0)} para gastar na loja.`,carSvg(M.v),[['Correr de novo',()=>openPista()],['Outra pista',()=>window.CARROS.openPistas()],['Ir para a loja',()=>window.CARROS.openLoja(M.i)],['Garagem',()=>show('garagem')]],st)},900)}
+  if(!S.done&&S.x>=END){S.done=true;S.gas=false;engine(false);setTimeout(()=>{const st=TH.award('pista:'+window.CARROS.ls.get('thur-pista','dia'));parabens('Parabéns!',`Você pegou ${S.got} estrelas! Agora você tem ${window.CARROS.ls.get('thur-estrelas',0)} para gastar na loja.`,carSvg(M.v),[['Correr de novo',()=>openPista()],['Outra pista',()=>window.CARROS.openPistas()],['Ir para a loja',()=>window.CARROS.openLoja(M.i)],['Garagem',()=>show('garagem')]],st)},900)}
   draw();requestAnimationFrame(tick)}
 function deco(kind,x,y){px.strokeStyle='#2E2440';px.lineWidth=4;
   if(kind==='palma'){px.strokeStyle='#8B5A2B';px.lineWidth=12;px.beginPath();px.moveTo(x,y);px.quadraticCurveTo(x+18,y-60,x+8,y-130);px.stroke();px.fillStyle='#3FB35A';[[-1,0],[1,0],[-.7,-.6],[.7,-.6],[0,-1]].forEach(([dx,dy])=>{px.beginPath();px.ellipse(x+8+dx*36,y-130+dy*14+12,40,11,Math.atan2(dy+.5,dx)*.6,0,7);px.fill()});px.fillStyle='#8B5A2B';px.beginPath();px.arc(x+8,y-124,9,0,7);px.fill()}

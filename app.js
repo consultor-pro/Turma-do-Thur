@@ -68,16 +68,32 @@ $('#viewClose').onclick=()=>$('#viewer').classList.remove('on');
 $('#viewSave').onclick=()=>{try{const a=document.createElement('a');a.href=$('#viewImg').src;a.download='arte-turma-do-thur.jpg';document.body.appendChild(a);a.click();a.remove();toast('Imagem salva!')}catch(e){toast('Não deu para salvar aqui.')}};
 
 /* ---------- adesivos ---------- */
-function award(){const got=store.get('thur-st',[]);const left=STICKERS.map((_,i)=>i).filter(i=>!got.includes(i));const i=left.length?left[rnd(left.length)]:rnd(STICKERS.length);if(!got.includes(i)){got.push(i);store.set('thur-st',got)}return STICKERS[i]}
-onShow.adesivos=()=>{const got=store.get('thur-st',[]);$('#stTitle').textContent=`Meus adesivos (${got.length} de ${STICKERS.length})`;
-  $('#album').innerHTML=STICKERS.map((s,i)=>got.includes(i)?`<div class="stk" role="img" aria-label="Adesivo">${s}</div>`:`<div class="stk locked" aria-label="Adesivo ainda não ganho">?</div>`).join('')};
+/* adesivos: um para cada atividade que dá para completar (o álbum cresce junto com o app) */
+let ACTS_=null;
+function acts(){if(ACTS_)return ACTS_;const k=[];const seen=new Set();
+  PAGES.forEach(p=>{if(!seen.has(p.n)){seen.add(p.n);k.push('balde:'+p.n)}});
+  Object.keys(PLANS).forEach(n=>k.push('numeros:'+n));PIXELS.forEach((_,i)=>k.push('px:'+i));REVEAL.forEach((_,i)=>k.push('rv:'+i));
+  ['up','low'].forEach(s=>LETRAS.forEach(l=>k.push('l:'+s+':'+(s==='low'?l[0].toLowerCase():l[0]))));NUMS.forEach((_,i)=>k.push('l:num:'+i));
+  PALAVRAS.forEach(w=>k.push('w:'+w[0]));
+  const C=window.CARROS;if(C){C.V.forEach(v=>k.push('car:'+v.id));Object.keys(C.PISTAS||{}).forEach(p=>k.push('pista:'+p))}
+  ['arroz','feijao','macarrao','carne','salada'].forEach(r=>k.push('cook:'+r));
+  ACTS_=[...new Set(k)];return ACTS_}
+const STK_BG=['#FFF4D2','#DDF3FF','#E5F9DD','#FFE3F0','#EEE5FF','#FFE8D6'];
+const stkOf=i=>({e:STICKERS[i%STICKERS.length],bg:STK_BG[Math.floor(i/STICKERS.length)%STK_BG.length]});
+function gotSet(){let g=store.get('thur-st2',null);if(!g){g=[];const old=store.get('thur-st',[]);const A=acts();old.forEach(()=>{const left=A.filter(x=>!g.includes(x));if(left.length)g.push(left[rnd(left.length)])});store.set('thur-st2',g)}return g}
+/* ganha o adesivo da atividade (repetir não dá outro); sem atividade: um adesivo que ainda falta */
+function award(key){const A=acts(),g=gotSet();let k=key&&A.includes(key)?key:null;
+  if(!k){const left=A.filter(x=>!g.includes(x));k=left.length?left[rnd(left.length)]:A[rnd(A.length)]}
+  const fresh=!g.includes(k);if(fresh){g.push(k);store.set('thur-st2',g)}award.fresh=fresh;return stkOf(A.indexOf(k)).e}
+onShow.adesivos=()=>{const A=acts(),g=new Set(gotSet());$('#stTitle').textContent=`Meus adesivos (${A.filter(k=>g.has(k)).length} de ${A.length})`;
+  $('#album').innerHTML=A.map((k,i)=>{const s=stkOf(i);return g.has(k)?`<div class="stk" style="background:${s.bg}" role="img" aria-label="Adesivo">${s.e}</div>`:`<div class="stk locked" aria-label="Adesivo ainda não ganho">?</div>`}).join('')};
 let doneBack=null;
-function complete(url,back){
+function complete(url,back,key){
   if(url)dbAdd(url);
-  const st=award();
+  const st=award(key);
   $('#doneImg').parentElement.style.display=url?'':'none';if(url)$('#doneImg').src=url;
   const d=$('#doneSt');d.textContent=st;d.style.animation='none';void d.offsetWidth;d.style.animation='';
-  $('#doneT').textContent=url?'Que lindo! Guardei na galeria e você ganhou um adesivo!':'Muito bem! Você ganhou um adesivo!';
+  $('#doneT').textContent=(url?'Que lindo! Guardei na galeria':'Muito bem!')+(award.fresh?' Você ganhou um adesivo novo!':' Você já tinha esse adesivo — complete outras atividades para ganhar mais!');
   doneBack=back||null;$('#done').classList.add('on');party();hop();speak(url?'Que lindo! Você ganhou um adesivo!':'Muito bem! Você ganhou um adesivo!');
 }
 $('#doneOk').onclick=()=>{$('#done').classList.remove('on');pop(520);if(doneBack)doneBack()};
@@ -199,7 +215,7 @@ function svgToUrl(svg,size=900){return new Promise(res=>{const c=svg.cloneNode(t
   const str=new XMLSerializer().serializeToString(c);const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=cv.height=size;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,size,size);x.drawImage(im,0,0,size,size);res(cv.toDataURL('image/jpeg',.88))};im.onerror=()=>res(null);im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(str)})}
 /* terminou de pintar tudo: parabéns e guarda na galeria sozinho */
 let bDone=false;function checkBalde(s){if(bDone)return;const left=[...s.querySelectorAll('.r')].filter(r=>(r.getAttribute('fill')||'').toLowerCase()==='#fff'&&!r.dataset.cov).length;if(!left){bDone=true;setTimeout(()=>{finishSvg().finally(()=>bDone=false)},600)}}
-async function finishSvg(){const url=await svgToUrl(svgEl());store.del(pKey());complete(url,()=>openPicker(P.mode))}
+async function finishSvg(){const url=await svgToUrl(svgEl());store.del(pKey());complete(url,()=>openPicker(P.mode),P.mode+':'+PAGES[P.i].n)}
 $('#pDone').onclick=()=>{pop(600);finishSvg()};
 
 /* ---------- tela livre: desenhar, brilho, espelho, aquarela ---------- */
@@ -289,7 +305,7 @@ function paintPx(el,isDown){if(!el||!el.classList.contains('px')||el.dataset.n==
   X.painted.add(idx);el.style.background=X.d.c[X.sel];el.textContent='';el.classList.remove('hl');
   const now=performance.now();if(now-pxPopT>70){pop(700+rnd(200));pxPopT=now}
   store.set('thur-px-'+X.i,[...X.painted]);markPx();
-  if(X.painted.size===$$('#pxGrid .px[data-n]').length){X.down=false;setTimeout(()=>{const c=document.createElement('canvas');c.width=c.height=600;drawPix(c,X.d,null);store.del('thur-px-'+X.i);complete(c.toDataURL('image/jpeg',.9),()=>show('pixpick'))},450)}}
+  if(X.painted.size===$$('#pxGrid .px[data-n]').length){X.down=false;setTimeout(()=>{const c=document.createElement('canvas');c.width=c.height=600;drawPix(c,X.d,null);store.del('thur-px-'+X.i);complete(c.toDataURL('image/jpeg',.9),()=>show('pixpick'),'px:'+X.i)},450)}}
 const gridEl=$('#pxGrid');
 gridEl.addEventListener('pointerdown',e=>{e.preventDefault();X.down=true;try{gridEl.setPointerCapture(e.pointerId)}catch(x){}paintPx(document.elementFromPoint(e.clientX,e.clientY),true)});
 gridEl.addEventListener('pointermove',e=>{if(!X.down)return;evs(e).forEach(ev=>paintPx(document.elementFromPoint(ev.clientX,ev.clientY),false))});
@@ -324,7 +340,7 @@ let rQ=[],rRaf=0;
 rc.addEventListener('pointermove',e=>{if(!R.down)return;evs(e).forEach(ev=>rQ.push(rPt(ev)));if(!rRaf)rRaf=requestAnimationFrame(()=>{rRaf=0;rQ.forEach(rub);rQ=[]})});
 const rUp=()=>{if(!R.down)return;rQ.forEach(rub);rQ=[];R.down=false;R.last=null;checkReveal()};rc.addEventListener('pointerup',rUp);rc.addEventListener('pointercancel',rUp);
 function checkReveal(){const q=R.rect;if(!q||R.done)return;const id=rcx.getImageData(q.x|0,q.y|0,Math.ceil(q.w),Math.ceil(q.h)).data,W=Math.ceil(q.w);let tot=0,left=0;for(let y=0;y<q.h;y+=8)for(let x=0;x<W;x+=8){tot++;if(id[(y*W+x)*4+3]>10)left++}
-  if(left/tot<.12){R.done=true;rc.style.transition='opacity .6s';rc.style.opacity=0;setTimeout(()=>{const c=document.createElement('canvas');c.width=c.height=720;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,720,720);const im=R.img,s=Math.min(720/im.width,720/im.height);x.drawImage(im,(720-im.width*s)/2,(720-im.height*s)/2,im.width*s,im.height*s);complete(c.toDataURL('image/jpeg',.9),()=>show('revpick'))},700)}}
+  if(left/tot<.12){R.done=true;rc.style.transition='opacity .6s';rc.style.opacity=0;setTimeout(()=>{const c=document.createElement('canvas');c.width=c.height=720;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,720,720);const im=R.img,s=Math.min(720/im.width,720/im.height);x.drawImage(im,(720-im.width*s)/2,(720-im.height*s)/2,im.width*s,im.height*s);complete(c.toDataURL('image/jpeg',.9),()=>show('revpick'),'rv:'+R.i)},700)}}
 $('#rAgain').onclick=()=>{pop(330);openReveal(R.i)};
 
 /* ---------- letras ---------- */
@@ -352,7 +368,7 @@ function lCheck(){if(lDone||!mk.width)return;const a=mk.getContext('2d').getImag
   for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2){const i=(y*W+x)*4+3;if(a[i]>100){const c=Math.min(G-1,Math.floor(x/W*G))+G*Math.min(G-1,Math.floor(y/H*G));cl[c]++;if(b[i]>100)cb[c]++}}
   const tot=cl.reduce((p,q)=>p+q,0);const parts=cl.every((n,c)=>n<tot*.02||cb[c]/n>.7);
   if(L&&both/L>.8&&both/U>.45&&parts){lDone=true;$('#lStars').innerHTML='<svg viewBox="0 0 100 100" width="55%" height="55%" aria-hidden="true"><polygon points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round" opacity=".9"/></svg>';party();const it=lItems()[lIdx];speak('Muito bem! '+(lSet==='num'?it[1]:it[0].toUpperCase()+' de '+it[1]));
-    if(every('thur-cnt-l',3))setTimeout(()=>complete(null,null),1600)}}
+    const lk='l:'+lSet+':'+it[0];if(every('thur-cnt-l',3))setTimeout(()=>complete(null,null,lk),1600);else award(lk)}}
 function sayLetter(){const it=lItems()[lIdx];speak(lSet==='num'?it[1]:it[0].toUpperCase()+', de '+it[1])}
 $('#lNext').onclick=()=>{pop(520);setLetter(lIdx+1);sayLetter()};$('#lPrev').onclick=()=>{pop(520);setLetter(lIdx-1);sayLetter()};
 $('#lClear').onclick=()=>{pop(330);setLetter(lIdx)};$('#lSay').onclick=sayLetter;
@@ -374,7 +390,7 @@ const wl=i=>[...word[0]][i];
 function renderSlots(){$('#slots').innerHTML=slots.map((t,i)=>{const c=t===null?(wHint?wl(i):''):wl(t);return`<button class="slot${t!==null?' full':''}" data-s="${i}" aria-label="Espaço ${i+1}">${c}</button>`}).join('')}
 $('#ltiles').onclick=e=>{const b=e.target.closest('.lt');if(!b||b.classList.contains('used'))return;const k=slots.indexOf(null);if(k<0)return;const t=+b.dataset.t;slots[k]=t;b.classList.add('used');speak(wl(t).toLowerCase());pop(640);renderSlots();if(!slots.includes(null))wCheck()};
 $('#slots').onclick=e=>{const s=e.target.closest('.slot');if(!s)return;const i=+s.dataset.s,t=slots[i];if(t===null)return;slots[i]=null;$(`.lt[data-t="${t}"]`).classList.remove('used');pop(380);renderSlots()};
-function wCheck(){const got=slots.map(t=>wl(t)).join('');if(got===word[0]){$$('.slot').forEach(s=>s.classList.add('ok'));party();speak(word[0].toLowerCase()+'! Muito bem!');if(every('thur-cnt-w',3))setTimeout(()=>complete(null,newWord),1500);else setTimeout(newWord,2600)}
+function wCheck(){const got=slots.map(t=>wl(t)).join('');if(got===word[0]){$$('.slot').forEach(s=>s.classList.add('ok'));party();speak(word[0].toLowerCase()+'! Muito bem!');const wk='w:'+word[0];if(every('thur-cnt-w',3))setTimeout(()=>complete(null,newWord,wk),1500);else{award(wk);setTimeout(newWord,2600)}}
   else{const box=$('#slots');box.classList.add('shake');pop(200);setTimeout(()=>{box.classList.remove('shake');slots.forEach((t,i)=>{if(t!==null&&wl(t)!==wl(i)){$(`.lt[data-t="${t}"]`).classList.remove('used');slots[i]=null}});renderSlots()},450)}}
 $('#wSay').onclick=()=>{if(word)speak(word[0].toLowerCase())};$('#wNext').onclick=()=>{pop(520);newWord()};
 $('#wHint').onclick=()=>{wHint=!wHint;store.set('thur-dica',wHint);$('#wHint').classList.toggle('on',wHint);renderSlots();pop(480)};
@@ -401,14 +417,14 @@ onShow.pais=()=>{$('#panel').hidden=true;$('#gate').hidden=false;const a=3+rnd(7
 $('#cfgSom').checked=cfg.som;$('#cfgVoz').checked=cfg.voz;
 $('#cfgSom').onchange=e=>{cfg.som=e.target.checked;store.set('thur-cfg',cfg)};$('#cfgVoz').onchange=e=>{cfg.voz=e.target.checked;store.set('thur-cfg',cfg)};
 $('#clrArt').onclick=()=>ask('Apagar todas as artes da galeria?',()=>{dbClear();toast('Galeria apagada.')});
-$('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st');toast('Adesivos zerados.')});
+$('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st');store.set('thur-st2',[]);toast('Adesivos zerados.')});
 $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.keys(localStorage).filter(k=>/^thur-(s|t|px)-/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}toast('Pinturas em andamento apagadas.')});
 
 window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award};
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.1';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.2';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}

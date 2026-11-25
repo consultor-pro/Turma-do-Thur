@@ -67,6 +67,7 @@ function cozinhar(){if(C.step!=='fogo')return;C.step='cozinhando';setBtn('',fals
     if(Math.random()<.3){C.blobs.forEach(b=>{if(b.f==='agua'||b.f==='grao')b.y+=rnd(4)-2});drawPot()}
     if(k<1&&C.step==='cozinhando')requestAnimationFrame(tick);else if(C.step==='cozinhando')finish()};requestAnimationFrame(tick)}
 function finish(){C.step='pronto';bar(1);drawPot(true);party();[0,.12,.24,.4].forEach((d,i)=>tone('sine',[523,659,784,1046][i],[523,659,784,1046][i]*1.01,.25,.12,d));
+  const st=window.TH.award('cook:'+C.r.id);$('#ckTitle').textContent=C.r.n+' pronto! '+st;
   speak(C.r.fim+' Leve para a mesa!');setBtn('🍽️ Servir na mesa')}
 function servir(){const id=C.r.id;close();window.MUNDO.go('cozinha');
   setTimeout(()=>{const e=$(`#stage .ent.food[data-id="${id}"]`);if(!e)return;const an=e.querySelector('.an');
