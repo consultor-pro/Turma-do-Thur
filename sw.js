@@ -1,4 +1,4 @@
-const CACHE = 'turma-thur-v2';
+const CACHE = 'turma-thur-v3';
 const FILES = ['./', './index.html', './manifest.json', './thur.png', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -17,7 +17,7 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
-      if (res.ok && new URL(e.request.url).origin === location.origin) {
+      if (res.ok || res.type === 'opaque') {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
       }
