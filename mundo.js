@@ -4,11 +4,11 @@
 const {$,$$,show,pop,speak,actx,cfg,rnd,onShow}=window.TH;
 const O='img/mundo/obj/';
 const CH=[
-  {id:'thur',v:'thur',src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!',pitch:1.1},
-  {id:'zuzu',v:'zuzu',src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!',pitch:1.6},
-  {id:'lelo',v:'lelo',src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!',pitch:.75},
-  {id:'pituca',v:'pituca',src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!',pitch:1.9},
-  {id:'bubu',v:'bubu',src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!',pitch:1.4}];
+  {id:'thur',v:'thur',boca:[47,136,54,24,186,480],src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!',pitch:1.1},
+  {id:'zuzu',v:'zuzu',boca:[80,149,64,44,236,240],src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!',pitch:1.6},
+  {id:'lelo',v:'lelo',boca:[78,129,106,50,263,240],src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!',pitch:.75},
+  {id:'pituca',v:'pituca',boca:[86,142,76,48,246,240],src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!',pitch:1.9},
+  {id:'bubu',v:'bubu',boca:[113,139,44,46,310,240],src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!',pitch:1.4}];
 const SCENES={
   parque:{n:'Parque',bg:'img/mundo/parque.jpg',items:[
     {id:'cavalinho',w:15,x:14,y:82,seat:[54,42],act:'rock'},
@@ -79,7 +79,10 @@ const FALAS={
   'cenoura':['Cenoura! Agora eu enxergo no escuro!','Cenourinha! Crunch, crunch! Igual um coelhinho!']};
 function mk(d){const e=document.createElement('div');e.className='ent '+d.kind;e.dataset.id=d.id;e.dataset.w=d.w;place(e,d.x,d.y,d.w);
   if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;if(d.pitch)e.dataset.pitch=d.pitch;if(d.v)e.dataset.v=d.v;if(d.auto)e.dataset.auto=1;
-  e.innerHTML=`<div class="an"><img class="im" src="${d.src}" alt="" draggable="false"></div>`;return e}
+  let boca='';if(d.boca){const [x,y,w,h,W,H]=d.boca;boca=`<div class="boca" style="left:${x/W*100}%;top:${y/H*100}%;width:${w/W*100}%;height:${h/H*100}%;background-image:url(${d.src});background-size:${W/w*100}% ${H/h*100}%;background-position:${x/(W-w)*100}% ${y/(H-h)*100}%"></div>`}
+  e.innerHTML=`<div class="an"><img class="im" src="${d.src}" alt="" draggable="false">${boca}</div>`;return e}
+/* boca mexendo enquanto o personagem fala */
+document.addEventListener('thur-fala',ev=>{const {who,on}=ev.detail;stage.querySelectorAll('.ent.char').forEach(c=>c.classList.toggle('falando',on&&c.dataset.v===who))});
 function build(key){cur=key;const S=SCENES[key];stage.classList.remove('isnight');stage.querySelectorAll('.ent,.fx').forEach(e=>e.remove());
   stage.querySelector('.sbg').src=S.bg;$('#mTitle').textContent=S.n;
   S.items.forEach(it=>stage.appendChild(mk({src:O+it.id+'.webp',...it,kind:it.food?'food':'obj'})));

@@ -334,3 +334,14 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 
 .ico.pronto{width:auto;padding:0 16px 0 10px;gap:6px;font-size:18px;font-weight:800;display:inline-flex;align-items:center}
 .ico.pronto svg{width:26px;height:26px}
+
+/* boca falando e corpinho animado */
+.ent .boca{position:absolute;pointer-events:none;background-repeat:no-repeat;transform-origin:50% 15%;opacity:0}
+.ent.falando .boca{opacity:1;animation:boca .2s ease-in-out infinite alternate}
+@keyframes boca{from{transform:scale(1,1)}to{transform:scale(1.08,1.55)}}
+.ent.char.falando>.an{animation:falaCorpo .4s ease-in-out infinite alternate}
+@keyframes falaCorpo{from{transform:rotate(-2deg) scaleY(1)}to{transform:rotate(2deg) scaleY(1.03)}}
+.ent.char.drag>.an{animation:anda .32s ease-in-out infinite alternate}
+@keyframes anda{from{transform:scale(1.1) rotate(-7deg) translateY(0)}to{transform:scale(1.1) rotate(7deg) translateY(-6%)}}
+.ent.char:not(.drag):not(.falando):not(.apertado)>.an{animation:respira 2.4s ease-in-out infinite alternate}
+@keyframes respira{from{transform:scaleY(1)}to{transform:scaleY(1.025) scaleX(.99)}}
