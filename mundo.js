@@ -4,11 +4,11 @@
 const {$,$$,show,pop,speak,actx,cfg,rnd,onShow}=window.TH;
 const O='img/mundo/obj/';
 const CH=[
-  {id:'thur',src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!',pitch:1.1},
-  {id:'zuzu',src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!',pitch:1.6},
-  {id:'lelo',src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!',pitch:.75},
-  {id:'pituca',src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!',pitch:1.9},
-  {id:'bubu',src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!',pitch:1.4}];
+  {id:'thur',v:'thur',src:'img/thur.png',w:9,say:'Oi! Eu sou o Thur!',pitch:1.1},
+  {id:'zuzu',v:'zuzu',src:'img/pets/zuzu.png',w:7.5,say:'Zum-zum! Eu sou o Zuzu!',pitch:1.6},
+  {id:'lelo',v:'lelo',src:'img/pets/lelo.png',w:7.5,say:'Oi! Eu sou o Lelo!',pitch:.75},
+  {id:'pituca',v:'pituca',src:'img/pets/pituca.png',w:7.5,say:'Pulão! Eu sou a Pituca!',pitch:1.9},
+  {id:'bubu',v:'bubu',src:'img/pets/bubu.png',w:8.5,say:'Atchim! Eu sou a Bubu!',pitch:1.4}];
 const SCENES={
   parque:{n:'Parque',bg:'img/mundo/parque.jpg',items:[
     {id:'cavalinho',w:15,x:14,y:82,seat:[54,42],act:'rock'},
@@ -59,7 +59,7 @@ function applyLv(c,anim=true){c.style.transition=anim?'width .5s cubic-bezier(.3
   let b=c.querySelector(':scope > .need');const full=(LV[c.dataset.id]||0)>=MAXLV;
   if(full&&!b){b=document.createElement('div');b.className='need';b.innerHTML='<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="18" fill="#fff" stroke="#2E2440" stroke-width="3"/><path d="M12 14h16v6c0 6-4 9-8 9s-8-3-8-9z" fill="#BDE6FF" stroke="#2E2440" stroke-width="2.5"/><rect x="11" y="10" width="18" height="5" rx="2" fill="#fff" stroke="#2E2440" stroke-width="2.5"/></svg>';c.appendChild(b)}
   if(!full&&b)b.remove();c.classList.toggle('apertado',full)}
-function say(c,t,queue){if(!cfg.voz)return;try{const s=speechSynthesis;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=.95;u.pitch=Math.min(2,+(c&&c.dataset.pitch)||1.1);const v=s.getVoices().find(v=>/pt[-_]BR/i.test(v.lang));if(v)u.voice=v;s.speak(u)}catch(e){}}
+function say(c,t,queue){TH.speak(t,(c&&c.dataset.v)||'thur',queue)}
 const FALAS={
   'maçã':['Maçã crocante! Crec, crec, crec!','Hummm, maçã vermelhinha! Que delícia!'],
   'banana':['Banana! Uh uh, ah ah! Virei macaquinho!','Bananinha docinha! Escorregou na boca!'],
@@ -70,7 +70,7 @@ const FALAS={
   'biscoito':['Biscoito! Croc, croc, croc! Caiu farelo!','Biscoito com gotinhas! Que crocante!'],
   'cenoura':['Cenoura! Agora eu enxergo no escuro!','Cenourinha! Crunch, crunch! Igual um coelhinho!']};
 function mk(d){const e=document.createElement('div');e.className='ent '+d.kind;e.dataset.id=d.id;e.dataset.w=d.w;place(e,d.x,d.y,d.w);
-  if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;if(d.pitch)e.dataset.pitch=d.pitch;if(d.auto)e.dataset.auto=1;
+  if(d.seat)e.dataset.seat=d.seat.join(',');if(d.act)e.dataset.act=d.act;if(d.food){e.dataset.food=d.food;e.dataset.hx=d.x;e.dataset.hy=d.y}if(d.say)e.dataset.say=d.say;if(d.pitch)e.dataset.pitch=d.pitch;if(d.v)e.dataset.v=d.v;if(d.auto)e.dataset.auto=1;
   e.innerHTML=`<div class="an"><img class="im" src="${d.src}" alt="" draggable="false"></div>`;return e}
 function build(key){cur=key;const S=SCENES[key];stage.classList.remove('isnight');stage.querySelectorAll('.ent,.fx').forEach(e=>e.remove());
   stage.querySelector('.sbg').src=S.bg;$('#mTitle').textContent=S.n;

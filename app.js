@@ -18,7 +18,12 @@ let ac=null;
 function actx(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch(e){ac=null}return ac}
 function pop(f=520){if(!cfg.som)return;const a=actx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(f,a.currentTime);o.frequency.exponentialRampToValueAtTime(f*1.8,a.currentTime+.12);g.gain.setValueAtTime(.16,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.18);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.2)}catch(e){}}
 function splashSound(){if(!cfg.som)return;const a=actx();if(!a)return;try{const n=a.sampleRate*.25,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();f.type='lowpass';f.frequency.value=900;g.gain.value=.5;s.buffer=b;s.connect(f).connect(g).connect(a.destination);s.start()}catch(e){}}
-function speak(t){if(!cfg.voz)return;try{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=.88;u.pitch=1.15;const v=s.getVoices().find(v=>/pt[-_]BR/i.test(v.lang));if(v)u.voice=v;s.speak(u)}catch(e){}}
+/* vozes: Thur = menino; mascotes = vozinhas de bichinho (estilo esquilo: bem aguda e rápida) */
+const VOZES={thur:{p:1.75,r:1.05},zuzu:{p:2,r:1.3},lelo:{p:2,r:1.18},pituca:{p:2,r:1.4},bubu:{p:2,r:1.24}};
+const MASC=/daniel|ant[oô]nio|felipe|fabio|f[aá]bio|humberto|julio|j[uú]lio|ricardo|donato|valerio|male|masculin/i;
+let VCACHE=null;function ptVoice(){const vs=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));if(!vs.length)return null;if(VCACHE&&vs.includes(VCACHE))return VCACHE;VCACHE=vs.find(v=>MASC.test(v.name)&&v.localService)||vs.find(v=>MASC.test(v.name))||vs.find(v=>v.localService)||vs[0];return VCACHE}
+function speak(t,who='thur',queue=false){if(!cfg.voz)return;try{const s=window.speechSynthesis;if(!s)return;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vz=VOZES[who]||VOZES.thur;u.pitch=vz.p;u.rate=vz.r;const v=ptVoice();if(v)u.voice=v;s.speak(u)}catch(e){}}
+try{speechSynthesis.addEventListener('voiceschanged',()=>{VCACHE=null})}catch(e){}
 function party(){const p=$('#party');p.innerHTML='';for(let i=0;i<44;i++){const c=document.createElement('i');c.style.left=Math.random()*100+'vw';c.style.background=COLORS[i%12];c.style.animationDelay=Math.random()*.5+'s';p.appendChild(c)}[660,880,1100].forEach((f,i)=>setTimeout(()=>pop(f),i*120));setTimeout(()=>p.innerHTML='',2500)}
 function hop(){$$('.peek').forEach(p=>{p.classList.remove('hop');void p.offsetWidth;p.classList.add('hop')})}
 function peek(view){const p=view.querySelector('.peek');if(p)p.src='img/pets/'+PETS[rnd(4)]+'.png'}
@@ -358,9 +363,9 @@ $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.
 
 window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award};
 /* ---------- início ---------- */
-{const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem'].includes(h)?h:'home',false)}
+{const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='4.3';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='4.4';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}

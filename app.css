@@ -277,3 +277,24 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .ent.apertado>.an{animation:aperto .5s ease-in-out infinite alternate}
 @keyframes aperto{to{transform:translateX(3%) rotate(2deg)}}
 .fx .bub{display:block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0 25%,rgba(190,230,255,.7) 26% 100%);border:2px solid #9ED6F0}
+
+/* loja */
+#loja{background-image:url(img/bg-quarto.jpg)}
+.lmain{flex:1;display:flex;gap:14px;padding:0 14px 14px;min-height:0}
+.lprev{flex:1 1 45%;background:#fff;border-radius:28px;box-shadow:0 6px 0 var(--sombra);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:14px;min-height:0}
+.lcar{width:100%;max-width:520px}.lcar svg{width:100%;height:auto;display:block}
+.lpick{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.lpk{width:74px;height:48px;border-radius:14px;background:#F4EFE6;padding:4px}.lpk svg{width:100%;height:100%}
+.lpk.on{box-shadow:0 0 0 3px var(--ink);background:#fff}
+.lside{flex:1 1 55%;display:flex;flex-direction:column;gap:10px;min-height:0}
+.ltabs{justify-content:flex-start}.ltabs .ico.txt{min-width:0;font-size:17px;height:46px}
+.litems{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;align-content:start;padding:4px}
+.litem{background:#fff;border-radius:22px;padding:10px 8px;box-shadow:0 5px 0 var(--sombra);display:flex;flex-direction:column;align-items:center;gap:6px;font-size:16px;font-weight:800}
+.litem.using{box-shadow:0 0 0 4px var(--verde),0 5px 0 var(--sombra)}
+.swc{width:60px;height:60px;border-radius:50%;box-shadow:inset 0 -6px 0 rgba(0,0,0,.15),0 0 0 3px #2E2440;display:block}
+.swc.orig{background:#fff;border-radius:14px;width:90px;height:60px;box-shadow:none}.swc.orig svg{width:100%;height:100%}
+.ipv{width:66px;height:60px}.ipt{font-size:34px;height:60px;line-height:60px;color:#bbb}
+.lbt{background:#F4EFE6;border-radius:999px;padding:4px 14px;font-size:16px;display:flex;align-items:center;gap:4px}
+.lbt.buy{background:#FFF4D2}
+.litem.using .lbt{background:var(--verde);color:#fff}
+@media (max-width:700px){.lmain{flex-direction:column}.lprev{flex:0 0 auto}.lcar{max-width:300px}}
