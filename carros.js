@@ -367,7 +367,7 @@ function fanfare(){if(!cfg.som)return;const a=actx();if(!a)return;[523,659,784,1
 let pBtns=[];
 function parabens(title,sub,svg,buttons,sticker){$('#pbT').innerHTML=[...title].map((ch,i)=>`<span style="color:${['#FF4D4D','#FF9F1C','#F5B800','#4CC764','#4FB3F0','#9B5DE5','#FF85C0'][i%7]};animation-delay:${i*60}ms">${ch===' '?'&nbsp;':ch}</span>`).join('');
   $('#pbS').textContent=sub;$('#pbCar').innerHTML=svg||'';$('#pbSt').textContent=sticker||'';$('#pbSt').hidden=!sticker;
-  $('#pbB').innerHTML=buttons.map((b,i)=>`<button class="pbtn${i===0?' go2 bigb':''}" data-i="${i}">${b[0]}</button>`).join('');pBtns=buttons;
+  $('#pbB').innerHTML=buttons.map((b,i)=>`<button class="pbtn${i===0?' go2':''}" data-i="${i}">${b[0]}</button>`).join('');pBtns=buttons;
   $('#parab').classList.add('on');party();setTimeout(party,900);fanfare();speak(title+' '+sub)}
 $('#pbB').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;$('#parab').classList.remove('on');pop(600);pBtns[+b.dataset.i][1]()};
 window.CARROS.parabens=parabens;

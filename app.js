@@ -461,7 +461,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.4';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.5';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
@@ -472,3 +472,39 @@ $('#forceUpd').onclick=async()=>{toast('Atualizando o app…');try{if('serviceWo
 (()=>{const inApp=matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches||navigator.standalone;
   const go=()=>{const d=document.documentElement;if(document.fullscreenElement||!d.requestFullscreen)return;d.requestFullscreen({navigationUI:'hide'}).catch(()=>{})};
   if(inApp)document.addEventListener('pointerup',go,{passive:true});})();
+
+/* desenhos nos botões com palavras: a criança que ainda não lê entende pelo desenho */
+(()=>{const I={
+  replay:'<path d="M24 10a10 10 0 1 0 3 8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M27 4v8h-8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>',
+  flag:'<path d="M7 4v26" stroke="#2E2440" stroke-width="3" stroke-linecap="round"/><rect x="8" y="5" width="18" height="12" fill="#fff" stroke="#2E2440" stroke-width="2"/><path d="M8 5h4.5v4H8zM17 5h4.5v4H17zM12.5 9H17v4h-4.5zM21.5 9H26v4h-4.5zM8 13h4.5v4H8zM17 13h4.5v4H17z" fill="#2E2440"/>',
+  shop:'<path d="M6 12h20l-2 16H8z" fill="#FF85C0" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 12V9a5 5 0 0 1 10 0v3" fill="none" stroke="#2E2440" stroke-width="2.5"/><path d="M16 17l1.5 3 3.3.4-2.4 2.3.6 3.3-3-1.6-3 1.6.6-3.3-2.4-2.3 3.3-.4z" fill="#FFD60A"/>',
+  garage:'<path d="M4 14L16 5l12 9v14H4z" fill="#FFD60A" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><rect x="8" y="17" width="16" height="11" fill="#fff" stroke="#2E2440" stroke-width="2"/><rect x="10" y="21" width="12" height="5" rx="2" fill="#FF4D4D"/>',
+  brush:'<path d="M20 4l8 8-10 10-8-8z" fill="#4FB3F0" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 14c-4 1-5 5-6 12 6-1 11-2 12-6z" fill="#FF4D4D" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/>',
+  wheel:'<circle cx="16" cy="16" r="12" fill="#2B2B2B" stroke="#2E2440" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/>',
+  sticker:'<path d="M16 3l4 8.5 9.3 1.2-6.8 6.4 1.7 9.2L16 23.8 7.8 28.3l1.7-9.2-6.8-6.4 9.3-1.2z" fill="#FFD60A" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/>',
+  wing:'<path d="M3 22h26l-4-8H7z" fill="#2B2B2B" stroke="#2E2440" stroke-width="2"/><path d="M16 22v7" stroke="#2E2440" stroke-width="4"/><path d="M24 3v12" stroke="#2E2440" stroke-width="2"/><path d="M24 3l-7 2.5 7 2.5z" fill="#FF4D4D"/>',
+  horn:'<path d="M4 12h6l12-7v22l-12-7H4z" fill="#FF9F1C" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><path d="M25 10a8 8 0 0 1 0 12" fill="none" stroke="#2E2440" stroke-width="2.5" stroke-linecap="round"/>',
+  pet:'<circle cx="16" cy="18" r="11" fill="#7ED957" stroke="#2E2440" stroke-width="2.5"/><path d="M16 7c0-3 2-4 4-4" fill="none" stroke="#2E2440" stroke-width="2.5"/><circle cx="20" cy="3.5" r="2.5" fill="#7ED957" stroke="#2E2440" stroke-width="1.5"/><circle cx="12" cy="17" r="2" fill="#2E2440"/><circle cx="20" cy="17" r="2" fill="#2E2440"/><path d="M12 22q4 4 8 0" fill="none" stroke="#2E2440" stroke-width="2" stroke-linecap="round"/>',
+  paw:'<ellipse cx="16" cy="21" rx="7" ry="6" fill="#C98B4E" stroke="#2E2440" stroke-width="2"/><circle cx="8" cy="13" r="3" fill="#C98B4E" stroke="#2E2440" stroke-width="2"/><circle cx="13" cy="8" r="3" fill="#C98B4E" stroke="#2E2440" stroke-width="2"/><circle cx="19" cy="8" r="3" fill="#C98B4E" stroke="#2E2440" stroke-width="2"/><circle cx="24" cy="13" r="3" fill="#C98B4E" stroke="#2E2440" stroke-width="2"/>',
+  car:'<path d="M3 21v-5l4-1 4-6h10l4 6 4 1v5z" fill="#FF4D4D" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><circle cx="9" cy="22" r="3.5" fill="#2B2B2B" stroke="#2E2440" stroke-width="1.5"/><circle cx="23" cy="22" r="3.5" fill="#2B2B2B" stroke="#2E2440" stroke-width="1.5"/>',
+  flower:'<g fill="#FF85C0" stroke="#2E2440" stroke-width="2"><circle cx="16" cy="8" r="5"/><circle cx="24" cy="14" r="5"/><circle cx="21" cy="23" r="5"/><circle cx="11" cy="23" r="5"/><circle cx="8" cy="14" r="5"/></g><circle cx="16" cy="16" r="4" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/>',
+  ball:'<circle cx="16" cy="16" r="12" fill="#fff" stroke="#2E2440" stroke-width="2.5"/><path d="M4 16h24" stroke="#FF4D4D" stroke-width="5"/><path d="M16 4v24" stroke="#4FB3F0" stroke-width="5"/><circle cx="16" cy="16" r="12" fill="none" stroke="#2E2440" stroke-width="2.5"/>',
+  letter:'<text x="16" y="26" font-size="26" font-weight="800" text-anchor="middle" fill="#4FB3F0" stroke="#2E2440" stroke-width="1.5" font-family="Baloo 2,Arial Black,sans-serif">A</text>',
+  number:'<text x="16" y="25" font-size="18" font-weight="800" text-anchor="middle" fill="#9B5DE5" stroke="#2E2440" stroke-width="1" font-family="Baloo 2,Arial Black,sans-serif">123</text>',
+  word:'<rect x="2" y="9" width="9" height="14" rx="2" fill="#FF4D4D" stroke="#2E2440" stroke-width="2"/><rect x="11.5" y="9" width="9" height="14" rx="2" fill="#4FB3F0" stroke="#2E2440" stroke-width="2"/><rect x="21" y="9" width="9" height="14" rx="2" fill="#4CC764" stroke="#2E2440" stroke-width="2"/>',
+  star1:'<path d="M16 5l3 6.6 7.2.8-5.3 4.9 1.4 7.1L16 20.9l-6.3 3.5 1.4-7.1-5.3-4.9 7.2-.8z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/>',
+  star2:'<g fill="#FFD60A" stroke="#2E2440" stroke-width="1.8"><path d="M9 8l2 4.4 4.8.5-3.6 3.3.9 4.8L9 18.7 4.9 21l.9-4.8-3.6-3.3 4.8-.5z"/><path d="M23 8l2 4.4 4.8.5-3.6 3.3.9 4.8-4.1-2.3-4.1 2.3.9-4.8-3.6-3.3 4.8-.5z"/></g>',
+  star3:'<g fill="#FFD60A" stroke="#2E2440" stroke-width="1.6"><path d="M16 2l2 4.4 4.8.5-3.6 3.3.9 4.8L16 12.7 11.9 15l.9-4.8-3.6-3.3 4.8-.5z"/><path d="M8 14l2 4.4 4.8.5-3.6 3.3.9 4.8L8 24.7 3.9 27l.9-4.8-3.6-3.3 4.8-.5z"/><path d="M24 14l2 4.4 4.8.5-3.6 3.3.9 4.8-4.1-2.3-4.1 2.3.9-4.8-3.6-3.3 4.8-.5z"/></g>',
+  family:'<path d="M16 28C5 20 3 13 7 9s9-2 9 2c0-4 5-6 9-2s2 11-9 19z" fill="#FF4D6D" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/>',
+  plate:'<ellipse cx="16" cy="20" rx="13" ry="6" fill="#fff" stroke="#2E2440" stroke-width="2.5"/><path d="M8 18c0-6 4-10 8-10s8 4 8 10z" fill="#FFD36B" stroke="#2E2440" stroke-width="2"/>',
+  fire:'<path d="M16 3c2 6 9 9 9 17a9 9 0 0 1-18 0c0-5 3-7 4-11 1 3 2 4 3 4 0-4 1-7 2-10z" fill="#FF9F1C" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 15c1 3 4 4 4 8a4 4 0 0 1-8 0c0-3 3-4 4-8z" fill="#FFD60A"/>',
+  check:'<path d="M6 17l6 6 14-14" fill="none" stroke="#4CC764" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
+  hand:'<path d="M12 28c-4-2-7-6-7-9l3-2 4 3V6a2 2 0 0 1 4 0v8l8 1c2 .4 3 2 3 4l-1 6c-.5 2-2 3-4 3z" fill="#FFD2A8" stroke="#2E2440" stroke-width="2.2" stroke-linejoin="round"/>',
+  mirror:'<path d="M16 3v26" stroke="#B8860B" stroke-width="2.5" stroke-dasharray="3 3"/><path d="M14 8C6 4 2 12 8 16c-5 4 0 12 6 8z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/><path d="M18 8c8-4 12 4 6 8 5 4 0 12-6 8z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/>'};
+  const R=[[/^correr de novo/i,'replay'],[/pista|correr!/i,'flag'],[/loja/i,'shop'],[/^garagem/i,'garage'],[/^pintura/i,'brush'],[/^rodas?$/i,'wheel'],[/^adesivos?/i,'sticker'],[/^enfeites?/i,'wing'],[/^buzinas?/i,'horn'],[/^pistas$/i,'flag'],
+    [/^bolelecos/i,'pet'],[/^bichos/i,'paw'],[/^ve[ií]culos/i,'car'],[/^natureza/i,'flower'],[/^coisas/i,'ball'],[/^letras/i,'letter'],[/^n[uú]meros/i,'number'],[/^palavras/i,'word'],
+    [/^f[aá]cil/i,'star1'],[/^m[eé]dio/i,'star2'],[/^dif[ií]cil/i,'star3'],[/^fam[ií]lia/i,'family'],[/servir/i,'plate'],[/fogo/i,'fire'],[/^usando/i,'check'],[/^usar/i,'hand'],[/^\d×$/,'mirror']];
+  const txt=el=>[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').replace(/[🔥🍽️]/gu,'').trim();
+  function deco(){document.querySelectorAll('button, .lbt').forEach(b=>{if(b.querySelector('.bi'))return;if(b.closest('#pais'))return;const t=txt(b);if(!t)return;const r=R.find(([re])=>re.test(t));if(!r)return;
+    b.insertAdjacentHTML('afterbegin',`<span class="bi" aria-hidden="true"><svg viewBox="0 0 32 32">${I[r[1]]}</svg></span>`);b.classList.add('hasbi')})}
+  let q=0;new MutationObserver(()=>{if(!q)q=requestAnimationFrame(()=>{q=0;deco()})}).observe(document.body,{childList:true,subtree:true});deco()})();
