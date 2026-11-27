@@ -42,6 +42,23 @@ const PRONTAS=[
              {bg:K,it:[C('img/poses/bubu-espirro.webp',50,98,60),B('narr','ATCHIM!!!',50,14)]},
              {bg:K,it:[C('img/thur/surpreso.webp',40,98,82),B('thur','Saúde, Bubu!',64,16,'e')]},
              {bg:K,it:[C('img/poses/bubu-feliz.webp',35,98,50),C('img/thur/joinha.webp',72,98,80),B('bubu','Obrigado, Thur!',40,16,'d')]}]}]}];
+/* quadrinhos desenhados no Gemini: página em imagem + pontos de toque nos balões (cada um fala com a voz do personagem) */
+const I=(img,bal)=>({img:'img/hq/'+img+'.webp',bal:bal.map(([x,y,who,t])=>({x,y,who,t}))});
+const GEMINI=[
+ {id:'g-ep1',tipo:'hq',t:'Episódio 1: O lanche dividido',pags:[I('ep1',[[22,13.3,'lelo','Psiu... eu vi uma coisa!'],[76,11.7,'bubu','Atchim! Tem coisa errada aqui!'],[36,59.6,'thur','Bora dividir?'],[72.5,60,'thur','Fez o bem? Brilhou também!']])]},
+ {id:'g-ep2',tipo:'hq',t:'Episódio 2: O vaso quebrado',pags:[I('ep2',[[28.5,13.3,'narr','Crás!'],[84,13,'thur','Foi o vento...'],[34,60.4,'thur','Eu quebrei sem querer.'],[74,60.4,'narr','Fez o bem? Brilhou também!']])]},
+ {id:'g-parte2',tipo:'hq',t:'Quatro jeitos de ser amigo',pags:[I('p2a',[[38.6,20.3,'thur','Turma! Olha essa bagunça!']]),
+   {lay:2,pn:[{bg:Q,it:[C('img/thur/bravo.webp',32,98,88),C('img/poses/lelo-chorando.webp',76,98,42),C('img/poses/bubu-chorando.webp',92,98,30),B('thur','Vocês só atrapalham! Voltem para as nuvens!',60,16,'e')]},
+              {bg:'#FFF4D2',it:[C('img/prof/c-acolhe.webp',30,98,92),C('img/thur/pensando.webp',78,98,78),B('clara','Todo amigo erra. Amigo de verdade pede desculpas.',55,14,'e')]}]},
+   I('p2b',[[53,20,'thur','Me desculpem. Eu falei uma coisa feia.']]),I('p2c',[[29,18,'zuzu','Psiu... eu escutei um miado!']]),I('p2d',[[49,20,'thur','Fez o bem? Brilhou também!']])]},
+ {id:'g-bubu',tipo:'hq',t:'O Bubu das emoções',pags:[I('bubu',[[28,8,'bubu','Buáááá! O mundo é injusto!'],[80,7.5,'thur','Mas nem abrimos o lanche!'],[29.5,49,'bubu','Tô bravo... Quer dizer, arco-íris!'],[78,58,'thur','Tempestade e arco-íris no mesmo minuto!']]),
+   {lay:1,pn:[{bg:'#FFE3F0',it:[C('img/poses/bubu-feliz.webp',35,98,48),C('img/poses/pituca-amor.webp',68,98,48),B('narr','Tudo bem ficar bravo. Um abraço ajuda!',50,14),B('narr','Fez o bem? Brilhou também!',50,91)]}]}]},
+ {id:'g-lelo',tipo:'hq',t:'O show do Lelo',pags:[I('lelo',[[32,7.5,'lelo','Láááá! Soltaaaa o som!'],[85,7,'pituca','É isso aí! Bis! Bis!'],[29.5,49,'thur','Show às sete da manhã?!'],[77,58,'thur','Só se eu fizer o refrão!']]),
+   {lay:1,pn:[{bg:'#E5F9DD',it:[C('img/thur/cantando.webp',50,98,80),C('img/poses/lelo-cantando.webp',18,98,40),C('img/poses/pituca-cantando.webp',82,98,40),B('narr','Cantar junto é mais divertido!',50,12),B('narr','Fez o bem? Brilhou também!',50,91)]}]}]},
+ {id:'g-zuzu',tipo:'hq',t:'A estrela do Zuzu',pags:[I('zuzu',[[32.4,7.5,'zuzu','Thur, essa estrela é o meu tesouro!'],[29.5,49,'thur','Calma, eu peg... Opa!'],[78,58,'thur','Foi a gravidade! Fiu-fiu...']]),
+   {lay:2,pn:[{bg:Q,it:[C('img/thur/pensando.webp',30,98,88),C('img/poses/zuzu-bravo.webp',75,98,45),B('thur','Espera... não foi a gravidade. Fui eu.',60,15,'e')]},
+              {bg:Q,it:[C('img/thur/joinha.webp',30,98,88),C('img/poses/zuzu-amor.webp',74,98,45),B('thur','Desculpa, Zuzu!',30,14,'d'),B('zuzu','Obrigado pela verdade!',72,14,'e'),B('narr','Fez o bem? Brilhou também!',50,90)]}]}]}];
+PRONTAS.unshift(...GEMINI);
 const mine=()=>LS.get('thur-hist',[]);
 const allStories=tipo=>[...PRONTAS.filter(s=>s.tipo===tipo).map(s=>Object.assign({pronta:1},s)),...mine().filter(s=>s.tipo===tipo)];
 const findStory=id=>PRONTAS.find(s=>s.id===id)||mine().find(s=>s.id===id);
@@ -50,12 +67,12 @@ const findStory=id=>PRONTAS.find(s=>s.id===id)||mine().find(s=>s.id===id);
 const bgCss=bg=>bg&&bg[0]==='#'?`background:${bg}`:`background:#BDE6FF url(${bg}) center/cover`;
 function itemHtml(it,i,ed){if(it.k==='img')return`<img class="hit${ed?' ed':''}" data-i="${i}" src="${it.src}" alt="" draggable="false" style="left:${it.x}%;top:${it.y}%;height:${it.s}%;transform:translate(-50%,-100%)${it.f?' scaleX(-1)':''}">`;
   return`<div class="hbal ${it.who==='narr'?'narr':'tail-'+(it.tail||'e')}${ed?' ed':''}" data-i="${i}" data-who="${it.who}" style="left:${it.x}%;top:${it.y}%">${esc(it.txt)}</div>`}
-function pageHtml(pg,ed,sel){const pn=pg.pn||[];return`<div class="hpage lay${pg.lay}">${pn.map((p,j)=>`<div class="hpn${ed&&sel===j?' sel':''}" data-p="${j}" style="${bgCss(p.bg)}">${(p.it||[]).map((it,i)=>itemHtml(it,i,ed)).join('')}</div>`).join('')}</div>`}
+function pageHtml(pg,ed,sel){if(pg.img)return`<div class="hpage himgp"><div class="himgw"><img src="${pg.img}" alt="" draggable="false">${(pg.bal||[]).map(b=>`<button class="hspot" data-who="${b.who}" data-t="${esc(b.t)}" style="left:${b.x}%;top:${b.y}%" aria-label="${esc(b.t)}"></button>`).join('')}</div></div>`;const pn=pg.pn||[];return`<div class="hpage lay${pg.lay}">${pn.map((p,j)=>`<div class="hpn${ed&&sel===j?' sel':''}" data-p="${j}" style="${bgCss(p.bg)}">${(p.it||[]).map((it,i)=>itemHtml(it,i,ed)).join('')}</div>`).join('')}</div>`}
 
 /* ---------- biblioteca ---------- */
 let TAB='livro';
 const TABS=[['video','📺','Vídeos'],['livro','📖','Livros'],['hq','💬','Quadrinhos']];
-function capa(s){const p=s.pags[0],pn=p&&p.pn&&p.pn[0];return`<div class="hcapa" style="${bgCss(pn?pn.bg:'#FFF4D2')}">${pn?(pn.it||[]).filter(i=>i.k==='img').slice(0,3).map(i=>`<img src="${i.src}" alt="" style="left:${i.x}%;height:${Math.min(90,i.s)}%;${i.f?'transform:translateX(-50%) scaleX(-1)':''}">`).join(''):''}</div>`}
+function capa(s){const p=s.pags[0];if(p&&p.img)return`<div class="hcapa" style="background:#fff url(${p.img}) center 8%/cover"></div>`;const pn=p&&p.pn&&p.pn[0];return`<div class="hcapa" style="${bgCss(pn?pn.bg:'#FFF4D2')}">${pn?(pn.it||[]).filter(i=>i.k==='img').slice(0,3).map(i=>`<img src="${i.src}" alt="" style="left:${i.x}%;height:${Math.min(90,i.s)}%;${i.f?'transform:translateX(-50%) scaleX(-1)':''}">`).join(''):''}</div>`}
 const vids=()=>[...(window.HIST_VIDEOS||[]),...LS.get('thur-videos',[])];
 function renderLib(){$('#hTabs').innerHTML=TABS.map(([k,e,n])=>`<button class="htab${k===TAB?' on':''}" data-t="${k}"><span>${e}</span>${n}</button>`).join('');
   let h='';
@@ -82,7 +99,7 @@ function openReader(id){R.s=findStory(id);if(!R.s)return;R.p=0;R.auto=false;show
 function drawR(){const s=R.s,pg=s.pags[R.p];R.run++;
   $('#hrTitle').textContent=s.t;
   $('#hrBody').innerHTML=pageHtml(pg,false)+(s.tipo==='livro'?`<div class="hrtxt">${(pg.txt||'').split(/\s+/).map((w,i)=>`<span class="hw" data-w="${i}">${esc(w)}</span>`).join(' ')}</div>`:'');
-  $('#hrPg').textContent=`${R.p+1} / ${s.pags.length}`;$('#hrDel').style.display=PRONTAS.some(p=>p.id===s.id)?'none':'block';$('#hrPrev').disabled=R.p===0;
+  $('#hrPg').textContent=`${R.p+1} / ${s.pags.length}`;$('#hrDel').style.display=PRONTAS.some(p=>p.id===s.id)?'none':'block';$('#hrEdit').style.display=s.pags.some(p=>p.img)?'none':'';$('#hrPrev').disabled=R.p===0;
   $('#hrNext').classList.toggle('fim',R.p===s.pags.length-1);
   $('#hrBody .hpage').animate([{opacity:0,transform:'translateX(40px)'},{opacity:1,transform:'none'}],{duration:300});
   if(R.auto)readPage()}
@@ -91,7 +108,7 @@ function readPage(){const s=R.s,pg=s.pags[R.p],run=R.run;
   if(s.tipo==='livro'){const ws=$$('#hrBody .hw');const txt=pg.txt||'';speak(txt,'narr');const per=Math.max(260,Math.round(5200/Math.max(6,ws.length)*(ws.length/8)));
     ws.forEach((w,i)=>setTimeout(()=>{if(R.run!==run)return;ws.forEach(x=>x.classList.remove('on'));w.classList.add('on')},i*380));
     setTimeout(()=>{if(R.run!==run)return;ws.forEach(x=>x.classList.remove('on'));if(R.auto)nextR(true)},ws.length*380+1400);return}
-  const bals=$$('#hrBody .hbal');let t=0;bals.forEach(b=>{const d=900+b.textContent.length*85;setTimeout(()=>{if(R.run!==run)return;bals.forEach(x=>x.classList.remove('on'));b.classList.add('on');speak(b.textContent,b.dataset.who==='narr'?'narr':b.dataset.who)},t);t+=d});
+  const bals=$$('#hrBody .hbal,#hrBody .hspot');let t=0;bals.forEach(b=>{const tx=b.dataset.t||b.textContent,d=900+tx.length*85;setTimeout(()=>{if(R.run!==run)return;bals.forEach(x=>x.classList.remove('on'));b.classList.add('on');speak(tx,b.dataset.who)},t);t+=d});
   setTimeout(()=>{if(R.run!==run)return;bals.forEach(x=>x.classList.remove('on'));if(R.auto)nextR(true)},t+600)}
 function nextR(auto){const s=R.s;if(R.p<s.pags.length-1){R.p++;pop(560);drawR();return}
   R.auto=false;$('#hrAuto').classList.remove('on');const done=LS.get('thur-hist-lidas',[]),first=!done.includes(s.id);if(first){done.push(s.id);LS.set('thur-hist-lidas',done)}
@@ -101,7 +118,7 @@ $('#hrNext').onclick=()=>nextR(false);
 $('#hrPrev').onclick=()=>{if(R.p>0){R.p--;pop(480);drawR()}};
 $('#hrRead').onclick=()=>{pop(600);R.run++;readPage()};
 $('#hrAuto').onclick=()=>{R.auto=!R.auto;$('#hrAuto').classList.toggle('on',R.auto);pop(600);if(R.auto){R.run++;readPage()}else{R.run++;try{speechSynthesis.cancel()}catch(e){}}};
-$('#hrBody').onclick=e=>{const b=e.target.closest('.hbal');if(b){speak(b.textContent,b.dataset.who);b.classList.add('on');setTimeout(()=>b.classList.remove('on'),1500);return}
+$('#hrBody').onclick=e=>{const b=e.target.closest('.hbal,.hspot');if(b){speak(b.dataset.t||b.textContent,b.dataset.who);b.classList.add('on');setTimeout(()=>b.classList.remove('on'),1500);return}
   const w=e.target.closest('.hw');if(w){speak(w.textContent.replace(/[^\p{L}\p{N}]/gu,''),'narr');w.classList.add('on');setTimeout(()=>w.classList.remove('on'),900);return}
   const im=e.target.closest('.hit');if(im){im.animate([{transform:im.style.transform},{transform:im.style.transform+' translateY(-12%)'},{transform:im.style.transform}],{duration:420});pop(700)}};
 $('#hrBack').onclick=()=>{R.run++;R.auto=false;try{speechSynthesis.cancel()}catch(e){}pop(440);show('historias')};

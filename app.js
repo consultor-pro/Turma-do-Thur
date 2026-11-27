@@ -516,7 +516,7 @@ window.TH.meusAdesivos=()=>{const A=acts(),g=new Set(gotSet()),seen=new Set(),ou
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','ler','mat','historias','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='8.2';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='8.3';$('#appVer').textContent='Versão '+APP_VER;
 /* backup e importação (Área dos Pais): tudo do app num arquivo só */
 (()=>{
   $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}

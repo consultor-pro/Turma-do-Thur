@@ -682,3 +682,8 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .hb{background:#F1E8FF;border-radius:12px;padding:8px 12px;font-weight:800;font-size:17px}.hb.red{background:#FFE3E3}
 .hdlg{position:fixed;inset:0;z-index:96;background:#0007;display:none;place-items:center;padding:20px}.hdlg.on{display:grid}
 .hdbox{background:#fff;border-radius:22px;padding:18px;width:min(420px,100%);display:flex;flex-direction:column;gap:12px}.hdbox b{font-size:20px}.hdbox input{font:inherit;font-size:20px;padding:10px;border:2px solid #E5E5E5;border-radius:12px}
+/* páginas desenhadas (imagem) com balões que falam */
+.himgp{padding:6px}.himgw{position:relative;width:100%}.himgw img{width:100%;display:block;border-radius:10px}
+.hspot{position:absolute;width:30%;aspect-ratio:2/1;transform:translate(-50%,-50%);border-radius:50%;background:transparent;transition:box-shadow .2s,background .2s}
+.hspot.on{background:#58CC0230;box-shadow:0 0 0 4px #58CC02}
+#hrBody .himgp{max-width:560px}
