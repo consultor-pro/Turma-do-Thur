@@ -230,6 +230,13 @@
   <div class="pbox" id="panel" hidden>
     <label class="opt"><input type="checkbox" id="cfgSom"> Sons dos botões</label>
     <label class="opt"><input type="checkbox" id="cfgVoz"> Voz que fala as letras e palavras</label>
+    <h3 class="psec">Criança</h3>
+    <div class="cfgrow"><label for="cfgNome">Nome:</label><input id="cfgNome" maxlength="14" placeholder="Thur" autocomplete="off"></div>
+    <div class="cfgrow"><label for="cfgIdade">Idade:</label><select id="cfgIdade"><option value="2">2 anos</option><option value="3">3 anos</option><option value="4">4 anos</option><option value="5">5 anos ou mais</option></select></div>
+    <p class="small">A idade escolhe o degrau do "Aprender a ler": 2 anos começa em Primeiras palavras, 3 anos em Primeiras letras e 4 anos ou mais em Aprender a ler. A criança sobe sozinha quando termina um degrau.</p>
+    <div class="cfgrow"><label for="cfgPausa">Lembrete de pausa:</label><select id="cfgPausa"><option value="0">Desligado</option><option value="15">15 minutos por dia</option><option value="20">20 minutos por dia</option><option value="30">30 minutos por dia</option><option value="45">45 minutos por dia</option><option value="60">1 hora por dia</option></select></div>
+    <p class="small">A Sociedade Brasileira de Pediatria recomenda, de 2 a 5 anos, no máximo 1 hora de tela por dia (somando TV, celular e tablet), sempre com um adulto por perto.</p>
+    <h3 class="psec">Voz</h3>
     <div class="vozrow"><span>Voz:</span><label class="opt"><input type="radio" name="vozTipo" value="masc"> Masculina</label><label class="opt"><input type="radio" name="vozTipo" value="fem"> Feminina</label><button class="pbtn" id="vozTeste">Testar voz</button></div>
     <div class="row left">
       <button class="pbtn" id="clrArt">Apagar a galeria</button>
@@ -403,6 +410,7 @@
 <div id="tr" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 2l14 31 34 4-25 23 7 34-30-17-30 17 7-34L2 37l34-4z" fill="#FFD60A" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><path d="M50 30l6 13 14 2-10 10 3 14-13-7-13 7 3-14-10-10 14-2z" fill="#FF85C0"/></svg></div>
 <div id="trp" aria-hidden="true"><img src="img/poses/zuzu-pulando.webp" alt=""><img src="img/poses/lelo-pulando.webp" alt=""><img src="img/poses/pituca-pulando.webp" alt=""><img src="img/poses/bubu-feliz.webp" alt=""></div>
 <div id="party" aria-hidden="true"></div>
+<div id="pausa" role="dialog" aria-label="Hora da pausa"><div class="pzbox"><img src="img/prof/c-acolhe.webp" alt="Professora Clara"><h2>Hora de descansar os olhinhos!</h2><p>Que tal brincar lá fora, desenhar no papel ou ler uma historinha com a família?</p><button class="pbtn" id="pzMais">Segure aqui (adulto): mais 10 minutos</button></div></div>
 <div id="toast" role="status"></div>
 <div id="print"></div>
 

@@ -488,19 +488,29 @@ onShow.pais=()=>{$('#panel').hidden=true;$('#gate').hidden=false;const a=3+rnd(7
   $('#gopts').onclick=e=>{const b2=e.target.closest('.gnum');if(!b2)return;if(+b2.dataset.v===ok){$('#gate').hidden=true;$('#panel').hidden=false}else{pop(200);onShow.pais()}}};
 $$('input[name=vozTipo]').forEach(r=>{r.checked=r.value===cfg.vozTipo;r.onchange=()=>{cfg.vozTipo=r.value;store.set('thur-cfg',cfg);VCACHE={};speak(r.value==='fem'?'Oi! Agora eu falo com voz feminina.':'Oi! Agora eu falo com voz masculina.')}});
 $('#vozTeste').onclick=()=>speak('Olá! Eu sou o Thur. Vamos brincar?');
+/* criança: nome, idade (degrau do Aprender a ler) e lembrete de pausa */
+$('#cfgNome').value=cfg.nome||'';$('#cfgNome').onchange=e=>{cfg.nome=e.target.value.trim().slice(0,14);store.set('thur-cfg',cfg)};
+$('#cfgIdade').value=cfg.idade||'2';$('#cfgIdade').onchange=e=>{cfg.idade=e.target.value;store.set('thur-cfg',cfg);const i=cfg.idade;window.LER&&window.LER.setDeg(i==='2'?0:i==='3'?1:2);toast('Pronto! O Aprender a ler foi ajustado para '+e.target.selectedOptions[0].text+'.')};
+$('#cfgPausa').value=String(cfg.pausa||0);$('#cfgPausa').onchange=e=>{cfg.pausa=+e.target.value;store.set('thur-cfg',cfg)};
 $('#cfgSom').checked=cfg.som;$('#cfgVoz').checked=cfg.voz;
 $('#cfgSom').onchange=e=>{cfg.som=e.target.checked;store.set('thur-cfg',cfg)};$('#cfgVoz').onchange=e=>{cfg.voz=e.target.checked;store.set('thur-cfg',cfg)};
 $('#clrArt').onclick=()=>ask('Apagar todas as artes da galeria?',()=>{dbClear();toast('Galeria apagada.')});
 $('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st');store.set('thur-st2',[]);toast('Adesivos zerados.')});
 $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.keys(localStorage).filter(k=>/^thur-(s|t|px)-/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}toast('Pinturas em andamento apagadas.')});
 
+/* lembrete de pausa: soma o tempo de uso do dia (só com a tela visível) */
+(()=>{const dia=()=>new Date().toDateString();let U=store.get('thur-uso',{d:dia(),s:0});
+  setInterval(()=>{if(document.hidden)return;if(U.d!==dia())U={d:dia(),s:0,extra:0};U.s+=15;store.set('thur-uso',U);
+    const lim=(cfg.pausa||0)*60+(U.extra||0)*60;if(cfg.pausa&&U.s>=lim&&!$('#pausa').classList.contains('on')){$('#pausa').classList.add('on');try{speechSynthesis.cancel()}catch(e){}speak('Hora de descansar os olhinhos! Que tal brincar lá fora?','clara')}},15000);
+  let t=null;const b=$('#pzMais');const ini=e=>{e.preventDefault();b.classList.add('hold');t=setTimeout(()=>{b.classList.remove('hold');U.extra=(U.extra||0)+10;store.set('thur-uso',U);$('#pausa').classList.remove('on');toast('Mais 10 minutos liberados.')},2000)},fim=()=>{clearTimeout(t);b.classList.remove('hold')};
+  b.addEventListener('pointerdown',ini);['pointerup','pointerleave','pointercancel'].forEach(k=>b.addEventListener(k,fim))})();
 window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award,ask,toast};
 /* adesivos já ganhos (sem repetir o desenho), para colar nos carros */
 window.TH.meusAdesivos=()=>{const A=acts(),g=new Set(gotSet()),seen=new Set(),out=[];A.forEach((k,i)=>{if(g.has(k)){const e=stkOf(i).e;if(!seen.has(e)){seen.add(e);out.push(e)}}});return out};
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','ler','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='7.1';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='8.0';$('#appVer').textContent='Versão '+APP_VER;
 /* backup e importação (Área dos Pais): tudo do app num arquivo só */
 (()=>{
   $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}

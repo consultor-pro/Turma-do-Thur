@@ -539,3 +539,39 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .lunit em{display:inline-block;margin-top:6px;font-size:20px}
 .luprof{right:10px;height:96px}
 .lunit span{display:block}.lunit em{display:table}
+/* área dos pais: criança */
+.cfgrow{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;margin:8px 0;flex-wrap:wrap}
+.cfgrow input,.cfgrow select{font:inherit;font-size:19px;padding:8px 12px;border-radius:14px;border:2px solid #E5E5E5;background:#fff;min-width:160px}
+/* pausa */
+#pausa{position:fixed;inset:0;z-index:90;background:#0008;display:none;place-items:center;padding:20px}
+#pausa.on{display:grid}
+.pzbox{background:#fff;border-radius:28px;padding:22px;max-width:420px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pzbox img{height:200px;animation:lbob 1.6s ease-in-out infinite}.pzbox h2{margin:0;font-size:28px;color:#1CB0F6}.pzbox p{margin:0;font-size:19px}
+#pzMais{position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+#pzMais.hold::after{content:'';position:absolute;inset:0;background:#58CC0255;animation:hold 2s linear forwards;transform-origin:left}
+@keyframes hold{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* degraus */
+.ldegs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:520px;margin-top:4px}
+.ldeg{background:#fff;border:3px solid #E5E5E5;border-radius:16px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;box-shadow:0 4px 0 #E5E5E5;line-height:1.1}
+.ldeg span{font-size:28px}.ldeg b{font-size:13px;font-weight:800;color:#3C3C3C;text-align:center}.ldeg small{font-size:11px;color:#999;font-weight:700}
+.ldeg.on{border-color:#58CC02;background:#D7FFB8;box-shadow:0 4px 0 #58CC02}
+/* lições fáceis (2–4 anos): sem botão verificar, alvos grandes */
+#licao.easy #lcFootW{display:none}#licao.easy.fimon #lcFootW{display:block}
+#licao.easy .lcbub{font-size:26px}
+.lcverb{display:flex;align-items:center;gap:16px;background:#fff;border:4px solid #E5E5E5;box-shadow:0 7px 0 #E5E5E5;border-radius:32px;padding:18px 26px;position:relative;margin-top:10px}
+.lcverb .lcemo{font-size:clamp(110px,30vw,170px)}.lcverb .lcbigl{font-size:clamp(110px,30vw,170px)}
+.lcart{width:clamp(110px,32vw,170px);height:clamp(110px,32vw,170px);display:block}
+.lctap{position:absolute;right:-8px;bottom:-14px;font-size:44px;animation:tapme 1.2s ease-in-out infinite}
+@keyframes tapme{50%{transform:translate(-6px,-8px) scale(1.1)}}
+.lcopts.e2{gap:18px}
+.lco.e{min-width:clamp(130px,40vw,190px);min-height:clamp(130px,40vw,190px);border-radius:28px;font-size:clamp(80px,22vw,120px)}
+.lco.e .lcemo{font-size:clamp(80px,24vw,120px)}.lco.e .lcart{width:clamp(90px,28vw,130px);height:clamp(90px,28vw,130px)}
+.lco.hint{animation:hintp .7s ease-in-out 3;border-color:#58CC02}
+@keyframes hintp{50%{transform:scale(1.12);box-shadow:0 0 0 10px #58CC0244}}
+.lco.e.ok{opacity:1;transform:scale(1.08)}
+.lcdots{display:flex;gap:14px;justify-content:center}
+.lcdot{min-width:70px;height:70px;border-radius:35px;border:4px dashed #CE82FF;display:grid;place-items:center;font-size:24px;font-weight:800;color:transparent;padding:0 10px}
+.lcdot.on{background:#CE82FF;border-style:solid;color:#fff;animation:lcin .25s}
+.lcdrum{width:150px;height:150px;border-radius:50%;background:#FF9600;box-shadow:0 8px 0 #D97F00;font-size:80px;display:grid;place-items:center}
+.lcdrum:active{transform:translateY(5px);box-shadow:0 3px 0 #D97F00}
+#toast{pointer-events:none}
