@@ -40,8 +40,8 @@
   <header class="hbar">
     <img src="img/logo.jpg" alt="" class="hlogo">
     <h1>Turma do Thur<small class="hsub">e os Bolelecos</small></h1>
-    <button class="ico" data-go="galeria" aria-label="Galeria de arte"><svg><use href="#i-frame"/></svg></button>
-    <button class="ico" data-go="adesivos" aria-label="Meus adesivos"><svg><use href="#i-star"/></svg></button>
+    <button class="hbig" data-go="galeria" aria-label="Galeria de arte"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="6" width="40" height="34" rx="5" fill="#C98B4E" stroke="#2E2440" stroke-width="3"/><rect x="9" y="11" width="30" height="24" fill="#BDE6FF"/><path d="M9 35l10-12 7 8 5-5 8 9z" fill="#4CC764"/><circle cx="31" cy="17" r="4" fill="#FFD60A"/></svg><span>Galeria</span></button>
+    <button class="hbig" data-go="adesivos" aria-label="Meus adesivos"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="8" fill="#FFF4D2" stroke="#2E2440" stroke-width="3"/><path d="M24 9l4.3 9.2 10 1.2-7.4 6.9 2 9.9L24 31.3l-8.9 4.9 2-9.9-7.4-6.9 10-1.2z" fill="#FFD60A" stroke="#2E2440" stroke-width="2.5" stroke-linejoin="round"/><circle cx="12" cy="36" r="4" fill="#FF85C0"/><circle cx="37" cy="11" r="3" fill="#4FB3F0"/></svg><span>Adesivos</span></button>
     <button class="ico" data-go="pais" aria-label="Para os pais"><svg><use href="#i-gear"/></svg></button>
   </header>
   <div class="hmain">
@@ -71,6 +71,7 @@
     <h2 id="pTitle">Pintar</h2>
     <button class="ico" id="pUndo" aria-label="Desfazer"><svg><use href="#i-undo"/></svg></button>
     <button class="ico" id="pPrint" aria-label="Imprimir folha para colorir"><svg><use href="#i-print"/></svg></button>
+<button class="ico eraser" id="pErase" aria-label="Borracha: toque no que quer apagar"><svg><use href="#i-eraser"/></svg></button>
     <button class="ico" id="pClear" aria-label="Recomeçar"><svg><use href="#i-trash"/></svg></button>
     <button class="ico go txt pronto" id="pDone" aria-label="Pronto! Guardar na galeria"><svg><use href="#i-ok"/></svg>Pronto</button>
   </div>
@@ -127,6 +128,7 @@
   <div class="bar">
     <button class="ico" data-go="pixpick" aria-label="Voltar"><svg><use href="#i-back"/></svg></button>
     <h2 id="xTitle">Pixel</h2>
+<button class="ico eraser" id="xErase" aria-label="Borracha: toque no que quer apagar"><svg><use href="#i-eraser"/></svg></button>
     <button class="ico" id="xHint" aria-label="Mostrar onde vai a cor escolhida"><svg><use href="#i-bulb"/></svg></button>
     <button class="ico" id="xClear" aria-label="Recomeçar"><svg><use href="#i-trash"/></svg></button>
   </div>
@@ -165,6 +167,7 @@
     <button class="ico" id="lPrev" aria-label="Letra anterior"><svg><use href="#i-back"/></svg></button>
     <h2 id="lTitle">A</h2>
     <button class="ico" id="lNext" aria-label="Próxima letra"><svg><use href="#i-next"/></svg></button>
+<button class="ico eraser" id="lErase" aria-label="Borracha: toque no que quer apagar"><svg><use href="#i-eraser"/></svg></button>
     <button class="ico" id="lClear" aria-label="Escrever de novo"><svg><use href="#i-trash"/></svg></button>
   </div>
   <div class="cap"><span class="pic" id="lPic" aria-hidden="true"></span><span id="lWord"></span><button class="ico" id="lSay" aria-label="Ouvir"><svg><use href="#i-sound"/></svg></button></div>
@@ -207,6 +210,7 @@
 <!-- GALERIA -->
 <section id="galeria" class="view" aria-label="Galeria de arte">
   <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Galeria de arte</h2><span class="sp"></span></div>
+  <div class="row ltabs ptabs" id="galTabs"></div>
   <div class="gal wall" id="artGal"></div>
 </section>
 
@@ -372,6 +376,7 @@
     <div class="frame"><img id="viewImg" alt="Arte guardada"></div>
     <div class="row">
       <button id="viewSave" class="big2" style="background:#4FB3F0;color:#fff" aria-label="Salvar no aparelho"><svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 5v15M10 14l6 6 6-6M7 26h18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="viewDel" class="big2" style="background:#FF4D4D" aria-label="Apagar desenho"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 10h16l-1.5 17h-13z" fill="#fff"/><path d="M6 9h20M13 9V6h6v3" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></button>
       <button id="viewClose" class="big2" style="background:#eee" aria-label="Fechar"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14l20 20M34 14L14 34" stroke="#2E2440" stroke-width="6" stroke-linecap="round"/></svg></button>
     </div>
   </div>

@@ -57,13 +57,23 @@ function palette(el,colors,onPick,start=0,nums=false){
 let dbp=null;
 function db(){if(!dbp)dbp=new Promise((res,rej)=>{try{const r=indexedDB.open('thur',1);r.onupgradeneeded=()=>r.result.createObjectStore('arte',{keyPath:'id',autoIncrement:true});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});return dbp}
 function tx(mode,fn){return db().then(d=>new Promise((res,rej)=>{const t=d.transaction('arte',mode);const out=fn(t.objectStore('arte'));t.oncomplete=()=>res(out&&out.result);t.onerror=()=>rej(t.error)}))}
-const dbAdd=url=>tx('readwrite',s=>s.add({url,t:Date.now()})).catch(()=>toast('Não deu para guardar na galeria.'));
+const dbAdd=(url,m)=>tx('readwrite',s=>s.add({url,t:Date.now(),m:m||''})).catch(()=>toast('Não deu para guardar na galeria.'));
+const dbDel=id=>tx('readwrite',s=>s.delete(id)).catch(()=>{});
 const dbAll=()=>tx('readonly',s=>s.getAll()).catch(()=>[]);
 const dbClear=()=>tx('readwrite',s=>s.clear()).catch(()=>{});
-onShow.galeria=async()=>{const all=(await dbAll()||[]).sort((a,b)=>b.t-a.t);const g=$('#artGal');
-  g.innerHTML=all.length?all.map(a=>`<button class="card" data-id="${a.id}"><img alt="Arte guardada"></button>`).join(''):'<p class="empty">A galeria ainda está vazia. Termine uma pintura e toque no botão verde para guardar aqui.</p>';
-  all.forEach(a=>{const im=g.querySelector(`[data-id="${a.id}"] img`);if(im)im.src=a.url});
-  g.onclick=e=>{const c=e.target.closest('.card');if(!c)return;const a=all.find(x=>x.id==c.dataset.id);if(!a)return;$('#viewImg').src=a.url;$('#viewer').classList.add('on');pop(520)}};
+/* galeria separada por modo, com selo de onde veio cada desenho e opção de apagar */
+const GMODES=[['balde','Colorir','#FF4D4D'],['giz','Rabiscar','#FF9F1C'],['numeros','Pintar por números','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['espelho','Espelho','#B8860B'],['px','Pixel','#21A35A'],['rv','Revelar','#F25CA2'],['','Outros','#9A9A9A']];
+const GICO={balde:'<path d="M7 14l9-9 10 10-9 9z" fill="#FF4D4D" stroke="#2E2440" stroke-width="2"/><path d="M26 18c0 3 2 4 2 6a2 2 0 0 1-4 0c0-2 2-3 2-6z" fill="#4FB3F0"/>',giz:'<path d="M20 4l8 8-14 14H6v-8z" fill="#FF9F1C" stroke="#2E2440" stroke-width="2"/>',numeros:'<text x="16" y="23" font-size="16" font-weight="800" text-anchor="middle" fill="#9B5DE5">123</text>',desenho:'<path d="M4 24C10 6 16 28 28 8" fill="none" stroke="#3D5AFE" stroke-width="4" stroke-linecap="round"/>',brilho:'<path d="M16 3l3.5 8 8.5 1-6.5 5.5 2 8.5L16 21.5 8.5 26l2-8.5L4 12l8.5-1z" fill="#FF85C0" stroke="#2E2440" stroke-width="2"/>',espelho:'<path d="M16 3v26" stroke="#B8860B" stroke-width="2" stroke-dasharray="3 3"/><path d="M14 8C6 4 2 12 8 16c-5 4 0 12 6 8zM18 8c8-4 12 4 6 8 5 4 0 12-6 8z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/>',px:'<path d="M6 6h6v6H6zM14 6h6v6h-6zM10 14h6v6h-6zM18 14h6v6h-6zM14 22h6v6h-6z" fill="#FF4D4D"/>',rv:'<rect x="4" y="6" width="24" height="20" rx="3" fill="#BDE6FF" stroke="#2E2440" stroke-width="2"/><path d="M16 6h12v20H16z" fill="#BDBDBD"/>','':'<circle cx="16" cy="16" r="10" fill="#E0E0E0" stroke="#2E2440" stroke-width="2"/>'};
+let gFilter='todos';
+onShow.galeria=async()=>{const all=(await dbAll()||[]).sort((a,b)=>b.t-a.t);const g=$('#artGal');const mo=x=>GMODES.find(m=>m[0]===(x.m||''))||GMODES[GMODES.length-1];
+  const present=GMODES.filter(m=>all.some(x=>(x.m||'')===m[0]));
+  $('#galTabs').innerHTML=all.length?[`<button class="ico txt${gFilter==='todos'?' on':''}" data-gf="todos">Todos</button>`].concat(present.map(m=>`<button class="ico txt gtab${gFilter===m[0]?' on':''}" data-gf="${m[0]}"><svg viewBox="0 0 32 32">${GICO[m[0]]}</svg>${m[1]}</button>`)).join(''):'';
+  const list=all.filter(x=>gFilter==='todos'||(x.m||'')===gFilter);
+  g.innerHTML=list.length?list.map(a=>{const m=mo(a);return`<button class="card" data-id="${a.id}"><img alt="Arte guardada"><span class="gchip" style="--gc:${m[2]}"><svg viewBox="0 0 32 32">${GICO[m[0]]}</svg>${m[1]}</span></button>`}).join(''):'<p class="empty">A galeria ainda está vazia. Termine uma pintura e ela aparece aqui.</p>';
+  list.forEach(a=>{const im=g.querySelector(`[data-id="${a.id}"] img`);if(im)im.src=a.url});
+  g.onclick=e=>{const c=e.target.closest('.card');if(!c)return;const a=all.find(x=>x.id==c.dataset.id);if(!a)return;$('#viewImg').src=a.url;$('#viewer').dataset.id=a.id;$('#viewer').classList.add('on');pop(520)}};
+$('#galTabs').onclick=e=>{const b=e.target.closest('[data-gf]');if(!b)return;gFilter=b.dataset.gf;pop(480);onShow.galeria()};
+$('#viewDel').onclick=()=>{const id=+$('#viewer').dataset.id;$('#viewer').classList.remove('on');ask('Apagar este desenho da galeria?',async()=>{await dbDel(id);toast('Desenho apagado.');onShow.galeria()})};
 $('#viewClose').onclick=()=>$('#viewer').classList.remove('on');
 $('#viewSave').onclick=()=>{try{const a=document.createElement('a');a.href=$('#viewImg').src;a.download='arte-turma-do-thur.jpg';document.body.appendChild(a);a.click();a.remove();toast('Imagem salva!')}catch(e){toast('Não deu para salvar aqui.')}};
 
@@ -89,7 +99,7 @@ onShow.adesivos=()=>{const A=acts(),g=new Set(gotSet());$('#stTitle').textConten
   $('#album').innerHTML=A.map((k,i)=>{const s=stkOf(i);return g.has(k)?`<div class="stk" style="background:${s.bg}" role="img" aria-label="Adesivo">${s.e}</div>`:`<div class="stk locked" aria-label="Adesivo ainda não ganho">?</div>`}).join('')};
 let doneBack=null;
 function complete(url,back,key){
-  if(url)dbAdd(url);window.helperCheer&&window.helperCheer();
+  if(url)dbAdd(url,key?key.split(':')[0]:'');window.helperCheer&&window.helperCheer();
   const st=award(key);
   $('#doneImg').parentElement.style.display=url?'':'none';if(url)$('#doneImg').src=url;
   const d=$('#doneSt');d.textContent=st;d.style.animation='none';void d.offsetWidth;d.style.animation='';
@@ -194,8 +204,9 @@ function addNums(svg,page){const plan=PLANS[page.n];const at=AT[page.n]||{};let 
 function freshPage(){const page=PAGES[P.i];$('#page').innerHTML=pageSvg(page);if(P.mode==='numeros')addNums(svgEl(),page)}
 function openSvg(mode,i){Object.assign(P,{mode,i,hist:[],scrib:null});const page=PAGES[i];$('#pTitle').textContent=page.n;
   $('#page').innerHTML=pageSvg(page);const saved=store.get(pKey(),null);P.needNums=false;if(saved)svgEl().innerHTML=saved;else if(mode==='numeros')P.needNums=true;
-  if(mode==='numeros'){P.num=0;palette($('#palP'),PLANS[page.n].c,(i)=>{P.num=i},0,true);markNumDone()}
-  else palette($('#palP'),COLORS,(i,c)=>{P.color=c},COLORS.indexOf(P.color));
+  P.erase=false;$('#pErase').classList.remove('on');const offE=()=>{P.erase=false;$('#pErase').classList.remove('on')};
+  if(mode==='numeros'){P.num=0;palette($('#palP'),PLANS[page.n].c,(i)=>{P.num=i;offE()},0,true);markNumDone()}
+  else palette($('#palP'),COLORS,(i,c)=>{P.color=c;offE()},COLORS.indexOf(P.color));
   $('#texRow').style.display=(mode==='balde'||mode==='giz'||mode==='respingo')?'':'none';
   $('#toolRow').style.display='none';P.tool='balde';syncTool();
   peek($('#pintar'));show('pintar')}
@@ -211,7 +222,13 @@ function clipFor(s,a){const id='c'+Date.now().toString(36)+rnd(1e6).toString(36)
   const ol=a.cloneNode();ol.setAttribute('class','o');ol.setAttribute('fill','none');ol.removeAttribute('data-n');ol.setAttribute('pointer-events','none');
   /* o rabisco novo fica POR CIMA dos anteriores (antes entrava por baixo e parecia que não pintava) */
   let ref=a;while(ref.nextElementSibling&&(ref.nextElementSibling.matches('g[clip-path]')||ref.nextElementSibling.classList.contains('o')))ref=ref.nextElementSibling;ref.after(g);g.after(ol);return g}
+/* borracha: toque numa parte e ela volta a ficar branca (some a cor e o rabisco dela) */
+function eraseRegion(s,a){let n=a.nextElementSibling;while(n&&(n.matches('g[clip-path]')||n.classList.contains('o'))){const nx=n.nextElementSibling;n.remove();n=nx}
+  a.setAttribute('fill','#fff');delete a.dataset.cov;
+  if(P.mode==='numeros'&&a.dataset.f){delete a.dataset.f;const page=PAGES[P.i];const old=s.querySelector('.nums');if(old)old.remove();addNums(s,page);s.querySelectorAll('.r[data-f]').forEach(r=>{const t=s.querySelector(`.num[data-k="${r.dataset.k}"]`);if(t)t.remove()});markNumDone()}}
+$('#pErase').onclick=()=>{P.erase=!P.erase;$('#pErase').classList.toggle('on',P.erase);pop(380);if(P.erase)speak('Borracha! Toque no que quer apagar.')};
 $('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const el=document.elementFromPoint(e.clientX,e.clientY);const a=el&&el.closest?el.closest('.r'):null;if(!a)return;e.preventDefault();
+  if(P.erase){if(a.getAttribute('fill')==='#fff'&&!(a.nextElementSibling&&a.nextElementSibling.matches('g[clip-path]')))return;snap();eraseRegion(s,a);saveP();pop(300);return}
   if(P.mode==='balde'&&P.tool!=='giz'){const f=paintOf(s,P.color);if(a.getAttribute('fill')===f)return;snap();a.setAttribute('fill',f);saveP();pop(700);checkBalde(s);return}
   if(P.mode==='numeros'){if(a.dataset.n===undefined||a.dataset.f)return;if(+a.dataset.n!==P.num){a.classList.remove('bad');void a.getBBox();a.classList.add('bad');pop(200);return}
     snap();a.setAttribute('fill',PLANS[PAGES[P.i].n].c[P.num]);a.dataset.f='1';const t=s.querySelector(`.num[data-k="${a.dataset.k}"]`);if(t)t.remove();saveP();pop(720);markNumDone();
@@ -256,7 +273,7 @@ const dark=()=>T.mode==='brilho';
 function openTela(mode,page=-1){Object.assign(T,{mode,page,cur:null,e:false,stamp:-1});$('#stampRow').style.display='none';T.strokes=store.get(tKey(),[]);
   $('#tTitle').textContent=page>=0?PAGES[page].n:TITLES[mode];$('#tPaper').classList.toggle('dark',dark());
   const pal=dark()?NEON:COLORS;T.color=pal[dark()?4:7];palette($('#palT'),pal,(i,c)=>{T.color=c;T.e=false;T.stamp=-1;syncT()},dark()?4:7);
-  $('#tEraser').style.display=(mode==='desenho'||mode==='espelho')?'':'none';$('#tStamp').style.display=mode==='desenho'?'':'none';
+  $('#tEraser').style.display='';$('#tStamp').style.display=mode==='desenho'?'':'none';
   $('#tRainbow').style.display=mode==='brilho'?'':'none';$('#tMir').style.display=mode==='espelho'?'':'none';
   const ml=$('#mirLines');ml.style.display=mode==='espelho'?'block':'none';ml.classList.toggle('four',T.mir===4);$('#tMir').textContent=T.mir+'×';
   const ao=$('#aquaOver');if(mode==='aquarela'){ao.innerHTML=pageSvg({n:PAGES[page].n,s:PAGES[page].s.replace(/fill="#fff"/g,'fill="none"')});ao.style.display='flex'}else{ao.innerHTML='';ao.style.display='none'}
@@ -295,7 +312,7 @@ $('#tClear').onclick=()=>ask('Apagar tudo?',()=>{T.strokes=[];redrawT();saveT()}
 $('#tBack').onclick=async()=>{pop(440);
   /* saiu do desenho livre: guarda sozinho na galeria */
   /* guarda na galeria (só se mudou desde a última vez) e o desenho continua na tela para continuar depois */
-  const sig=T.strokes.length+':'+JSON.stringify(T.strokes[T.strokes.length-1]||'').length;if(T.strokes.length&&store.get(tKey()+'-g','')!==sig){const url=await telaUrl();dbAdd(url);store.set(tKey()+'-g',sig);saveT();toast('Guardei seu desenho na galeria! 🎨')}
+  const sig=T.strokes.length+':'+JSON.stringify(T.strokes[T.strokes.length-1]||'').length;if(T.strokes.length&&store.get(tKey()+'-g','')!==sig){const url=await telaUrl();dbAdd(url,T.mode);store.set(tKey()+'-g',sig);saveT();toast('Guardei seu desenho na galeria! 🎨')}
   if(T.mode==='aquarela')openPicker('aquarela');else show('home')};
 $$('.tsize').forEach(b=>b.onclick=()=>{T.s=+b.dataset.s;$$('.tsize').forEach(x=>x.classList.toggle('on',x===b));T.stamp=-1;syncT();pop(500)});
 $('#tEraser').onclick=()=>{T.e=!T.e;T.stamp=-1;syncT();pop(380)};
@@ -320,7 +337,7 @@ $('#pixGal').onclick=e=>{const c=e.target.closest('.card');if(c){pop(520);openPi
 function openPixel(i){X.i=i;X.d=PIXELS[i];X.sel=0;X.painted=new Set(store.get('thur-px-'+i,[]));$('#xTitle').textContent=X.d.n;
   const g=X.d.g,cols=Math.max(...g.map(r=>r.length));
   $('#pxGrid').innerHTML=g.map((r,ri)=>[...r.padEnd(cols,'.')].map((ch,ci)=>{const idx=ri*cols+ci;if(ch==='.')return'<div class="px blank"></div>';const done=X.painted.has(idx);return`<div class="px" data-i="${idx}" data-n="${+ch-1}"${done?` style="background:${X.d.c[+ch-1]}"`:''}>${done?'':ch}</div>`}).join('')).join('');
-  palette($('#palX'),X.d.c,(n)=>{X.sel=n;hl()},0,true);drawPix($('#pxPrev'),X.d,null);markPx();peek($('#pixel'));show('pixel')}
+  X.erase=false;$('#xErase').classList.remove('on');palette($('#palX'),X.d.c,(n)=>{X.sel=n;X.erase=false;$('#xErase').classList.remove('on');hl()},0,true);drawPix($('#pxPrev'),X.d,null);markPx();peek($('#pixel'));show('pixel')}
 function layoutPx(){const d=X.d;if(!d)return;const r=$('#pxWrap').getBoundingClientRect();const rows=d.g.length,cols=Math.max(...d.g.map(r=>r.length));const cell=Math.max(16,Math.floor(Math.min((r.width-36)/cols,(r.height-36)/rows))-2);
   const gr=$('#pxGrid');gr.style.gridTemplateColumns=`repeat(${cols},${cell}px)`;gr.style.gridAutoRows=cell+'px';gr.style.fontSize=Math.max(10,cell*.45)+'px'}
 onShow.pixel=()=>requestAnimationFrame(()=>{layoutPx();hl()});
@@ -328,7 +345,9 @@ new ResizeObserver(()=>{if($('#pixel').classList.contains('on'))layoutPx()}).obs
 function hl(){$$('#pxGrid .px[data-n]').forEach(c=>c.classList.toggle('hl',X.hint&&+c.dataset.n===X.sel&&!X.painted.has(+c.dataset.i)));$('#xHint').classList.toggle('on',X.hint)}
 function markPx(){X.d.c.forEach((_,n)=>{const left=$$(`#pxGrid .px[data-n="${n}"]`).some(c=>!X.painted.has(+c.dataset.i));const b=$(`#palX .sw[data-i="${n}"]`);if(b)b.classList.toggle('gone',!left)})}
 let pxPopT=0;
-function paintPx(el,isDown){if(!el||!el.classList.contains('px')||el.dataset.n===undefined)return;const idx=+el.dataset.i;if(X.painted.has(idx))return;
+function paintPx(el,isDown){if(!el||!el.classList.contains('px')||el.dataset.n===undefined)return;const idx=+el.dataset.i;
+  if(X.erase){if(!X.painted.has(idx))return;X.painted.delete(idx);el.style.background='';el.textContent=String(+el.dataset.n+1);store.set('thur-px-'+X.i,[...X.painted]);markPx();hl();pop(300);return}
+  if(X.painted.has(idx))return;
   if(+el.dataset.n!==X.sel){if(isDown){el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad');pop(200)}return}
   X.painted.add(idx);el.style.background=X.d.c[X.sel];el.textContent='';el.classList.remove('hl');
   const now=performance.now();if(now-pxPopT>70){pop(700+rnd(200));pxPopT=now}
@@ -338,6 +357,7 @@ const gridEl=$('#pxGrid');
 gridEl.addEventListener('pointerdown',e=>{e.preventDefault();X.down=true;try{gridEl.setPointerCapture(e.pointerId)}catch(x){}paintPx(document.elementFromPoint(e.clientX,e.clientY),true)});
 gridEl.addEventListener('pointermove',e=>{if(!X.down)return;evs(e).forEach(ev=>paintPx(document.elementFromPoint(ev.clientX,ev.clientY),false))});
 const pxUp=()=>X.down=false;gridEl.addEventListener('pointerup',pxUp);gridEl.addEventListener('pointercancel',pxUp);
+$('#xErase').onclick=()=>{X.erase=!X.erase;$('#xErase').classList.toggle('on',X.erase);pop(380);if(X.erase)speak('Borracha! Passe o dedo no que quer apagar.')};
 $('#xHint').onclick=()=>{X.hint=!X.hint;hl();pop(480)};
 $('#xClear').onclick=()=>ask('Recomeçar este desenho?',()=>{store.del('thur-px-'+X.i);openPixel(X.i)});
 
@@ -374,10 +394,10 @@ $('#rAgain').onclick=()=>{pop(330);openReveal(R.i)};
 /* ---------- letras ---------- */
 let lSet='up',lIdx=0,lColor=COLORS[5],tStroke=null,lDone=false,tFs=200,tW=0,tH=0;
 const tcv=$('#tcv'),tctx=tcv.getContext('2d'),mk=document.createElement('canvas'),um=document.createElement('canvas');const K=.25;
-palette($('#palL'),COLORS,(i,c)=>lColor=c,5);
+palette($('#palL'),COLORS,(i,c)=>{lColor=c;lErase=false;$('#lErase').classList.remove('on')},5);
 const lItems=()=>lSet==='num'?NUMS.map((n,i)=>[String(i),n,'']):LETRAS.map(l=>[lSet==='low'?l[0].toLowerCase():l[0],l[1],l[2]]);
 const glyphFont=px=>`800 ${px}px "Baloo 2", "Arial Rounded MT Bold", Arial, sans-serif`;
-function setLetter(i){const it=lItems();lIdx=(i+it.length)%it.length;const ch=it[lIdx][0];lDone=false;$('#lStars').innerHTML='';$('#lTitle').textContent=ch;$('#lPic').textContent=it[lIdx][2];$('#lWord').textContent=it[lIdx][1];
+function setLetter(i){LSTR=[];const it=lItems();lIdx=(i+it.length)%it.length;const ch=it[lIdx][0];lDone=false;$('#lStars').innerHTML='';$('#lTitle').textContent=ch;$('#lPic').textContent=it[lIdx][2];$('#lWord').textContent=it[lIdx][1];
   const r=tcv.parentElement.getBoundingClientRect();if(!r.width)return;const d=DPR();tW=r.width;tH=r.height;tcv.width=tW*d;tcv.height=tH*d;tctx.setTransform(d,0,0,d,0,0);
   tFs=Math.min(tH*.9,tW*.85);tctx.fillStyle='#fff';tctx.fillRect(0,0,tW,tH);tctx.font=glyphFont(tFs);tctx.textAlign='center';tctx.textBaseline='middle';const y=tH/2+tFs*.06;
   for(const c of[mk,um]){c.width=Math.ceil(tW*K);c.height=Math.ceil(tH*K)}const m=mk.getContext('2d');m.font=glyphFont(tFs*K);m.textAlign='center';m.textBaseline='middle';m.fillStyle='#000';m.fillText(ch,mk.width/2,y*K);
@@ -397,7 +417,12 @@ function skeleton(cv){const W=cv.width,H=cv.height,d=cv.getContext('2d').getImag
 function tLine(c,p,from,w,k){c.lineCap='round';c.lineJoin='round';c.lineWidth=w*k;c.beginPath();const a=Math.max(0,from-1);c.moveTo(p[a][0]*k,p[a][1]*k);if(p.length===1)c.lineTo(p[0][0]*k+.1,p[0][1]*k);for(let i=a+1;i<p.length;i++)c.lineTo(p[i][0]*k,p[i][1]*k);c.stroke()}
 const lPt=e=>{const r=tcv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
 function lDraw(from){const w=tFs*.1;tctx.strokeStyle=lColor;tLine(tctx,tStroke,from,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,tStroke,from,w,K)}
-tcv.addEventListener('pointerdown',e=>{e.preventDefault();tcv.setPointerCapture(e.pointerId);tStroke=[lPt(e)];lDraw(0);lDrawn=1});
+let LSTR=[],lErase=false;
+function lRedraw(){/* redesenha o pontilhado e os traços que sobraram */const ch=lItems()[lIdx][0];const sv=LSTR;setLetter(lIdx);LSTR=sv;sv.forEach(st=>{tStroke=st.p;tctx.strokeStyle=st.c;const w=tFs*.1;tLine(tctx,st.p,0,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,st.p,0,w,K)});tStroke=null}
+function lEraseAt(pt){const r=tFs*.09;const before=LSTR.length;LSTR=LSTR.filter(st=>!st.p.some(q=>(q[0]-pt[0])**2+(q[1]-pt[1])**2<r*r));if(LSTR.length!==before){pop(300);lRedraw()}}
+$('#lErase').onclick=()=>{lErase=!lErase;$('#lErase').classList.toggle('on',lErase);pop(380);if(lErase)speak('Borracha! Passe o dedo no risco que quer apagar.')};
+tcv.addEventListener('pointerdown',e=>{e.preventDefault();tcv.setPointerCapture(e.pointerId);if(lErase){tStroke=null;lEraseAt(lPt(e));tcv._er=true;return}tcv._er=false;tStroke=[lPt(e)];LSTR.push({p:tStroke,c:lColor});lDraw(0);lDrawn=1});
+tcv.addEventListener('pointermove',e=>{if(tcv._er&&e.buttons)lEraseAt(lPt(e))});
 let lDrawn=0,lRaf=0;
 tcv.addEventListener('pointermove',e=>{if(!tStroke)return;evs(e).forEach(ev=>tStroke.push(lPt(ev)));if(!lRaf)lRaf=requestAnimationFrame(()=>{lRaf=0;if(tStroke){lDraw(lDrawn);lDrawn=tStroke.length}})});
 const lEnd=()=>{if(!tStroke)return;if(lDrawn<tStroke.length)lDraw(lDrawn);tStroke=null;lCheck()};tcv.addEventListener('pointerup',lEnd);tcv.addEventListener('pointercancel',lEnd);
@@ -465,7 +490,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.9';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='6.0';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
