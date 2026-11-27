@@ -487,10 +487,12 @@ $('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st')
 $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.keys(localStorage).filter(k=>/^thur-(s|t|px)-/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}toast('Pinturas em andamento apagadas.')});
 
 window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award};
+/* adesivos já ganhos (sem repetir o desenho), para colar nos carros */
+window.TH.meusAdesivos=()=>{const A=acts(),g=new Set(gotSet()),seen=new Set(),out=[];A.forEach((k,i)=>{if(g.has(k)){const e=stkOf(i).e;if(!seen.has(e)){seen.add(e);out.push(e)}}});return out};
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='6.1';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='6.2';$('#appVer').textContent='Versão '+APP_VER;
 /* backup e importação (Área dos Pais): tudo do app num arquivo só */
 (()=>{
   $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}

@@ -245,6 +245,8 @@ const DECAL={
   chamas:'<path d="M-40 20 C-30 -6 -18 6 -12 -16 C-4 2 4 -20 12 -6 C18 -24 30 -4 40 -12 C34 10 20 22 -40 20 Z" fill="#FF9F1C" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/><path d="M-26 16 C-18 2 -10 10 -6 -2 C0 8 6 -6 12 4 C16 -6 24 4 28 0 C22 12 10 18 -26 16 Z" fill="#FFD60A"/>',
   sete:'<circle r="28" fill="#fff" stroke="#2E2440" stroke-width="4"/><text y="13" text-anchor="middle" font-size="40" font-weight="800" font-family="Baloo 2,sans-serif" fill="#2E2440">7</text>',
   arco:'<path d="M-34 14 A34 34 0 0 1 34 14" fill="none" stroke="#FF4D4D" stroke-width="8"/><path d="M-26 14 A26 26 0 0 1 26 14" fill="none" stroke="#FFD60A" stroke-width="8"/><path d="M-18 14 A18 18 0 0 1 18 14" fill="none" stroke="#4CC764" stroke-width="8"/><path d="M-10 14 A10 10 0 0 1 10 14" fill="none" stroke="#4FB3F0" stroke-width="8"/>'};
+/* adesivos ganhos nas atividades (id 'e:'+emoji) também colam no carro */
+const decal=id=>id&&id.startsWith('e:')?`<circle r="44" fill="#fff" stroke="#2E2440" stroke-width="5"/><text y="20" text-anchor="middle" font-size="58">${id.slice(2)}</text>`:DECAL[id];
 const AERO=(x,y)=>`<path d="M${x-8} ${y} v-26" stroke="#2E2440" stroke-width="8"/><path d="M${x-64} ${y-24} h96 l-10 -18 h-82 z" fill="#2B2B2B" stroke="#2E2440" stroke-width="5" stroke-linejoin="round"/>`;
 const ANT=(x,y)=>`<path d="M${x} ${y} v-74" stroke="#2E2440" stroke-width="5" stroke-linecap="round"/><path d="M${x} ${y-74} l40 12 l-40 12 z" fill="#FF4D4D" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/>`;
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -280,7 +282,7 @@ function partsOf(v){const c=custom(v.id);const fl=FLIP[v.id]||[];let out=v.parts
     if(c.cor&&!t.startsWith('<g class="wh">')){t=t.split(`fill="${v.main}"`).join(`fill="${c.cor}"`);if(v.dark)t=t.split(`fill="${v.dark}"`).join(`fill="${shade(c.cor,c.cor==='#2B2B2B'?1.6:.88)}"`)}
     if(c.roda&&t.startsWith('<g class="wh">')){const m=t.match(/^<g class="wh"><circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/);const ws=m&&c.roda[0]!=='#'?wheelStyle(+m[1],+m[2],+m[3],c.roda):null;t=ws||t.replace(/(<g class="wh"><circle[^>]*\/><circle [^>]*?fill=")[^"]+/,`$1${c.roda}`)}
     return[id,nm,t]});
-  if(c.adesivo&&DECAL[c.adesivo])out.push(['adesivo','adesivo',`<g transform="translate(${v.dec[0]} ${v.dec[1]})">${DECAL[c.adesivo]}</g>`]);
+  if(c.adesivo&&decal(c.adesivo))out.push(['adesivo','adesivo',`<g transform="translate(${v.dec[0]} ${v.dec[1]})">${decal(c.adesivo)}</g>`]);
   if(c.extra==='aero'||c.extra==='ambos')out.push(['aero','aerofólio',AERO(v.spo[0],v.spo[1])]);
   const AX=fl.length?1020-v.ant[0]:v.ant[0];
   if(c.extra==='antena'||c.extra==='ambos')out.push(['antena','bandeirinha',ANT(AX,v.ant[1])]);
@@ -370,7 +372,7 @@ function loop(t){if(!R.run)return;if(!$('#estrada').classList.contains('on')){R.
 function jump(){if(R.jump>0)return;R.jump=900;tone('sine',300,700,.25,.12)}
 $('#eScene').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;actx();jump()});
 $('#eJump').onclick=jump;$('#eHonk').onclick=()=>{actx();honk();const sv=$('#eCar svg');if(sv)sv.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:250})};
-window.CARROS={V,M,carSvg,openPosto,partsOf,LOJA,DECAL,ls,custom,wheelStyle,EXTRA,PETDATA};
+window.CARROS={V,M,carSvg,openPosto,partsOf,LOJA,DECAL,decal,ls,custom,wheelStyle,EXTRA,PETDATA};
 function finishDrive(){R.run=false;R.stars.forEach(s=>s.el.remove());R.stars=[];TH.complete(null,()=>show('garagem'))}
 }
 
@@ -518,7 +520,8 @@ function syncWallet(){$$('.walletN').forEach(e=>e.textContent=wallet())}
 function tone(type,f1,f2,dur,vol=.14,delay=0){if(!cfg.som)return;const a=actx();if(!a)return;try{const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.02)}catch(e){}}
 C.horn=type=>{if(type==='pato'){tone('square',760,520,.12,.07);tone('square',700,480,.14,.07,.17)}else if(type==='palhaco'){[0,.12,.24,.36].forEach((d,i)=>tone('sine',[600,800,600,1000][i],[900,500,900,400][i],.11,.12,d))}else if(type==='trem'){tone('sawtooth',300,300,.5,.05);tone('sawtooth',378,378,.5,.05);tone('sawtooth',300,280,.4,.05,.6);tone('sawtooth',378,350,.4,.05,.6)}else{tone('square',440,420,.15,.07);tone('square',350,340,.2,.07,.18)}};
 const TABS=[['cor','Pintura'],['roda','Rodas'],['adesivo','Adesivos'],['extra','Enfeites'],['buzina','Buzinas'],['pista','Pistas']];
-const items=tab=>tab==='cor'||tab==='roda'?[['','Original',0],...LOJA[tab]]:tab==='adesivo'||tab==='extra'?[['','Nenhum',0],...LOJA[tab]]:LOJA[tab];
+const mine=()=>((window.TH&&TH.meusAdesivos)?TH.meusAdesivos():[]).map(e=>['e:'+e,'Ganhei!',0,1]);
+const items=tab=>tab==='cor'||tab==='roda'?[['','Original',0],...LOJA[tab]]:tab==='adesivo'?[['','Nenhum',0],...LOJA[tab],...mine()]:tab==='extra'?[['','Nenhum',0],...LOJA[tab]]:LOJA[tab];
 const L={vi:0,tab:'cor'};
 const owned=()=>ls.get('thur-loja',[]);
 /* cada carro tem as suas compras (pintura, rodas, adesivos, enfeites, buzina); pistas valem para todos */
@@ -530,7 +533,7 @@ function using(tab,id){if(tab==='pista')return ls.get('thur-pista','dia')===id;c
 function preview(tab,id){
   if(tab==='cor')return id?`<span class="swc" style="background:${id}"></span>`:`<span class="swc orig">${carSvg(V[L.vi])}</span>`;
   if(tab==='roda')return id&&id[0]!=='#'?`<svg viewBox="-34 -34 68 68" class="ipv">${C.wheelStyle(0,0,30,id)}</svg>`:`<svg viewBox="-34 -34 68 68" class="ipv"><circle r="30" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><circle r="16" fill="${id||'#FFD60A'}" stroke="#2E2440" stroke-width="3"/></svg>`;
-  if(tab==='adesivo')return id?`<svg viewBox="-44 -36 88 72" class="ipv">${DECAL[id]}</svg>`:'<span class="ipt">—</span>';
+  if(tab==='adesivo')return id?`<svg viewBox="-48 -48 96 96" class="ipv">${C.decal(id)}</svg>`:'<span class="ipt">—</span>';
   if(tab==='extra'&&id&&!['aero','antena','ambos'].includes(id))return`<svg viewBox="-70 -110 140 120" class="ipv"><rect x="-66" y="0" width="132" height="10" rx="5" fill="#BDBDBD"/>${C.EXTRA(id,0,0)}</svg>`;
   if(tab==='extra')return id?`<svg viewBox="0 0 120 90" class="ipv">${id!=='antena'?'<path d="M20 50 h80 l-10 -18 h-62 z" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><path d="M60 50 v20" stroke="#2E2440" stroke-width="6"/>':''}${id!=='aero'?'<path d="M98 86 v-70" stroke="#2E2440" stroke-width="4"/><path d="M98 16 l-30 9 l30 9 z" fill="#FF4D4D" stroke="#2E2440" stroke-width="3"/>':''}</svg>`:'<span class="ipt">—</span>';
   if(tab==='buzina')return'<svg viewBox="0 0 32 32" class="ipv"><path d="M5 12h6l10-6v20l-10-6H5z" fill="#2E2440"/><path d="M24 11a6 6 0 0 1 0 10" fill="none" stroke="#2E2440" stroke-width="3" stroke-linecap="round"/></svg>';
@@ -538,8 +541,9 @@ function preview(tab,id){
 function render(){const v=V[L.vi];$('#lCar').innerHTML=carSvg(v);syncWallet();
   $('#lPick').innerHTML=V.map((x,i)=>`<button class="lpk${i===L.vi?' on':''}" data-i="${i}" aria-label="${x.n}">${carSvg(x)}</button>`).join('');
   $('#lTabs').innerHTML=TABS.map(([k,n])=>`<button class="ico txt${k===L.tab?' on':''}" data-t="${k}">${n}</button>`).join('');
-  $('#lItems').innerHTML=items(L.tab).map(([id,n,price])=>{const ow=has(L.tab,id,price),us=using(L.tab,id);
-    return`<button class="litem${us?' using':''}" data-id="${id}" data-p="${price}">${preview(L.tab,id)}<span class="lin">${n}</span><span class="lbt${ow?'':' buy'}">${us?'Usando':ow?'Usar':'<svg viewBox="0 0 32 32" width="20" height="20"><path d="M16 2l4.2 9 9.8 1.2-7.2 6.8 1.9 9.8L16 24 7.3 28.8l1.9-9.8L2 12.2 11.8 11z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/></svg>'+price}</span></button>`}).join('')}
+  let hd=0;const head=()=>`<div class="lhead"><svg viewBox="0 0 32 32" width="26" height="26"><rect x="4" y="4" width="24" height="24" rx="7" fill="#FFD60A" stroke="#2E2440" stroke-width="2.5"/><path d="M10 17l4 4 8-9" fill="none" stroke="#2E2440" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Adesivos que você ganhou (${mine().length}) — grátis!</div>`;
+  $('#lItems').innerHTML=items(L.tab).map(([id,n,price,m])=>{const ow=has(L.tab,id,price),us=using(L.tab,id);const h=m&&!hd++?head():'';
+    return h+`<button class="litem${us?' using':''}" data-id="${id}" data-p="${price}">${preview(L.tab,id)}<span class="lin">${n}</span><span class="lbt${ow?'':' buy'}">${us?'Usando':ow?'Usar':'<svg viewBox="0 0 32 32" width="20" height="20"><path d="M16 2l4.2 9 9.8 1.2-7.2 6.8 1.9 9.8L16 24 7.3 28.8l1.9-9.8L2 12.2 11.8 11z" fill="#FFD60A" stroke="#2E2440" stroke-width="2"/></svg>'+price}</span></button>`}).join('')+(L.tab==='adesivo'&&!mine().length?`<div class="lhead">Complete atividades para ganhar adesivos e colar aqui!</div>`:'')}
 function apply(tab,id){if(tab==='pista'){ls.set('thur-pista',id);return}const all=ls.get('thur-custom',{});const vid=V[L.vi].id;all[vid]=Object.assign({},all[vid],{[tab]:id||undefined});ls.set('thur-custom',all);if(tab==='buzina')C.horn(id)}
 $('#lPick').onclick=e=>{const b=e.target.closest('.lpk');if(!b)return;L.vi=+b.dataset.i;pop(480);render()};
 $('#lTabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;L.tab=b.dataset.t;pop(480);render()};
