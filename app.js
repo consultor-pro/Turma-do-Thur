@@ -71,7 +71,7 @@ $('#viewSave').onclick=()=>{try{const a=document.createElement('a');a.href=$('#v
 /* adesivos: um para cada atividade que dá para completar (o álbum cresce junto com o app) */
 let ACTS_=null;
 function acts(){if(ACTS_)return ACTS_;const k=[];const seen=new Set();
-  PAGES.forEach(p=>{if(!seen.has(p.n)){seen.add(p.n);k.push('balde:'+p.n)}});
+  PAGES.forEach(p=>{if(!seen.has(p.n)){seen.add(p.n);k.push('balde:'+p.n)}});PAGES.forEach(p=>{if(seen.has(p.n)){seen.delete(p.n);k.push('giz:'+p.n)}});
   Object.keys(PLANS).forEach(n=>k.push('numeros:'+n));PIXELS.forEach((_,i)=>k.push('px:'+i));REVEAL.forEach((_,i)=>k.push('rv:'+i));
   ['up','low'].forEach(s=>LETRAS.forEach(l=>k.push('l:'+s+':'+(s==='low'?l[0].toLowerCase():l[0]))));NUMS.forEach((_,i)=>k.push('l:num:'+i));
   PALAVRAS.forEach(w=>k.push('w:'+w[0]));
@@ -115,15 +115,37 @@ respingo:'<path d="M32 10c4 8 12 4 14 12s10 8 6 16-12 6-14 14-12 6-14-2-12-4-10-
 espelho:'<path d="M31 32C24 12 6 10 8 24c1 8 12 10 23 8zM31 34C22 36 10 44 14 52c4 6 14-4 17-14z" fill="#FFD60A"/><path d="M33 32c7-20 25-22 23-8-1 8-12 10-23 8zM33 34c9 2 21 10 17 18-4 6-14-4-17-14z" fill="#FF85C0"/><path d="M32 10v46" stroke="#fff" stroke-width="3" stroke-dasharray="4 4"/>',
 letras:'<text x="32" y="48" text-anchor="middle" font-size="42" font-weight="800" font-family="Baloo 2,sans-serif" fill="#4FB3F0" stroke="#2E2440" stroke-width="2.5" paint-order="stroke">Aa</text>',
 palavras:'<rect x="4" y="20" width="17" height="24" rx="5" fill="#FFD60A"/><rect x="24" y="20" width="17" height="24" rx="5" fill="#fff"/><rect x="44" y="20" width="17" height="24" rx="5" fill="#8FE0A0"/><g font-family="Baloo 2,sans-serif" font-weight="800" font-size="16" text-anchor="middle" fill="#2E2440"><text x="12.5" y="38">S</text><text x="32.5" y="38">O</text><text x="52.5" y="38">L</text></g>'};
-const TILES=[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946'],['balde','Colorir','#FF4D4D'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['numeros','Pintar por números','#FF9F1C'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2'],['espelho','Espelho','#B8860B'],['letras','Letras','#FFFFFF'],['palavras','Palavras','#FF6F61']];
-$('#tiles').innerHTML=TILES.map(([id,t,bg])=>`<button class="tile${lum(bg)>.8?' light':''}" style="background:${bg}" data-tile="${id}"><svg viewBox="0 0 64 64" aria-hidden="true">${ICON[id]}</svg>${t}</button>`).join('');
+/* tela inicial organizada em grupos, cada modo com um desenho que mostra o que ele faz */
+const GROUPS=[
+  ['Brincar',[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946']]],
+  ['Desenhar e colorir',[['balde','Colorir','#FF4D4D'],['giz','Rabiscar','#FF9F1C'],['numeros','Pintar por números','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['espelho','Espelho','#B8860B'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2']]],
+  ['Letras e palavras',[['letras','Letras','#4FB3F0'],['palavras','Palavras','#FF6F61']]]];
+const TILES=GROUPS.flatMap(g=>g[1]);
+function tileArt(id){const pg=n=>PAGES.find(p=>p.n===n);
+  const tint=(n,cols,partial)=>{const p=pg(n);if(!p)return'';let k=0;return pageSvg(p).replace(/fill="#fff"/g,()=>{const c=(partial&&k%3===2)?'#fff':cols[k%cols.length];k++;return`fill="${c}"`})};
+  switch(id){
+  case'balde':return tint('Flor',['#FF85C0','#FFD60A','#4CC764','#FF4D4D','#4FB3F0'])+'<svg class="tbadge" viewBox="0 0 32 32"><path d="M7 14l9-9 10 10-9 9z" fill="#FF4D4D" stroke="#2E2440" stroke-width="2"/><path d="M26 18c0 3 2 4 2 6a2 2 0 0 1-4 0c0-2 2-3 2-6z" fill="#4FB3F0"/></svg>';
+  case'giz':{const p=pg('Coração')||pg('Maçã')||pg('Flor');return(p?pageSvg(p):'')+'<svg class="tover" viewBox="0 0 100 100"><path d="M28 40 L70 34 L30 52 L72 46 L32 62 L68 58 L38 70" fill="none" stroke="#FF4D4D" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/></svg><svg class="tbadge" viewBox="0 0 32 32"><path d="M20 4l8 8-14 14H6v-8z" fill="#FF9F1C" stroke="#2E2440" stroke-width="2"/></svg>'}
+  case'numeros':return'<svg viewBox="0 0 100 100"><circle cx="34" cy="40" r="22" fill="#FFD60A" stroke="#2E2440" stroke-width="3"/><circle cx="66" cy="40" r="22" fill="#fff" stroke="#2E2440" stroke-width="3"/><rect x="22" y="62" width="56" height="26" rx="10" fill="#fff" stroke="#2E2440" stroke-width="3"/><text x="34" y="48" font-size="22" font-weight="800" text-anchor="middle" fill="#2E2440">1</text><text x="66" y="48" font-size="22" font-weight="800" text-anchor="middle" fill="#2E2440">2</text><text x="50" y="82" font-size="20" font-weight="800" text-anchor="middle" fill="#2E2440">3</text></svg>';
+  case'desenho':return'<svg viewBox="0 0 100 100"><rect x="8" y="8" width="84" height="84" rx="10" fill="#fff"/><path d="M18 70 C30 30 46 80 58 44 S80 30 84 56" fill="none" stroke="#3D5AFE" stroke-width="6" stroke-linecap="round"/><path d="M22 30 q10 -12 20 0" fill="none" stroke="#FF4D4D" stroke-width="6" stroke-linecap="round"/><circle cx="72" cy="26" r="9" fill="#FFD60A"/><path d="M60 88 l26 -26 6 6 -26 26z" fill="#FF9F1C" stroke="#2E2440" stroke-width="2"/></svg>';
+  case'brilho':return'<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="10" fill="#1B1430"/><defs><filter id="tglow"><feGaussianBlur stdDeviation="3"/></filter></defs><g filter="url(#tglow)"><path d="M50 14 L60 40 L88 42 L66 60 L74 88 L50 72 L26 88 L34 60 L12 42 L40 40 Z" fill="none" stroke="#FF85C0" stroke-width="6"/></g><path d="M50 14 L60 40 L88 42 L66 60 L74 88 L50 72 L26 88 L34 60 L12 42 L40 40 Z" fill="none" stroke="#fff" stroke-width="2.5"/></svg>';
+  case'espelho':return'<svg viewBox="0 0 100 100"><rect x="6" y="6" width="88" height="88" rx="10" fill="#fff"/><path d="M50 20 C30 4 6 24 22 46 C8 60 26 84 50 64 C74 84 92 60 78 46 C94 24 70 4 50 20 Z" fill="#FFD60A" stroke="#2E2440" stroke-width="3"/><circle cx="32" cy="36" r="7" fill="#FF85C0"/><circle cx="68" cy="36" r="7" fill="#FF85C0"/><path d="M50 10 V90" stroke="#B8860B" stroke-width="3" stroke-dasharray="6 5"/></svg>';
+  case'pixel':{const H=['0110110','1111111','1111111','0111110','0011100','0001000'];return'<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="10" fill="#fff"/>'+H.map((r,y)=>[...r].map((c,x)=>`<rect x="${15+x*10}" y="${22+y*10}" width="9" height="9" rx="1.5" fill="${c==='1'?'#FF4D4D':'#EEE'}"/>`).join('')).join('')+'</svg>'}
+  case'revelar':{const s=REVEAL.find(r=>r.f&&!r.f.startsWith('data:'));return s?`<div class="trev"><img src="${s.f}" alt=""><img src="${s.f}" alt="" class="gray"></div>`:''}
+  case'letras':return'<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="10" fill="#fff"/><text x="50" y="80" font-size="80" font-weight="800" text-anchor="middle" fill="#EAF6FF" stroke="#4FB3F0" stroke-width="3" stroke-dasharray="7 6" font-family="Baloo 2,Arial Black,sans-serif">A</text><circle cx="30" cy="80" r="7" fill="#4CC764"/><path d="M34 76 L44 50" stroke="#FF4D4D" stroke-width="6" stroke-linecap="round"/></svg>';
+  case'palavras':return'<svg viewBox="0 0 100 100"><circle cx="50" cy="30" r="16" fill="#FFD60A" stroke="#2E2440" stroke-width="3"/>'+['S','O','L'].map((l,i)=>`<rect x="${14+i*25}" y="56" width="22" height="26" rx="5" fill="${['#FF4D4D','#4FB3F0','#4CC764'][i]}" stroke="#2E2440" stroke-width="2.5"/><text x="${25+i*25}" y="76" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">${l}</text>`).join('')+'</svg>';
+  case'mundo':return'<div class="tmundo"><img src="img/mundo/parque.jpg" alt=""><img src="img/thur.png" alt="" class="tt"><img src="img/pets/lelo.png" alt="" class="tp"></div>';
+  case'carros':return(window.CARROS?window.CARROS.carSvg(window.CARROS.V.find(v=>v.id==='super')||window.CARROS.V[0]):'')}
+  return''}
+function drawTiles(){$('#tiles').innerHTML=GROUPS.map(([g,ts])=>`<h3 class="tgrp">${g}</h3><div class="tgrid">${ts.map(([id,t,bg])=>`<button class="tile2" data-tile="${id}" style="--tc:${bg}"><span class="tpic">${tileArt(id)}</span><span class="tname">${t}</span></button>`).join('')}</div>`).join('')}
+drawTiles();window.addEventListener('load',drawTiles);
 $('#tiles').onclick=e=>{const b=e.target.closest('[data-tile]');if(!b)return;pop(460);const id=b.dataset.tile;
   if(['balde','giz','respingo','numeros','aquarela'].includes(id))openPicker(id);
   else if(['desenho','brilho','espelho'].includes(id))openTela(id);
   else if(id==='mundo')window.openMundo&&window.openMundo();else if(id==='carros')window.openGaragem&&window.openGaragem();else if(id==='pixel')show('pixpick');else if(id==='revelar')show('revpick');else show(id)};
 
 /* ---------- escolher desenho ---------- */
-const MODE_T={balde:'Colorir',giz:'Giz de cera',respingo:'Respingo',numeros:'Pintar por números',aquarela:'Aquarela'};
+const MODE_T={balde:'Colorir',giz:'Rabiscar',respingo:'Respingo',numeros:'Pintar por números',aquarela:'Aquarela'};
 let pickMode='balde';
 /* Colorir: todos os desenhos, separados por tipo */
 const CATS=(()=>{const c3=window.CATS3||{};const C=[
@@ -139,7 +161,7 @@ let pickCat=0;
 function drawPick(names){const list=names.map(n=>({p:PAGES.find(p=>p.n===n),i:PAGES.findIndex(p=>p.n===n)})).filter(x=>x.p);
   $('#pickGal').innerHTML=list.map(({p,i})=>`<button class="card" data-p="${i}">${pageSvg(p)}<span>${p.n}</span></button>`).join('');$('#pickGal').scrollTop=0}
 function openPicker(mode){pickMode=mode;$('#pickTitle').textContent=MODE_T[mode];const tabs=$('#pickTabs');
-  if(mode==='balde'){tabs.hidden=false;tabs.innerHTML=CATS.map(([n],k)=>`<button class="ico txt${k===pickCat?' on':''}" data-c="${k}">${n}</button>`).join('');drawPick(CATS[pickCat][1])}
+  if(mode==='balde'||mode==='giz'){tabs.hidden=false;tabs.innerHTML=CATS.map(([n],k)=>`<button class="ico txt${k===pickCat?' on':''}" data-c="${k}">${n}</button>`).join('');drawPick(CATS[pickCat][1])}
   else{tabs.hidden=true;drawPick(SETS[mode])}
   show('escolher')}
 $('#pickTabs').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;pickCat=+b.dataset.c;pop(480);$$('#pickTabs [data-c]').forEach(x=>x.classList.toggle('on',x===b));drawPick(CATS[pickCat][1])};
@@ -172,7 +194,7 @@ function openSvg(mode,i){Object.assign(P,{mode,i,hist:[],scrib:null});const page
   if(mode==='numeros'){P.num=0;palette($('#palP'),PLANS[page.n].c,(i)=>{P.num=i},0,true);markNumDone()}
   else palette($('#palP'),COLORS,(i,c)=>{P.color=c},COLORS.indexOf(P.color));
   $('#texRow').style.display=(mode==='balde'||mode==='giz'||mode==='respingo')?'':'none';
-  $('#toolRow').style.display=mode==='balde'?'':'none';syncTool();
+  $('#toolRow').style.display='none';P.tool='balde';syncTool();
   peek($('#pintar'));show('pintar')}
 onShow.pintar=()=>{if(P.needNums){P.needNums=false;addNums(svgEl(),PAGES[P.i]);saveP();markNumDone()}};
 function markNumDone(){if(P.mode!=='numeros')return;const s=svgEl();const plan=PLANS[PAGES[P.i].n];plan.c.forEach((_,n)=>{const left=s.querySelectorAll(`.r[data-n="${n}"]:not([data-f])`).length;const b=$(`#palP .sw[data-i="${n}"]`);if(b)b.classList.toggle('gone',left===0)})}
@@ -197,7 +219,7 @@ $('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const
   snap();const g=clipFor(s,a);const path=document.createElementNS(NS,'path');const d=`M${q.x.toFixed(1)} ${q.y.toFixed(1)} l0.1 0`;path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',paintOf(s,P.color));path.setAttribute('stroke-width',P.w);path.setAttribute('stroke-linecap','round');path.setAttribute('stroke-linejoin','round');g.appendChild(path);
   P.scrib={s,path,d,a,g};try{$('#page').setPointerCapture(e.pointerId)}catch(x){}});
 $('#page').addEventListener('pointermove',e=>{const sc=P.scrib;if(!sc)return;evs(e).forEach(ev=>{const q=toSvg(sc.s,ev);sc.d+=` L${q.x.toFixed(1)} ${q.y.toFixed(1)}`});if(!sc.raf)sc.raf=requestAnimationFrame(()=>{sc.raf=0;sc.path.setAttribute('d',sc.d)})});
-const pEnd=()=>{if(P.scrib){const sc=P.scrib;sc.path.setAttribute('d',sc.d);P.scrib=null;if(P.mode==='balde')covCheck(sc);saveP();if(P.mode==='balde')checkBalde(sc.s)}};
+const pEnd=()=>{if(P.scrib){const sc=P.scrib;sc.path.setAttribute('d',sc.d);P.scrib=null;if(P.mode==='balde'||P.mode==='giz')covCheck(sc);saveP();if(P.mode==='balde'||P.mode==='giz')checkBalde(sc.s)}};
 /* rabisco: a parte conta como pintada quando o rabisco cobre quase toda ela */
 function covCheck(sc){const a=sc.a;if(a.dataset.cov)return;try{const s=sc.s,b=a.getBBox(),toA=a.getCTM().inverse().multiply(s.getCTM());
   const all=[];for(let n=a.nextElementSibling;n&&(n.matches('g[clip-path]')||n.classList.contains('o'));n=n.nextElementSibling)if(n.matches('g[clip-path]'))all.push(...n.querySelectorAll('path'));
@@ -424,7 +446,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.2.1';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.3';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
