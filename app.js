@@ -19,19 +19,19 @@ function actx(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)(
 function pop(f=520){if(!cfg.som)return;const a=actx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(f,a.currentTime);o.frequency.exponentialRampToValueAtTime(f*1.8,a.currentTime+.12);g.gain.setValueAtTime(.16,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.18);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.2)}catch(e){}}
 function splashSound(){if(!cfg.som)return;const a=actx();if(!a)return;try{const n=a.sampleRate*.25,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();f.type='lowpass';f.frequency.value=900;g.gain.value=.5;s.buffer=b;s.connect(f).connect(g).connect(a.destination);s.start()}catch(e){}}
 /* vozes: Thur = menino; mascotes = vozinhas de bichinho (estilo esquilo: bem aguda e rápida) */
-const VOZES={thur:{p:1.75,r:1.05},zuzu:{p:2,r:1.3},lelo:{p:2,r:1.18},pituca:{p:2,r:1.4},bubu:{p:2,r:1.24}};
+const VOZES={clara:{p:1.15,r:.98,g:'fem'},lois:{p:.95,r:.98,g:'masc'},thur:{p:1.75,r:1.05},zuzu:{p:2,r:1.3},lelo:{p:2,r:1.18},pituca:{p:2,r:1.4},bubu:{p:2,r:1.24}};
 const MASC=/daniel|ant[oô]nio|felipe|fabio|f[aá]bio|humberto|julio|j[uú]lio|ricardo|donato|valerio|male|masculin/i;
 const FEM=/maria|luciana|francisca|vit[oó]ria|thalita|raquel|camila|leila|helo[ií]sa|manuela|yara|female|feminin/i;
 /* os pais escolhem voz masculina ou feminina; se o celular não tiver a voz pedida, muda o tom da que existe */
-let VCACHE=null;function ptVoice(){const vs=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));if(!vs.length)return null;if(VCACHE&&vs.includes(VCACHE))return VCACHE;const W=cfg.vozTipo==='fem'?FEM:MASC,N=cfg.vozTipo==='fem'?MASC:FEM;
-  VCACHE=vs.find(v=>W.test(v.name)&&v.localService)||vs.find(v=>W.test(v.name))||vs.find(v=>!N.test(v.name)&&v.localService)||vs.find(v=>!N.test(v.name))||vs[0];VCACHE._ok=W.test(VCACHE.name);return VCACHE}
-const vozAjuste=v=>v&&v._ok?1:cfg.vozTipo==='fem'?1.12:.82;
-function speak(t,who='thur',queue=false){if(!cfg.voz)return;try{const s=window.speechSynthesis;if(!s)return;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vz=VOZES[who]||VOZES.thur;const v=ptVoice();if(v)u.voice=v;u.pitch=Math.min(2,vz.p*vozAjuste(v));u.rate=vz.r;
+let VCACHE={};function ptVoice(g=cfg.vozTipo){const vs=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));if(!vs.length)return null;if(VCACHE[g]&&vs.includes(VCACHE[g]))return VCACHE[g];const W=g==='fem'?FEM:MASC,N=g==='fem'?MASC:FEM;let V;
+  V=vs.find(v=>W.test(v.name)&&v.localService)||vs.find(v=>W.test(v.name))||vs.find(v=>!N.test(v.name)&&v.localService)||vs.find(v=>!N.test(v.name))||vs[0];VCACHE[g]=V;V['_ok'+g]=W.test(V.name);return V}
+const vozAjuste=(v,g)=>v&&v['_ok'+g]?1:g==='fem'?1.12:.82;
+function speak(t,who='thur',queue=false){if(!cfg.voz)return;try{const s=window.speechSynthesis;if(!s)return;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vz=VOZES[who]||VOZES.thur;const g=vz.g||cfg.vozTipo,v=ptVoice(g);if(v)u.voice=v;u.pitch=Math.min(2,vz.p*vozAjuste(v,g));u.rate=vz.r;
   /* avisa quem está falando, para a boca mexer */
   const fala=on=>document.dispatchEvent(new CustomEvent('thur-fala',{detail:{who,on}}));clearTimeout(speak.t);
   u.onstart=()=>{if(speak.cur!==u)return;fala(true);clearTimeout(speak.t);speak.t=setTimeout(()=>fala(false),600+t.length*75/vz.r)};u.onend=u.onerror=()=>{if(speak.cur!==u)return;clearTimeout(speak.t);fala(false)};speak.cur=u;
   fala(true);speak.t=setTimeout(()=>fala(false),900+t.length*75/vz.r);s.speak(u)}catch(e){}}
-try{speechSynthesis.addEventListener('voiceschanged',()=>{VCACHE=null})}catch(e){}
+try{speechSynthesis.addEventListener('voiceschanged',()=>{VCACHE={}})}catch(e){}
 function party(){const p=$('#party');p.innerHTML='';for(let i=0;i<44;i++){const c=document.createElement('i');c.style.left=Math.random()*100+'vw';c.style.background=COLORS[i%12];c.style.animationDelay=Math.random()*.5+'s';p.appendChild(c)}[660,880,1100].forEach((f,i)=>setTimeout(()=>pop(f),i*120));setTimeout(()=>p.innerHTML='',2500)}
 function hop(){$$('.peek').forEach(p=>{p.classList.remove('hop');void p.offsetWidth;p.classList.add('hop')});const h=document.getElementById('helper');if(h&&h.classList.contains('on'))h.animate([{transform:'translateY(0)'},{transform:'translateY(-25%)'},{transform:'translateY(0)'}],{duration:450})}
 function peek(view){const p=view.querySelector('.peek');if(p)p.src='img/pets/'+PETS[rnd(4)]+'.png'}
@@ -486,7 +486,7 @@ onShow.palavras=()=>{if(!word)newWord()};
 onShow.pais=()=>{$('#panel').hidden=true;$('#gate').hidden=false;const a=3+rnd(7),b=3+rnd(7),ok=a+b;$('#gq').textContent=`${a} + ${b}`;
   const opts=shuffle([ok,ok+1+rnd(3),Math.max(2,ok-1-rnd(3))]);$('#gopts').innerHTML=opts.map(v=>`<button class="gnum" data-v="${v}">${v}</button>`).join('');
   $('#gopts').onclick=e=>{const b2=e.target.closest('.gnum');if(!b2)return;if(+b2.dataset.v===ok){$('#gate').hidden=true;$('#panel').hidden=false}else{pop(200);onShow.pais()}}};
-$$('input[name=vozTipo]').forEach(r=>{r.checked=r.value===cfg.vozTipo;r.onchange=()=>{cfg.vozTipo=r.value;store.set('thur-cfg',cfg);VCACHE=null;speak(r.value==='fem'?'Oi! Agora eu falo com voz feminina.':'Oi! Agora eu falo com voz masculina.')}});
+$$('input[name=vozTipo]').forEach(r=>{r.checked=r.value===cfg.vozTipo;r.onchange=()=>{cfg.vozTipo=r.value;store.set('thur-cfg',cfg);VCACHE={};speak(r.value==='fem'?'Oi! Agora eu falo com voz feminina.':'Oi! Agora eu falo com voz masculina.')}});
 $('#vozTeste').onclick=()=>speak('Olá! Eu sou o Thur. Vamos brincar?');
 $('#cfgSom').checked=cfg.som;$('#cfgVoz').checked=cfg.voz;
 $('#cfgSom').onchange=e=>{cfg.som=e.target.checked;store.set('thur-cfg',cfg)};$('#cfgVoz').onchange=e=>{cfg.voz=e.target.checked;store.set('thur-cfg',cfg)};
@@ -500,7 +500,7 @@ window.TH.meusAdesivos=()=>{const A=acts(),g=new Set(gotSet()),seen=new Set(),ou
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','ler','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='7.0';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='7.1';$('#appVer').textContent='Versão '+APP_VER;
 /* backup e importação (Área dos Pais): tudo do app num arquivo só */
 (()=>{
   $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}

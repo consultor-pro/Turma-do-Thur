@@ -20,6 +20,11 @@ const words=u=>{const K=new Set(known(u));return PAL.filter(w=>cons(w).every(c=>
 const focusW=u=>{const F=UN[u][1],all=words(u),f=all.filter(w=>cons(w).some(c=>F.includes(c)));return f.length?f:all};
 const silPool=u=>[...VOG,...known(u).filter(c=>!VOG.includes(c)).flatMap(fam)];
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+/* professores: Clara (unidades ímpares) e Lois (pares) — cada um com a sua voz e as suas poses */
+const PROF={clara:{n:'Professora Clara',base:['c-ponteiro','c-ideia','c-lousa','c-quadro','c-acolhe'],oi:'c-acolhe',viva:'c-pulando',ops:'c-ideia',fala:'c-acolhe',mesa:'c-mesa'},
+  lois:{n:'Professor Lois',base:['l-ponteiro','l-mostra','l-ideia','l-quadro','l-livro'],oi:'l-mostra',viva:'l-pulando',ops:'l-pensando',fala:'l-mostra',mesa:'l-joinha'}};
+const profDe=u=>u%2===0?'clara':'lois';
+const PIMG=p=>`img/prof/${p}.webp`;
 window.LER={keys:()=>UN.flatMap((_,u)=>[0,1,2,3].map(li=>'ler:'+u+':'+li))};
 
 /* ---------- progresso, ofensiva (dias seguidos) e XP ---------- */
@@ -42,9 +47,10 @@ function nodeIco(u,li,done,open){if(!open)return LOCK;if(li===3)return CHEST(don
 /* ---------- trilha ---------- */
 let pet=pick(['zuzu','lelo','pituca','bubu']);
 function renderPath(){const P=prog();let h='',k=0,cur=null;
-  UN.forEach(([n,ls,c,d],u)=>{h+=`<div class="lunit" style="--uc:${c};--ud:${d}"><div><b>Unidade ${u+1}</b><span>${n}</span></div><em>${ls.join(' ')}</em></div><div class="lnodes">`;
+  h+=`<div class="lhello"><img src="${PIMG('dupla')}" alt="Professora Clara e Professor Lois"><div class="lbub">Oi! Nós somos a <b>Professora Clara</b> e o <b>Professor Lois</b>. Vamos aprender a ler juntos?</div></div>`;
+  UN.forEach(([n,ls,c,d],u)=>{h+=`<div class="lunit" style="--uc:${c};--ud:${d}"><div><b>Unidade ${u+1}</b><span>${n}</span><em>${ls.join(' ')}</em></div><img class="luprof" src="${PIMG(PROF[profDe(u)].base[0])}" alt=""></div><div class="lnodes">`;
     NODES(u).forEach((nm,li)=>{const id=u+'-'+li,done=!!P.done[id],open=done||isOpen(u,li,P);if(open&&!done&&!cur)cur=id;const x=Math.round(Math.sin(k*1.15)*72);k++;const me=id===cur;
-      h+=`<div class="lnw" style="transform:translateX(${x}px)">${me?'<div class="lgo">COMEÇAR</div>':''}<button class="lnode${done?' done':''}${open?'':' lock'}${me?' cur':''}${li===3?' chest':''}" style="--uc:${c};--ud:${d}" data-u="${u}" data-li="${li}" aria-label="${nm}">${nodeIco(u,li,done,open)}${done&&li<3?'<i class="lck">✓</i>':''}</button>${me?`<img class="lpet" src="img/pets/${pet}.png" alt="">`:''}</div>`});
+      h+=`<div class="lnw" style="transform:translateX(${x}px)">${me?'<div class="lgo">COMEÇAR</div>':''}<button class="lnode${done?' done':''}${open?'':' lock'}${me?' cur':''}${li===3?' chest':''}" style="--uc:${c};--ud:${d}" data-u="${u}" data-li="${li}" aria-label="${nm}">${nodeIco(u,li,done,open)}${done&&li<3?'<i class="lck">✓</i>':''}</button>${me?`<img class="lpet prof" src="${PIMG(PROF[profDe(u)].oi)}" alt="${PROF[profDe(u)].n}">`:''}</div>`});
     h+='</div>'});
   h+='<div class="lfim">🏆 Você vai ler muitas palavras!</div>';
   $('#lerPath').innerHTML=h;
@@ -53,7 +59,7 @@ function renderPath(){const P=prog();let h='',k=0,cur=null;
 $('#lerPath').onclick=e=>{const b=e.target.closest('.lnode');if(!b)return;const u=+b.dataset.u,li=+b.dataset.li;
   if(b.classList.contains('lock')){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');pop(200);speak('Termine a lição de antes primeiro!');return}
   pop(640);start(u,li)};
-onShow.ler=()=>{pet=pick(['zuzu','lelo','pituca','bubu']);renderPath();speak('Vamos aprender a ler!')};
+onShow.ler=()=>{renderPath();const P=prog();speak(Object.keys(P.done).length?'Que bom te ver de novo! Vamos continuar?':'Oi! Eu sou a professora Clara. E este é o professor Lois. Vamos aprender a ler!','clara')};
 
 /* ---------- exercícios ---------- */
 const PLAN=u=>u===0?[['som','som','fig','som','fig','pares','fig','som'],['fig','som','fig','pares','som','fig','som','fig'],['pares','som','fig','pares','som','fig','pares','som'],['som','fig','pares','som','fig','pares','som','fig','pares','som']]
@@ -71,12 +77,14 @@ function mk(t,u){const F=UN[u][1],K=known(u),tgt=()=>Math.random()<.75?pick(F):p
   return{t:'falar',w,sy}}
 
 const S={};window.LER.S=S;
-function start(u,li){Object.assign(S,{u,li,q:PLAN(u)[li].map(t=>mk(fix(t,u),u)),done:0,err:0,combo:0,xp0:prog().xp});S.total=S.q.length;show('licao');setTimeout(()=>{speak(li===3?'Hora do baú! Vamos revisar tudo!':u===0?'Vamos aprender o som das vogais!':`Vamos aprender o som do ${UN[u][1][0]} e do ${UN[u][1][1]}!`,'thur');setTimeout(next,1300)},380)}
+function start(u,li){Object.assign(S,{T:profDe(u),u,li,q:PLAN(u)[li].map(t=>mk(fix(t,u),u)),done:0,err:0,combo:0,xp0:prog().xp});S.total=S.q.length;S.state='';$('#lcBody').innerHTML='';foot('','','VERIFICAR',true);bar();show('licao');setTimeout(()=>{S.pose=PROF[S.T].oi;speak(li===3?'Hora do baú! Vamos revisar tudo!':u===0?'Vamos aprender o som das vogais!':`Vamos aprender o som do ${UN[u][1][0]} e do ${UN[u][1][1]}!`,S.T);$('#lcBody').innerHTML=`<div class="lcend"><img class="lcpf big" src="${PIMG(li===3?'dupla':PROF[S.T].oi)}" alt=""><h2 class="lcintro">${li===3?'Clara e Lois':PROF[S.T].n}</h2></div>`;setTimeout(next,2200)},380)}
 const bar=()=>{$('#lcBar').style.width=Math.round(S.done/S.total*100)+'%'};
 const foot=(cls,msg,btn,dis)=>{const f=$('#lcFoot');f.className=cls||'';$('#lcMsg').innerHTML=msg||'';const b=$('#lcBtn');b.textContent=btn;b.disabled=!!dis};
 function next(){bar();if(!S.q.length){finish();return}S.ex=S.q.shift();S.sel=null;S.state='ask';S.fill=[];S.tries=0;render();foot('','', 'VERIFICAR',true)}
 const big=(e,say)=>`<div class="lcfig"><span class="lcemo">${e}</span><button class="lcspk" data-say="${say}" aria-label="Ouvir de novo">${SPK}</button></div>`;
-function render(){const x=S.ex,B=$('#lcBody');let h='';
+const prof=q=>`<div class="lcprof"><img class="lcpf" id="lcPf" src="${PIMG(S.pose)}" alt="${PROF[S.T].n}"><div class="lcbub">${q}</div></div>`;
+function setPose(p,ms){S.pose=p;const i=$('#lcPf');if(!i)return;i.src=PIMG(p);i.animate([{transform:'scale(.9) translateY(6px)'},{transform:'scale(1.06) translateY(-6px)'},{transform:'scale(1)'}],{duration:420});if(ms){clearTimeout(setPose.t);setPose.t=setTimeout(()=>{if(S.state==='ask')setPose(pick(PROF[S.T].base))},ms)}}
+function render(){const x=S.ex,B=$('#lcBody');let h='';S.pose=x.t==='falar'?PROF[S.T].fala:pick(PROF[S.T].base);
   if(x.t==='som'){h=`<h3 class="lcq">Que letra faz esse som?</h3>${big(LET[x.l][1],somDe(x.l))}<div class="lcopts">${x.opts.map(o=>`<button class="lco let" data-v="${o}">${o}</button>`).join('')}</div>`;sayL(somDe(x.l))}
   else if(x.t==='fig'){h=`<h3 class="lcq">Qual figura começa com esse som?</h3><div class="lcfig"><span class="lcbigl">${x.l}<small>${x.l.toLowerCase()}</small></span><button class="lcspk" data-say="${LET[x.l][2]}" aria-label="Ouvir o som">${SPK}</button></div><div class="lcopts">${x.opts.map(o=>`<button class="lco pic" data-v="${o[0]}" data-say="${o[0]}">${o[1]}</button>`).join('')}</div>`;sayL(`Qual começa com ${LET[x.l][2]}?`)}
   else if(x.t==='pares'){h=`<h3 class="lcq">Junte cada letra com a figura</h3><div class="lcpairs"><div>${x.ls.map(l=>`<button class="lco let pl" data-l="${l}">${l}</button>`).join('')}</div><div>${x.ps.map(l=>`<button class="lco pic pp" data-l="${l}">${LET[l][1]}</button>`).join('')}</div></div>`;S.pl=null;S.ok=0;sayL('Junte cada letra com a figura!')}
@@ -84,23 +92,23 @@ function render(){const x=S.ex,B=$('#lcBody');let h='';
   else if(x.t==='montar'){h=`<h3 class="lcq">Monte a palavra</h3>${big(x.w[2],x.w[0])}<div class="lcans" id="lcAns"></div><div class="lcopts" id="lcTiles">${x.tiles.map((s,i)=>`<button class="lco syl" data-i="${i}">${s}</button>`).join('')}</div>`;sayL(x.w[0])}
   else if(x.t==='completa'){h=`<h3 class="lcq">Qual sílaba está faltando?</h3>${big(x.w[2],x.w[0])}<div class="lcans">${x.sy.map((s,i)=>`<span class="lcsy${i===x.i?' gap':''}" ${i===x.i?'id="lcGap"':''}>${i===x.i?'?':s}</span>`).join('')}</div><div class="lcopts">${x.opts.map(o=>`<button class="lco syl" data-v="${o}">${o}</button>`).join('')}</div>`;sayL(x.w[0])}
   else if(x.t==='falar'){h=`<h3 class="lcq">Fale a palavra bem alto</h3>${big(x.w[2],x.w[0])}<div class="lcans">${x.sy.map(s=>`<span class="lcsy">${s}</span>`).join('')}</div><button class="lcmic" id="lcMic" aria-label="Falar">${MIC}</button><div class="lcmst" id="lcMst">Toque no microfone e fale</div><button class="lcskip" id="lcSkip">Agora não posso falar</button>`;sayL(`Fale comigo: ${x.w[0]}!`)}
-  B.innerHTML=h;B.classList.remove('in');void B.offsetWidth;B.classList.add('in')}
-const sayL=t=>setTimeout(()=>speak(t,'thur'),250);
+  h=h.replace(/<h3 class="lcq">(.*?)<\/h3>/,(m,q)=>prof(q));B.innerHTML=h;B.classList.remove('in');void B.offsetWidth;B.classList.add('in')}
+const sayL=t=>setTimeout(()=>speak(t,S.T),250);
 function renderAns(){const x=S.ex;$('#lcAns').innerHTML=S.fill.map((i,k)=>`<button class="lco syl in" data-k="${k}">${x.tiles[i]}</button>`).join('')||'<span class="lcline"></span>';
   $$('#lcTiles .lco').forEach(b=>b.classList.toggle('used',S.fill.includes(+b.dataset.i)));$('#lcBtn').disabled=!S.fill.length}
-$('#lcBody').onclick=e=>{const sp=e.target.closest('.lcspk');if(sp){pop(500);speak(sp.dataset.say,'thur');return}
+$('#lcBody').onclick=e=>{const sp=e.target.closest('.lcspk');if(sp){pop(500);speak(sp.dataset.say,S.T);return}
   if(S.state!=='ask')return;const x=S.ex,b=e.target.closest('.lco,#lcMic,#lcSkip');if(!b)return;
   if(x.t==='pares'){pairTap(b);return}
-  if(x.t==='montar'){if(b.dataset.k!==undefined){S.fill.splice(+b.dataset.k,1);pop(380)}else if(b.dataset.i!==undefined&&!b.classList.contains('used')){S.fill.push(+b.dataset.i);speak(silSay(x.tiles[+b.dataset.i]),'thur');pop(640)}renderAns();return}
+  if(x.t==='montar'){if(b.dataset.k!==undefined){S.fill.splice(+b.dataset.k,1);pop(380)}else if(b.dataset.i!==undefined&&!b.classList.contains('used')){S.fill.push(+b.dataset.i);speak(silSay(x.tiles[+b.dataset.i]),S.T);pop(640)}renderAns();return}
   if(x.t==='falar'){if(b.id==='lcSkip'){S.q=S.q.filter(()=>true);S.done++;S.state='fb';foot('ok','Tudo bem! Vamos continuar.','CONTINUAR');return}if(b.id==='lcMic')listen();return}
   $$('#lcBody .lco').forEach(o=>o.classList.toggle('sel',o===b));S.sel=b.dataset.v;pop(560);
-  if(x.t==='fig')speak(b.dataset.say,'thur');
+  if(x.t==='fig')speak(b.dataset.say,S.T);
   if(x.t==='completa'){const g=$('#lcGap');g.textContent=S.sel;g.classList.add('fill')}
   $('#lcBtn').disabled=false};
 function pairTap(b){const x=S.ex;if(b.classList.contains('ok'))return;
-  if(b.classList.contains('pl')){$$('.pl').forEach(o=>o.classList.toggle('sel',o===b));S.pl=b.dataset.l;speak(LET[S.pl][2],'thur');pop(560);return}
-  if(!S.pl){speak(LET[b.dataset.l][0],'thur');return}
-  const L=$(`.pl[data-l="${S.pl}"]`);if(b.dataset.l===S.pl){L.classList.remove('sel');L.classList.add('ok');b.classList.add('ok');speak(somDe(S.pl),'thur');pop(880);S.pl=null;if(++S.ok===x.ls.length)setTimeout(()=>result(true),500)}
+  if(b.classList.contains('pl')){$$('.pl').forEach(o=>o.classList.toggle('sel',o===b));S.pl=b.dataset.l;speak(LET[S.pl][2],S.T);pop(560);return}
+  if(!S.pl){speak(LET[b.dataset.l][0],S.T);return}
+  const L=$(`.pl[data-l="${S.pl}"]`);if(b.dataset.l===S.pl){L.classList.remove('sel');L.classList.add('ok');b.classList.add('ok');speak(somDe(S.pl),S.T);pop(880);S.pl=null;if(++S.ok===x.ls.length)setTimeout(()=>result(true),500)}
   else{[L,b].forEach(o=>{o.classList.remove('shake','sel');void o.offsetWidth;o.classList.add('shake','bad');setTimeout(()=>o.classList.remove('bad'),500)});S.pl=null;pop(200);S.pairErr=1}}
 function check(){const x=S.ex;let ok,ans;
   if(x.t==='som'){ok=S.sel===x.l;ans=x.l}
@@ -112,10 +120,10 @@ function check(){const x=S.ex;let ok,ans;
 const VIVA=['Muito bem!','Isso aí!','Excelente!','Arrasou!','Perfeito!','Você é demais!'];
 function result(ok,ans){const x=S.ex;S.state='fb';
   if(ok){S.done++;S.combo++;const v=pick(VIVA);const extra=S.combo>=3&&S.combo%3===0?`<span class="lcombo">🔥 ${S.combo} seguidas!</span>`:'';
-    foot('ok',`<b>${v}</b>${extra}`,'CONTINUAR');pop(880);setTimeout(()=>pop(1180),110);
-    speak(x.t==='montar'||x.t==='completa'||x.t==='falar'?`${x.w[1].split('-').map(silSay).join('... ')}... ${x.w[0]}! ${v}`:x.t==='pares'?v:v,'thur');window.helperCheer&&window.helperCheer()}
-  else{S.err++;S.combo=0;S.q.push(x);foot('bad',`<b>Quase!</b><span>Resposta certa: ${ans}</span>`,'CONTINUAR');pop(200);
-    speak('Quase! '+(x.t==='som'?'Esse é o '+x.l+': '+somDe(x.l):x.t==='sil'?'É '+silSay(x.s):x.t==='fig'?'É '+x.ans:'É '+x.w[0]),'thur')}
+    foot('ok',`<b>${v}</b>${extra}`,'CONTINUAR');setPose(PROF[S.T].viva);pop(880);setTimeout(()=>pop(1180),110);
+    speak(x.t==='montar'||x.t==='completa'||x.t==='falar'?`${x.w[1].split('-').map(silSay).join('... ')}... ${x.w[0]}! ${v}`:x.t==='pares'?v:v,S.T);window.helperCheer&&window.helperCheer()}
+  else{S.err++;S.combo=0;S.q.push(x);setPose(PROF[S.T].ops);foot('bad',`<b>Quase!</b><span>Resposta certa: ${ans}</span>`,'CONTINUAR');pop(200);
+    speak('Quase! '+(x.t==='som'?'Esse é o '+x.l+': '+somDe(x.l):x.t==='sil'?'É '+silSay(x.s):x.t==='fig'?'É '+x.ans:'É '+x.w[0]),S.T)}
   bar()}
 $('#lcBtn').onclick=()=>{if(S.state==='ask')check();else if(S.state==='fb')next();else if(S.state==='fim')collect()};
 
@@ -126,8 +134,8 @@ function listen(){const x=S.ex,mic=$('#lcMic'),st=$('#lcMst');if(!SR||mic.classL
   let r;try{r=new SR()}catch(e){return}r.lang='pt-BR';r.maxAlternatives=5;r.interimResults=false;let fim=false;
   const end=(ok,heard)=>{if(fim)return;fim=true;mic.classList.remove('on');if(S.state!=='ask')return;
     if(ok){result(true);return}S.tries++;
-    if(S.tries>=3){S.done++;S.state='fb';foot('ok','<b>Boa tentativa!</b><span>Vamos treinar mais depois.</span>','CONTINUAR');speak('Boa tentativa! '+x.w[0],'thur');bar();return}
-    st.textContent=heard?`Ouvi "${heard}". Tente de novo!`:'Não ouvi nada. Tente de novo!';speak('Tente de novo: '+x.w[0],'thur')};
+    if(S.tries>=3){S.done++;S.state='fb';foot('ok','<b>Boa tentativa!</b><span>Vamos treinar mais depois.</span>','CONTINUAR');speak('Boa tentativa! '+x.w[0],S.T);bar();return}
+    setPose(PROF[S.T].ops,1800);st.textContent=heard?`Ouvi "${heard}". Tente de novo!`:'Não ouvi nada. Tente de novo!';speak('Tente de novo: '+x.w[0],S.T)};
   r.onresult=e=>{const t=norm(x.w[0]),alts=[...e.results[0]].map(a=>a.transcript);end(alts.some(a=>{const n=norm(a);return n.includes(t)||lev(n,t)<=(t.length>4?2:1)}),alts[0]||'')};
   r.onerror=()=>end(false,'');r.onend=()=>end(false,'');
   mic.classList.add('on');st.textContent='Pode falar…';try{r.start()}catch(e){end(false,'')}}
@@ -135,11 +143,13 @@ function listen(){const x=S.ex,mic=$('#lcMic'),st=$('#lcMst');if(!SR||mic.classL
 /* ---------- fim da lição: XP, estrelas, ofensiva e adesivo ---------- */
 function finish(){const perf=S.err===0,xp=10+(perf?5:0)+(S.li===3?10:0),stars=S.li===3?10:3;S.gain={xp,stars};S.state='fim';
   const n=streak()+(LS.get('thur-ler-dias',{d:''}).d===hoje()?0:1);
-  $('#lcBody').innerHTML=`<div class="lcend">${S.li===3?`<div class="lcchest">${CHEST(true)}</div>`:''}<img class="lcpet" src="img/pets/${pet}.png" alt=""><h2>${S.li===3?'Baú aberto!':'Lição completa!'}</h2>
+  $('#lcBody').innerHTML=`<div class="lcend">${S.li===3?`<div class="lcchest">${CHEST(true)}</div>`:''}<img class="lcpf big" src="${PIMG(S.li===3?'dupla':PROF[S.T].viva)}" alt=""><h2>${S.li===3?'Baú aberto!':'Lição completa!'}</h2>
     <div class="lccards"><div class="lcc xp"><b>XP</b><span>⚡ ${xp}</span></div><div class="lcc st"><b>Estrelas</b><span>⭐ ${stars}</span></div><div class="lcc ac"><b>${perf?'Perfeito':'Acertos'}</b><span>🎯 ${Math.round(S.total/(S.total+S.err)*100)}%</span></div></div>
     <div class="lcstreak">🔥 ${n} ${n===1?'dia':'dias'} seguidos aprendendo!</div></div>`;
-  foot('','', 'CONTINUAR');bar();party();speak(perf?'Perfeito! Você não errou nenhuma!':'Lição completa! Muito bem!','thur')}
+  foot('','', 'CONTINUAR');bar();party();speak(perf?'Perfeito! Você não errou nenhuma!':'Lição completa! Muito bem!',S.T)}
 function collect(){const P=prog();P.done[S.u+'-'+S.li]=1;P.xp+=S.gain.xp;LS.set('thur-ler',P);LS.set('thur-estrelas',LS.get('thur-estrelas',0)+S.gain.stars);bumpStreak();
   S.state='';complete(null,()=>show('ler'),'ler:'+S.u+':'+S.li)}
 $('#lcX').onclick=()=>{pop(380);if(S.state==='fim'){collect();return}TH.ask?TH.ask('Sair da lição? Você vai perder o progresso desta lição.',()=>show('ler')):show('ler')};
+document.addEventListener('thur-fala',e=>{const d=e.detail||{};$$('#licao .lcpf,#ler .lpet.prof').forEach(i=>i.classList.toggle('talk',!!d.on&&(d.who==='clara'||d.who==='lois')))});
 })();
+

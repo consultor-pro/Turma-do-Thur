@@ -519,3 +519,23 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .lcc.xp{border-color:#FFC800}.lcc.xp b{background:#FFC800}.lcc.st{border-color:#1CB0F6}.lcc.st b{background:#1CB0F6}.lcc.ac{border-color:#58CC02}.lcc.ac b{background:#58CC02}
 .lcstreak{font-size:20px;font-weight:800;color:#FF9600}
 @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+/* professores Clara e Lois */
+.lhello{display:flex;align-items:flex-end;gap:10px;width:100%;max-width:520px;margin-top:6px}
+.lhello img{width:120px;flex:none;animation:lbob 2s ease-in-out infinite}
+.lbub,.lcbub{position:relative;background:#fff;border:2px solid #E5E5E5;border-radius:18px;padding:12px 14px;font-size:18px;font-weight:700;color:#3C3C3C;margin-bottom:30px}
+.lbub::before,.lcbub::before{content:'';position:absolute;left:-12px;bottom:18px;border:10px solid transparent;border-right-color:#E5E5E5}
+.lbub::after,.lcbub::after{content:'';position:absolute;left:-9px;bottom:19px;border:9px solid transparent;border-right-color:#fff}
+.lunit{position:relative;overflow:visible}
+.luprof{position:absolute;right:58px;bottom:0;height:78px;pointer-events:none}
+.lunit em{position:relative;z-index:1}
+.lpet.prof{width:auto;height:118px;top:-20px}
+.lcprof{display:flex;align-items:flex-end;gap:12px;align-self:stretch}
+.lcpf{height:clamp(120px,22vh,170px);flex:none;transform-origin:50% 100%}
+.lcpf.big{height:clamp(180px,32vh,260px)}
+.lcbub{font-size:23px;font-weight:800;margin-bottom:40px}
+.lcintro{color:#1CB0F6!important;text-shadow:none!important}
+.talk{animation:talk .32s ease-in-out infinite alternate}
+@keyframes talk{from{transform:rotate(-2deg) scale(1)}to{transform:rotate(2deg) scale(1.02)}}
+.lunit em{display:inline-block;margin-top:6px;font-size:20px}
+.luprof{right:10px;height:96px}
+.lunit span{display:block}.lunit em{display:table}
