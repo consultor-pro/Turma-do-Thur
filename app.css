@@ -396,8 +396,9 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 
 /* pedais desenhados e botão de pular */
 .pedal svg{width:62%;height:62%}
-#jmpP{left:50%;transform:translateX(-50%);background:#9B5DE5}
-#jmpP.down{transform:translate(-50%,6px)}
+/* pular fica ao lado do acelerador, para usar os dois com a mesma mão */
+#jmpP{left:auto;right:calc(16px + clamp(64px,min(14vw,24vh),120px) + 12px);background:#9B5DE5}
+#jmpP.down{transform:translateY(6px)}
 .trick{position:absolute;left:50%;top:22%;font-size:clamp(26px,5vw,48px);font-weight:800;color:#FFD60A;-webkit-text-stroke:2px #2E2440;pointer-events:none;white-space:nowrap;z-index:5}
 
 /* Boleleco ajudante */
