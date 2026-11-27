@@ -23,7 +23,10 @@ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 /* professores: Clara (unidades ímpares) e Lois (pares) — cada um com a sua voz e as suas poses */
 const PROF={clara:{n:'Professora Clara',base:['c-ponteiro','c-ideia','c-lousa','c-quadro','c-acolhe'],oi:'c-acolhe',viva:'c-pulando',ops:'c-ideia',fala:'c-acolhe',mesa:'c-mesa'},
   lois:{n:'Professor Lois',base:['l-ponteiro','l-mostra','l-ideia','l-quadro','l-livro'],oi:'l-mostra',viva:'l-pulando',ops:'l-pensando',fala:'l-mostra',mesa:'l-joinha'}};
-const profDe=u=>u%2===0?'clara':'lois';
+let CUR='ler';
+const CFGC={ler:{prog:'thur-ler',deg:'thur-ler-deg',path:'#lerPath',stat:'#lerStat',view:'ler'},mat:{prog:'thur-mat',deg:'thur-mat-deg',path:'#matPath',stat:'#matStat',view:'mat'}};
+const KC=()=>CFGC[CUR];
+const profDe=u=>(u+(CUR==='mat'?1:0))%2===0?'clara':'lois';
 const PIMG=p=>`img/prof/${p}.webp`;
 /* ---------- degraus por idade: 1 Primeiras palavras (2–3), 2 Primeiras letras (3–4), 3 Aprender a ler (4–6) ---------- */
 const DEGS=[{n:'Primeiras palavras',e:'🐣',id:'2 a 3 anos'},{n:'Primeiras letras',e:'🐥',id:'3 a 4 anos'},{n:'Aprender a ler',e:'🦉',id:'4 a 6 anos'}];
@@ -49,16 +52,17 @@ const nomeLetras=()=>[...new Set(nomeKid().normalize('NFD').replace(/[̀-ͯ]/g,'
 const RIMAS=[['gato','🐱','pato','🦆'],['mão','✋','pão','🍞'],['leão','🦁','limão','🍋'],['rato','🐭','sapato','👞'],['janela','🪟','panela','🍳'],['pé','🦶','café','☕'],['bota','👢','gota','💧'],['anel','💍','pincel','🖌️'],['bolo','🎂','tijolo','🧱'],['cama','🛏️','pijama','🩳']];
 const PALMAS=[['sol','☀️',['SOL']],['pão','🍞',['PÃO']],['flor','🌸',['FLOR']],['bola','⚽',['BO','LA']],['gato','🐱',['GA','TO']],['casa','🏠',['CA','SA']],['uva','🍇',['U','VA']],['banana','🍌',['BA','NA','NA']],['macaco','🐒',['MA','CA','CO']],['sapato','👞',['SA','PA','TO']]];
 const E2=[['Vogais A E I','vog','#58CC02','#46A302',['A','E','I']],['Vogais O U','vog','#1CB0F6','#1899D6',['O','U']],['Meu nome','nome','#FF86D0','#D96FB0'],['Rimas','rima','#FF9600','#E08600'],['Palmas','palmas','#CE82FF','#A568CC']];
-const unitsOf=d=>d===0?E1:d===1?E2:UN;
-const nodesOf=(d,u)=>d===2?NODES(u):['Conhecer','Cadê?','Brincar','Baú'];
-const pk=(d,u,li)=>d===2?u+'-'+li:`d${d+1}:${u}-${li}`;
-const stk=(d,u,li)=>d===2?'ler:'+u+':'+li:`ler${d+1}:${u}:${li}`;
-const unitTag=(d,u)=>{const U=unitsOf(d)[u];if(d===2)return U[1].join(' ');if(d===0)return itemsOf(U[1]).slice(0,3).map(it=>it.e||(it.c?'🎨':'🔷')).join('');return U[1]==='vog'?U[4].join(' '):U[1]==='nome'?nomeLetras().join(''):U[1]==='rima'?'🐱🦆':'👏👏'};
-const degAtual=()=>{const s=LS.get('thur-ler-deg',null);if(s!==null)return s;const i=String((TH.cfg&&TH.cfg.idade)||'2');return i==='2'?0:i==='3'?1:2};
-window.LER={keys:()=>[0,1,2].flatMap(d=>unitsOf(d).flatMap((_,u)=>[0,1,2,3].map(li=>stk(d,u,li)))),setDeg:d=>LS.set('thur-ler-deg',d)};
+const unitsOf=d=>CUR==='mat'?MU[d]:d===0?E1:d===1?E2:UN;
+const nodesOf=(d,u)=>CUR==='mat'?['Conhecer','Treinar','Brincar','Baú']:d===2?NODES(u):['Conhecer','Cadê?','Brincar','Baú'];
+const pk=(d,u,li)=>CUR==='mat'?`m${d+1}:${u}-${li}`:d===2?u+'-'+li:`d${d+1}:${u}-${li}`;
+const stk=(d,u,li)=>CUR==='mat'?`mat${d+1}:${u}:${li}`:d===2?'ler:'+u+':'+li:`ler${d+1}:${u}:${li}`;
+const unitTag=(d,u)=>{const U=unitsOf(d)[u];if(CUR==='mat')return Array.isArray(U[1])?U[1].join(' '):U[1]==='mais'?'🍎🍎🍎 🍎':U[1]==='mix'?'+ − × ÷':U[1]+' =';if(d===2)return U[1].join(' ');if(d===0)return itemsOf(U[1]).slice(0,3).map(it=>it.e||(it.c?'🎨':'🔷')).join('');return U[1]==='vog'?U[4].join(' '):U[1]==='nome'?nomeLetras().join(''):U[1]==='rima'?'🐱🦆':'👏👏'};
+const degAtual=()=>{const s=LS.get(KC().deg,null);if(s!==null)return s;const i=String((TH.cfg&&TH.cfg.idade)||'2');return CUR==='mat'?(i==='2'?0:i==='5'?2:1):(i==='2'?0:i==='3'?1:2)};
+const degs=()=>CUR==='mat'?DEGSM:DEGS;
+window.LER={keys:()=>{const c=CUR,r=[];['ler','mat'].forEach(k=>{CUR=k;[0,1,2].forEach(d=>unitsOf(d).forEach((_,u)=>[0,1,2,3].forEach(li=>r.push(stk(d,u,li)))))});CUR=c;return r},setDeg:d=>LS.set('thur-ler-deg',d),setDegM:d=>LS.set('thur-mat-deg',d)};
 
 /* ---------- progresso, ofensiva (dias seguidos) e XP ---------- */
-const prog=()=>LS.get('thur-ler',{done:{},xp:0});
+const prog=()=>LS.get(KC().prog,{done:{},xp:0});
 const hoje=(d=new Date())=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 function streak(){const D=LS.get('thur-ler-dias',{d:'',n:0});const ont=hoje(new Date(Date.now()-864e5));return D.d===hoje()||D.d===ont?D.n:0}
 function bumpStreak(){const D=LS.get('thur-ler-dias',{d:'',n:0});if(D.d===hoje())return D.n;D.n=D.d===hoje(new Date(Date.now()-864e5))?D.n+1:1;D.d=hoje();LS.set('thur-ler-dias',D);return D.n}
@@ -76,23 +80,24 @@ function nodeIco(d,u,li,done,open){if(!open)return LOCK;if(li===3)return CHEST(d
 
 /* ---------- trilha ---------- */
 let pet=pick(['zuzu','lelo','pituca','bubu']);
-const HELLO=['Vamos conhecer as primeiras palavras?','Vamos conhecer as letras?','Vamos aprender a ler juntos?'];
+const HELLO=['Vamos conhecer as primeiras palavras?','Vamos conhecer as letras?','Vamos aprender a ler juntos?'],HELLOM=['Vamos contar juntos?','Vamos conhecer os números e os sinais?','Vamos fazer contas?'];
 function renderPath(){const P=prog(),D=degAtual();let h='',k=0,cur=null;
-  h+=`<div class="ldegs">${DEGS.map((g,i)=>`<button class="ldeg${i===D?' on':''}" data-d="${i}"><span>${g.e}</span><b>${g.n}</b><small>${g.id}</small></button>`).join('')}</div>`;
-  h+=`<div class="lhello"><img src="${PIMG('dupla')}" alt="Professora Clara e Professor Lois"><div class="lbub">Oi! Nós somos a <b>Professora Clara</b> e o <b>Professor Lois</b>. ${HELLO[D]}</div></div>`;
+  h+=`<div class="ldegs">${degs().map((g,i)=>`<button class="ldeg${i===D?' on':''}" data-d="${i}"><span>${g.e}</span><b>${g.n}</b><small>${g.id}</small></button>`).join('')}</div>`;
+  h+=`<div class="lhello"><img src="${PIMG('dupla')}" alt="Professora Clara e Professor Lois"><div class="lbub">Oi! Nós somos a <b>Professora Clara</b> e o <b>Professor Lois</b>. ${(CUR==='mat'?HELLOM:HELLO)[D]}</div></div>`;
   unitsOf(D).forEach(([n,_,c,dd],u)=>{const d=dd;h+=`<div class="lunit" style="--uc:${c};--ud:${d}"><div><b>Unidade ${u+1}</b><span>${n}</span><em>${unitTag(D,u)}</em></div><img class="luprof" src="${PIMG(PROF[profDe(u)].base[0])}" alt=""></div><div class="lnodes">`;
     nodesOf(D,u).forEach((nm,li)=>{const id=pk(D,u,li),done=!!P.done[id],open=done||isOpen(D,u,li,P);if(open&&!done&&!cur)cur=id;const x=Math.round(Math.sin(k*1.15)*72);k++;const me=id===cur;
       h+=`<div class="lnw" style="transform:translateX(${x}px)">${me?'<div class="lgo">COMEÇAR</div>':''}<button class="lnode${done?' done':''}${open?'':' lock'}${me?' cur':''}${li===3?' chest':''}" style="--uc:${c};--ud:${d}" data-u="${u}" data-li="${li}" aria-label="${nm}">${nodeIco(D,u,li,done,open)}${done&&li<3?'<i class="lck">✓</i>':''}</button>${me?`<img class="lpet prof" src="${PIMG(PROF[profDe(u)].oi)}" alt="${PROF[profDe(u)].n}">`:''}</div>`});
     h+='</div>'});
-  h+=`<div class="lfim">${D<2?`🏆 Depois vem: ${DEGS[D+1].e} ${DEGS[D+1].n}`:'🏆 Você vai ler muitas palavras!'}</div>`;
-  $('#lerPath').innerHTML=h;
-  $('#lerStat').innerHTML=`<span class="lsb fire">🔥 ${streak()}</span><span class="lsb xp">⚡ ${P.xp}</span>`;
-  requestAnimationFrame(()=>{const c=$('#lerPath .lnode.cur');if(c)c.scrollIntoView({block:'center'})})}
-$('#lerPath').onclick=e=>{const g=e.target.closest('.ldeg');if(g){pop(560);LS.set('thur-ler-deg',+g.dataset.d);renderPath();speak(DEGS[+g.dataset.d].n+'!','clara');return}
+  h+=`<div class="lfim">${D<2?`🏆 Depois vem: ${degs()[D+1].e} ${degs()[D+1].n}`:CUR==='mat'?'🏆 Você vai ser craque nas contas!':'🏆 Você vai ler muitas palavras!'}</div>`;
+  $(KC().path).innerHTML=h;
+  $(KC().stat).innerHTML=`<span class="lsb fire">🔥 ${streak()}</span><span class="lsb xp">⚡ ${P.xp}</span>`;
+  requestAnimationFrame(()=>{const c=$(KC().path+' .lnode.cur');if(c)c.scrollIntoView({block:'center'})})}
+$('#lerPath').onclick=$('#matPath').onclick=e=>{const g=e.target.closest('.ldeg');if(g){pop(560);LS.set(KC().deg,+g.dataset.d);renderPath();speak(degs()[+g.dataset.d].n+'!','clara');return}
   const b=e.target.closest('.lnode');if(!b)return;const u=+b.dataset.u,li=+b.dataset.li;
   if(b.classList.contains('lock')){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');pop(200);speak('Termine a lição de antes primeiro!');return}
   pop(640);start(u,li)};
-onShow.ler=()=>{renderPath();const P=prog();speak(Object.keys(P.done).length?'Que bom te ver de novo! Vamos continuar?':'Oi! Eu sou a professora Clara. E este é o professor Lois. Vamos aprender a ler!','clara')};
+onShow.mat=()=>{CUR='mat';renderPath();const P=prog();speak(Object.keys(P.done).length?'Vamos continuar com os números?':'Oi! Eu sou o professor Lois. Vamos brincar com os números!','lois')};
+onShow.ler=()=>{CUR='ler';renderPath();const P=prog();speak(Object.keys(P.done).length?'Que bom te ver de novo! Vamos continuar?':'Oi! Eu sou a professora Clara. E este é o professor Lois. Vamos aprender a ler!','clara')};
 
 /* ---------- exercícios ---------- */
 const PLAN=u=>u===0?[['som','som','fig','som','fig','pares','fig','som'],['fig','som','fig','pares','som','fig','som','fig'],['pares','som','fig','pares','som','fig','pares','som'],['som','fig','pares','som','fig','pares','som','fig','pares','som']]
@@ -128,24 +133,108 @@ function mkE(t,d,u,li){
     const p=LET[l]?pick(pics(l)):picL(l);const ol=pick(Object.keys(LET).filter(x=>x!==l&&x[0]!==l)),op=pick(pics(ol));return{t,l,ans:p[0],opts:shuf([p,op])}}
   if(k==='rima'){const r=pickU(RIMAS,x=>x[0]);if(t==='verR')return{t,r};const o=pick(RIMAS.filter(x=>x!==r));const op=Math.random()<.5?[o[0],o[1]]:[o[2],o[3]];return{t,r,ans:r[2],opts:shuf([[r[2],r[3]],op])}}
   const p=pickU(PALMAS,x=>x[0]);return{t,p}}
+/* ---------- MATEMÁTICA: contar → números e sinais (+ = −) → contas (+ − × ÷) ---------- */
+const DEGSM=[{n:'Contar',e:'🐣',id:'2 a 3 anos'},{n:'Números e sinais',e:'🐥',id:'3 a 5 anos'},{n:'Contas',e:'🦉',id:'5 a 7 anos'}];
+const MU=[[['1, 2, 3',[1,2,3],'#58CC02','#46A302'],['4 e 5',[4,5],'#1CB0F6','#1899D6'],['Onde tem mais?','mais','#FF9600','#E08600']],
+  [['Números até 10',[6,7,8,9,10],'#58CC02','#46A302'],['O sinal +','+','#1CB0F6','#1899D6'],['O sinal =','=','#CE82FF','#A568CC'],['O sinal −','-','#FF4B4B','#D63F3F']],
+  [['Somar até 10','+','#58CC02','#46A302'],['Subtrair até 10','-','#FF4B4B','#D63F3F'],['Vezes ×','×','#1CB0F6','#1899D6'],['Dividir ÷','÷','#FF9600','#E08600'],['Desafio','mix','#7B61FF','#6450D6']]];
+const NUMW=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','catorze','quinze','dezesseis','dezessete','dezoito','dezenove','vinte'];
+const OBJ=['🍎','⭐','🎈','🐥','🍪','⚽','🚗','🌸','🐟','🍓','🧁','🦋'];
+const SIGN={'+':['+','mais','juntar'],'-':['−','menos','tirar'],'=':['=','igual','mesma quantidade'],'×':['×','vezes','grupos iguais'],'÷':['÷','dividido por','repartir igual']};
+const PETS=[['zuzu','Zuzu'],['lelo','Lelo'],['pituca','Pituca'],['bubu','Bubu']];
+const nOpts=(ans,k,max)=>{const s=new Set([ans]);let g=0;while(s.size<k&&g<50){g++;const v=ans+(rnd(5)-2);if(v>=0&&v<=max)s.add(v)}for(let v=0;s.size<k;v++)s.add(v);return shuf([...s])};
+function planM(d,u,li){const k=MU[d][u][1],nk=d===0?2:3;
+  if(Array.isArray(k))return[['mverN','mverN','mverN'],['mverN','mconta','mconta','mdar'],['mconta','mdar','mconta','mdar'],['mconta','mdar','mconta','mdar','mconta']][li];
+  if(k==='mais')return[['mmais','mmais','mmais'],['mmais','mmais','mmais','mmais'],['mmais','mmais','mmais','mmais'],['mmais','mmais','mmais','mmais','mmais']][li];
+  const op={'+':'msoma','-':'msub','=':'migual','×':'mvezes','÷':'mdiv'}[k];
+  if(k==='mix')return[['msinalq','msoma','msub','msinalq'],['mvezes','msinalq','mdiv','msinalq'],['msoma','msub','mvezes','msinalq'],['msinalq','msoma','msub','mvezes','msinalq']][li];
+  if(k==='÷')return[['msinal','mdiv','mdiv'],['mdiv','mdiv','mdiv'],['msinal','mdiv','mdiv'],['mdiv','mdiv','mdiv','mdiv']][li];
+  return[['msinal',op,'msinal',op],[op,op,op,op],d===2&&k!=='×'?[op,'msinalq',op,'msinalq']:[op,op,op,op],[op,op,op,op,op]][li]}
+const introM=(d,u)=>{const k=MU[d][u][1];return Array.isArray(k)?`Vamos contar até ${k[k.length-1]}!`:k==='mais'?'Vamos descobrir onde tem mais!':k==='mix'?'Desafio! Vamos usar todos os sinais!':`Vamos aprender o sinal ${SIGN[k][1]}!`};
+function mkM(t,d,u,li){const k=MU[d][u][1],e=pick(OBJ),nk=d===0?2:3;
+  const N=Array.isArray(k)?(li===3?[...new Set(MU[d].slice(0,u+1).filter(x=>Array.isArray(x[1])).flatMap(x=>x[1]))]:k):[1,2,3,4,5];
+  const lim=d===2?10:5;
+  if(t==='mverN'){const n=pickU(N);return{t,n,e}}
+  if(t==='mconta'){const n=pickU(d===0?[1,2,3,4,5].filter(x=>x<=Math.max(...N)):N);return{t,n,e,ans:String(n),opts:nOpts(n,nk,Math.max(...N)+2).map(String),okSay:`${NUMW[n]}!`}}
+  if(t==='mdar'){const n=pickU(N),p=pick(PETS);return{t,n,e,p,okSay:`${p[1]} ganhou ${NUMW[n]}!`}}
+  if(t==='mmais'){const a=1+rnd(5);let b;do{b=1+rnd(5)}while(Math.abs(a-b)<(d===0?2:1));return{t,a,b,e,ans:a>b?'L':'R',okSay:`Aqui tem ${NUMW[Math.max(a,b)]}! É mais!`}}
+  const kk=k==='mix'?pick(['+','-','×','÷']):k;
+  if(t==='msinal'){if(kk==='+'){const a=1+rnd(3),b=1+rnd(2);return{t,s:'+',a,b,c:a+b,e}}if(kk==='-'){const a=3+rnd(3),b=1+rnd(2);return{t,s:'-',a,b,c:a-b,e}}
+    if(kk==='='){const a=2+rnd(3);return{t,s:'=',a,b:a,c:a,e}}if(kk==='×'){const a=2+rnd(2),b=2;return{t,s:'×',a,b,c:a*b,e}}const b=2,a=2+rnd(2);return{t,s:'÷',a,b,c:a*b,e}}
+  if(t==='msoma'){const c=2+rnd(lim-1),a=1+rnd(c-1),b=c-a;return{t,a,b,c,e,ans:String(c),opts:nOpts(c,nk,lim+2).map(String),okSay:`${NUMW[a]} mais ${NUMW[b]} é igual a ${NUMW[c]}!`}}
+  if(t==='msub'){const a=2+rnd(lim-1),b=1+rnd(a-1),c=a-b;return{t,a,b,c,e,ans:String(c),opts:nOpts(c,nk,lim).map(String),okSay:`${NUMW[a]} menos ${NUMW[b]} é igual a ${NUMW[c]}!`}}
+  if(t==='migual'){const n=1+rnd(5);let m;do{m=1+rnd(5)}while(m===n);return{t,n,m,e,ans:String(n),opts:shuf([n,m]).map(String),okSay:`${NUMW[n]} é igual a ${NUMW[n]}!`}}
+  if(t==='mvezes'){const a=2+rnd(2),b=2+rnd(d===2?3:2),c=a*b;return{t,a,b,c,e,ans:String(c),opts:nOpts(c,3,20).map(String),okSay:`${NUMW[a]} vezes ${NUMW[b]} é igual a ${NUMW[c]}!`}}
+  if(t==='mdiv'){const b=2+rnd(2),a=1+rnd(3),c=a*b;return{t,c,b,a,e,ans:String(a),opts:nOpts(a,3,6).map(String),okSay:`${NUMW[c]} dividido por ${NUMW[b]} é igual a ${NUMW[a]}!`}}
+  /* msinalq: qual sinal falta? */
+  const ops=d===2&&k==='mix'?['+','-','×','÷']:['+','-'];const s=pick(ops);let a,b,c;
+  if(s==='+'){a=1+rnd(5);b=1+rnd(4);c=a+b}else if(s==='-'){a=4+rnd(6);b=1+rnd(3);c=a-b}else if(s==='×'){a=2+rnd(3);b=2+rnd(2);c=a*b}else{b=2+rnd(2);c=2+rnd(3);a=b*c;[a,b,c]=[a,b,c]}
+  if(s==='÷'){const x=b*(2+rnd(3));c=x/b;a=x}
+  const wrong=pick(ops.filter(o=>o!==s).filter(o=>{const r=o==='+'?a+b:o==='-'?a-b:o==='×'?a*b:a/b;return r!==c}));
+  return{t:'msinalq',a,b,c,s,e,ans:s,opts:shuf([s,wrong||(s==='+'?'-':'+')]),okSay:`${NUMW[a]} ${SIGN[s][1]} ${NUMW[b]} é igual a ${NUMW[c]}!`}}
+const grp=(n,e,cls='',x=0)=>`<div class="mgrp ${cls}">${Array.from({length:n},(_,i)=>`<span class="mo${i>=n-x?' x':''}" data-i="${i}">${e}</span>`).join('')}</div>`;
+const sg=s=>`<span class="msig">${SIGN[s][0]}</span>`;
+const nb=n=>`<span class="mnum">${n}</span>`;
+function renderM(){const x=S.ex,B=$('#lcBody');let q='',h='',say='';S.pose=pick(PROF[S.T].base);S.cnt=0;
+  const opts=(cls='')=>`<div class="lcopts e2 mopts">${x.opts.map(o=>`<button class="lco e mn ${cls}" data-v="${o}">${SIGN[o]?SIGN[o][0]:o}</button>`).join('')}</div>`;
+  if(x.t==='mverN'){q=`Este é o número ${x.n}!`;say=`Este é o número ${NUMW[x.n]}! Vamos contar?`;h=`<button class="lcverb mcol">${nb(x.n)}${grp(x.n,x.e)}<span class="lctap">👆</span></button>`}
+  else if(x.t==='mconta'){q='Quantos tem? Toque para contar!';say='Quantos tem? Toque neles para contar!';h=`<div class="mbox">${grp(x.n,x.e,'cnt')}</div>${opts()}`}
+  else if(x.t==='mdar'){q=`Dê ${x.n} ${x.e} para ${x.p[1]}!`;say=`Dê ${NUMW[x.n]} para ${x.p[1]}!`;h=`<div class="mdar"><div class="mpet"><img src="img/pets/${x.p[0]}.png" alt="${x.p[1]}"><div class="mcesta" id="mCesta"></div><b class="mcount" id="mCount">0</b></div><div class="mgoal">${nb(x.n)}</div></div>${grp(Math.max(x.n,Math.min(12,x.n+2)),x.e,'pile')}`}
+  else if(x.t==='mmais'){q='Onde tem mais?';say='Onde tem mais? Toque!';h=`<div class="lcopts e2 mopts"><button class="lco e mside" data-v="L">${grp(x.a,x.e)}</button><button class="lco e mside" data-v="R">${grp(x.b,x.e)}</button></div>`}
+  else if(x.t==='msinal'){const s=x.s,[sym,nome,ideia]=SIGN[s];q=`Este é o sinal ${sym} (${nome})`;
+    if(s==='+')h=`<div class="meq">${grp(x.a,x.e)}${sg('+')}${grp(x.b,x.e)}${sg('=')}<div class="mres">${grp(x.c,x.e)}</div></div>`;
+    else if(s==='-')h=`<div class="meq">${grp(x.a,x.e,'sub',x.b)}${sg('-')}${nb(x.b)}${sg('=')}<div class="mres">${grp(x.c,x.e)}</div></div>`;
+    else if(s==='=')h=`<div class="meq">${grp(x.a,x.e)}${sg('=')}${grp(x.a,pick(OBJ.filter(o=>o!==x.e)))}</div>`;
+    else if(s==='×')h=`<div class="meq">${Array.from({length:x.a},()=>`<div class="mplate">${grp(x.b,x.e)}</div>`).join('')}</div><div class="meq">${nb(x.a)}${sg('×')}${nb(x.b)}${sg('=')}<div class="mres">${nb(x.c)}</div></div>`;
+    else h=`<div class="meq">${grp(x.c,x.e,'pile2')}</div><div class="meq mres">${Array.from({length:x.b},()=>`<div class="mplate">${grp(x.a,x.e)}</div>`).join('')}</div><div class="meq">${nb(x.c)}${sg('÷')}${nb(x.b)}${sg('=')}<div class="mres">${nb(x.a)}</div></div>`;
+    h=`<button class="lcverb mcol msinb"><span class="mbigsig">${sym}</span>${h}<span class="lctap">👆</span></button>`;
+    say=s==='+'?`Este é o sinal mais! Ele quer dizer juntar. ${NUMW[x.a]} mais ${NUMW[x.b]}... é igual a ${NUMW[x.c]}!`:s==='-'?`Este é o sinal menos! Ele quer dizer tirar. ${NUMW[x.a]} menos ${NUMW[x.b]}... é igual a ${NUMW[x.c]}!`:s==='='?`Este é o sinal igual! Ele quer dizer que os dois lados têm a mesma quantidade. ${NUMW[x.a]} é igual a ${NUMW[x.a]}!`:s==='×'?`Este é o sinal vezes! Ele quer dizer grupos iguais. ${NUMW[x.a]} grupos de ${NUMW[x.b]}... é igual a ${NUMW[x.c]}! No computador, o vezes é uma estrelinha.`:`Este é o sinal de dividir! Ele quer dizer repartir igual. ${NUMW[x.c]} dividido por ${NUMW[x.b]}... cada um fica com ${NUMW[x.a]}! No computador, o dividir é uma barrinha.`}
+  else if(x.t==='msoma'){q=`Quanto é ${x.a} + ${x.b}?`;say=`Quanto é ${NUMW[x.a]} mais ${NUMW[x.b]}?`;h=`<div class="meq">${grp(x.a,x.e)}${sg('+')}${grp(x.b,x.e)}${sg('=')}<span class="mnum q">?</span></div><div class="meq small">${nb(x.a)}${sg('+')}${nb(x.b)}${sg('=')}<span class="mnum q">?</span></div>${opts()}`}
+  else if(x.t==='msub'){q=`Quanto é ${x.a} − ${x.b}?`;say=`Tinha ${NUMW[x.a]}. Foram embora ${NUMW[x.b]}. Quantos ficaram?`;h=`<div class="meq">${grp(x.a,x.e,'sub',x.b)}${sg('=')}<span class="mnum q">?</span></div><div class="meq small">${nb(x.a)}${sg('-')}${nb(x.b)}${sg('=')}<span class="mnum q">?</span></div>${opts()}`}
+  else if(x.t==='migual'){q='Qual tem a mesma quantidade?';say=`Qual é igual? Procure o que tem ${NUMW[x.n]}!`;const e2=pick(OBJ.filter(o=>o!==x.e));h=`<div class="meq">${grp(x.n,x.e)}${sg('=')}<span class="mnum q">?</span></div><div class="lcopts e2 mopts">${x.opts.map(o=>`<button class="lco e mside" data-v="${o}">${grp(+o,e2)}</button>`).join('')}</div>`}
+  else if(x.t==='mvezes'){q=`Quanto é ${x.a} × ${x.b}?`;say=`${NUMW[x.a]} pratinhos com ${NUMW[x.b]} em cada. Quanto é ${NUMW[x.a]} vezes ${NUMW[x.b]}?`;h=`<div class="meq">${Array.from({length:x.a},()=>`<div class="mplate">${grp(x.b,x.e)}</div>`).join('')}</div><div class="meq small">${nb(x.a)}${sg('×')}${nb(x.b)}${sg('=')}<span class="mnum q">?</span></div>${opts()}`}
+  else if(x.t==='mdiv'){q=`Reparta ${x.c} ${x.e} entre ${x.b} amigos!`;say=`Vamos repartir! Toque em cada um para dar aos ${NUMW[x.b]} amigos.`;S.dv=Array(x.b).fill(0);
+    h=`<div class="meq">${grp(x.c,x.e,'pile dv')}</div><div class="meq">${PETS.slice(0,x.b).map((p,i)=>`<div class="mplate dvp"><img src="img/pets/${p[0]}.png" alt="${p[1]}"><div class="mgrp" id="dvp${i}"></div></div>`).join('')}</div><div class="meq small">${nb(x.c)}${sg('÷')}${nb(x.b)}${sg('=')}<span class="mnum q">?</span></div><div id="dvOpts"></div>`}
+  else{q='Qual sinal está faltando?';say='Qual sinal está faltando?';h=`<div class="meq big">${nb(x.a)}<span class="msig q">?</span>${nb(x.b)}${sg('=')}${nb(x.c)}</div>${opts('sig')}`}
+  B.innerHTML=prof(q)+h;B.classList.remove('in');void B.offsetWidth;B.classList.add('in');sayL(say);S.msay=say;
+  if(x.t==='msinal')setTimeout(()=>{const r=$$('#lcBody .mres');r.forEach(z=>z.classList.add('show'));$$('#lcBody .mgrp.sub .mo.x').forEach(z=>z.classList.add('fly'))},2600)}
+function contar(objs,fim){[...objs].forEach((o,i)=>setTimeout(()=>{o.classList.add('on');pop(600+i*60);speak(NUMW[i+1],S.T,true);if(i===objs.length-1&&fim)setTimeout(fim,800)},i*650))}
+function tapM(e){const x=S.ex;
+  if(x.t==='mverN'){const b=e.target.closest('.lcverb');if(!b||S.tapped)return;S.tapped=1;const os=$$('#lcBody .mo');contar(os,()=>{speak(`${NUMW[x.n]}!`,S.T,true);setTimeout(okE,900)});return}
+  if(x.t==='msinal'){const b=e.target.closest('.lcverb');if(!b)return;speak(S.msay,S.T);$$('#lcBody .mres').forEach(z=>z.classList.add('show'));$$('#lcBody .mgrp.sub .mo.x').forEach(z=>z.classList.add('fly'));if(!S.tapped){S.tapped=1;setTimeout(()=>{if(S.ex===x&&S.state==='ask')okE()},Math.min(9000,S.msay.length*70))}return}
+  if(x.t==='mconta'){const o=e.target.closest('.mo');if(o&&!o.classList.contains('on')){S.cnt++;o.classList.add('on');speak(NUMW[S.cnt],S.T);pop(600+S.cnt*60);return}}
+  if(x.t==='mdar'){const o=e.target.closest('.pile .mo');if(!o||o.classList.contains('gone'))return;S.cnt++;o.classList.add('gone');$('#mCesta').insertAdjacentHTML('beforeend',`<span>${x.e}</span>`);$('#mCount').textContent=S.cnt;speak(NUMW[S.cnt],S.T);pop(600+S.cnt*70);if(S.cnt===x.n)setTimeout(okE,600);return}
+  if(x.t==='mdiv'&&!S.dvDone){const o=e.target.closest('.dv .mo');if(!o||o.classList.contains('gone'))return;const i=S.dv.indexOf(Math.min(...S.dv));S.dv[i]++;o.classList.add('gone');$('#dvp'+i).insertAdjacentHTML('beforeend',`<span class="mo on">${x.e}</span>`);pop(640+i*90);speak(NUMW[S.dv[i]],S.T);
+    if(S.dv.reduce((a,b)=>a+b,0)===x.c){S.dvDone=1;setTimeout(()=>{$('#dvOpts').innerHTML=`<div class="lcopts e2 mopts">${x.opts.map(o=>`<button class="lco e mn" data-v="${o}">${o}</button>`).join('')}</div>`;speak('Quantos ficou para cada um?',S.T)},700)}return}
+  const b=e.target.closest('.lco');if(!b||b.classList.contains('ok'))return;
+  if(b.dataset.v===x.ans){b.classList.add('ok');const qm=$$('#lcBody .mnum.q');qm.forEach(z=>{z.textContent=x.c!==undefined&&x.t!=='migual'?x.c:x.n;z.classList.add('ok')});const sq=$('#lcBody .msig.q');if(sq){sq.textContent=SIGN[x.s][0];sq.classList.add('ok')}S.dvDone=0;okE();return}
+  if(!S.miss){S.miss=1;S.err++}b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');pop(300);
+  const ok=[...$$('#lcBody .lco')].find(o=>o.dataset.v===x.ans);if(ok){ok.classList.remove('hint');void ok.offsetWidth;ok.classList.add('hint')}
+  setPose(PROF[S.T].ops,1600);
+  speak(x.t==='mconta'?`Vamos contar juntos!`:x.t==='mmais'?'Olha: aqui tem mais!':x.t==='migual'?`Olha: este tem ${NUMW[x.n]}, igual!`:x.t==='msinalq'?`É o sinal ${SIGN[x.s][1]}!`:`Olha, é ${x.ans}!`,S.T);
+  if(x.t==='mconta'){const os=$$('#lcBody .mo');os.forEach(o=>o.classList.remove('on'));contar(os)}}
+
 const sylSay=s=>silSay(s);
+/* palavras em destaque ficam verdes, para a criança ir se acostumando com a palavra escrita */
+const gw=w=>`<b class="pv">${w}</b>`,strip=s=>s.replace(/<[^>]+>/g,'');
+const wl=w=>`<span class="lcword">${w}</span>`;
 function renderE(){const x=S.ex,B=$('#lcBody');let q='',h='',say='';S.pose=pick(PROF[S.T].base);
-  if(x.t==='ver'){const it=x.it;q=x.kind==='sons'?`${oa(it.w)==='a'?'A':'O'} ${it.w} faz ${it.s}!`:`${oa(it.w)==='a'?'Esta é a':'Este é o'} ${it.w}!`;say=q;h=`<button class="lcverb" data-say="${x.kind==='sons'?it.s:it.w}">${artOf(it)}<span class="lctap">👆</span></button>`}
-  else if(x.t==='cade'){const it=x.it;q=x.kind==='sons'?`Quem faz ${it.s}?`:`Cadê ${oa(it.w)} ${it.w}?`;say=q;h=`<button class="lcspk" data-say="${q}" aria-label="Ouvir de novo">${SPK}</button><div class="lcopts e2">${x.opts.map(o=>`<button class="lco e" data-v="${o.w}">${artOf(o)}</button>`).join('')}</div>`}
-  else if(x.t==='verL'){const [w,e]=picL(x.l);q=`${x.l} de ${w}!`;say=`${NOMEL[x.l]}! ${NOMEL[x.l]} de ${w}!`;h=`<button class="lcverb" data-say="${say}"><span class="lcbigl">${x.l}<small>${x.l.toLowerCase()}</small></span><span class="lcemo">${e}</span><span class="lctap">👆</span></button>`}
+  if(x.t==='ver'){const it=x.it;q=x.kind==='sons'?`${oa(it.w)==='a'?'A':'O'} ${gw(it.w)} faz ${it.s}!`:`${oa(it.w)==='a'?'Esta é a':'Este é o'} ${gw(it.w)}!`;say=q;h=`<button class="lcverb lccol" data-say="${x.kind==='sons'?it.s:it.w}">${artOf(it)}${wl(it.w)}<span class="lctap">👆</span></button>`}
+  else if(x.t==='cade'){const it=x.it;q=x.kind==='sons'?`Quem faz ${it.s}?`:`Cadê ${oa(it.w)} ${gw(it.w)}?`;say=q;h=`<button class="lcspk" data-say="${strip(q)}" aria-label="Ouvir de novo">${SPK}</button><div class="lcopts e2">${x.opts.map(o=>`<button class="lco e" data-v="${o.w}">${artOf(o)}</button>`).join('')}</div>`}
+  else if(x.t==='verL'){const [w,e]=picL(x.l);q=`${x.l} de ${gw(w)}!`;say=`${NOMEL[x.l]}! ${NOMEL[x.l]} de ${w}!`;h=`<button class="lcverb" data-say="${say}"><span class="lcbigl">${x.l}<small>${x.l.toLowerCase()}</small></span><span class="lccol"><span class="lcemo">${e}</span>${wl(w)}</span><span class="lctap">👆</span></button>`}
   else if(x.t==='cadeL'){q=`Cadê a letra ${x.l}?`;say=`Cadê a letra ${NOMEL[x.l]}?`;h=`<button class="lcspk" data-say="${say}" aria-label="Ouvir de novo">${SPK}</button><div class="lcopts e2">${x.opts.map(o=>`<button class="lco e let" data-v="${o}">${o}</button>`).join('')}</div>`}
   else if(x.t==='fig2'){q=`Qual começa com ${x.l}?`;say=`Qual começa com ${NOMEL[x.l]}?`;h=`<div class="lcfig"><span class="lcbigl">${x.l}</span><button class="lcspk" data-say="${say}" aria-label="Ouvir de novo">${SPK}</button></div><div class="lcopts e2">${x.opts.map(o=>`<button class="lco e" data-v="${o[0]}" data-say="${o[0]}"><span class="lcemo">${o[1]}</span></button>`).join('')}</div>`}
-  else if(x.t==='verR'){const r=x.r;q=`${r[0]} e ${r[2]}: rima!`;say=`${r[0]}... ${r[2]}! Rima!`;h=`<button class="lcverb" data-say="${say}"><span class="lcemo">${r[1]}</span><span class="lcemo">${r[3]}</span><span class="lctap">👆</span></button>`}
-  else if(x.t==='rima'){const r=x.r;q=`O que rima com ${r[0]}?`;say=q;h=`<div class="lcfig"><span class="lcemo">${r[1]}</span><button class="lcspk" data-say="${q}" aria-label="Ouvir de novo">${SPK}</button></div><div class="lcopts e2">${x.opts.map(o=>`<button class="lco e" data-v="${o[0]}" data-say="${o[0]}"><span class="lcemo">${o[1]}</span></button>`).join('')}</div>`}
-  else{const [w,e,sy]=x.p,n=sy.length;q=x.t==='verP'?`${w}: ${n} ${n>1?'palmas':'palma'}!`:`Bata palmas: ${w}!`;say=x.t==='verP'?`Vamos bater palmas: ${w}!`:`Bata no tambor: ${w}!`;
-    h=`<div class="lcfig"><span class="lcemo">${e}</span><button class="lcspk" data-say="${sy.map(sylSay).join('... ')}" aria-label="Ouvir">${SPK}</button></div><div class="lcdots">${sy.map((s,i)=>`<span class="lcdot" data-i="${i}">${s}</span>`).join('')}</div><button class="lcdrum" id="lcDrum" aria-label="Bater palma">👏</button>`}
-  B.innerHTML=prof(q)+h;B.classList.remove('in');void B.offsetWidth;B.classList.add('in');sayL(say);
+  else if(x.t==='verR'){const r=x.r;q=`${gw(r[0])} e ${gw(r[2])}: rima!`;say=`${r[0]}... ${r[2]}! Rima!`;h=`<button class="lcverb" data-say="${say}"><span class="lccol"><span class="lcemo">${r[1]}</span>${wl(r[0])}</span><span class="lccol"><span class="lcemo">${r[3]}</span>${wl(r[2])}</span><span class="lctap">👆</span></button>`}
+  else if(x.t==='rima'){const r=x.r;q=`O que rima com ${gw(r[0])}?`;say=q;h=`<div class="lcfig"><span class="lccol"><span class="lcemo">${r[1]}</span>${wl(r[0])}</span><button class="lcspk" data-say="${strip(q)}" aria-label="Ouvir de novo">${SPK}</button></div><div class="lcopts e2">${x.opts.map(o=>`<button class="lco e" data-v="${o[0]}" data-say="${o[0]}"><span class="lcemo">${o[1]}</span></button>`).join('')}</div>`}
+  else{const [w,e,sy]=x.p,n=sy.length;q=x.t==='verP'?`${gw(w)}: ${n} ${n>1?'palmas':'palma'}!`:`Bata palmas: ${gw(w)}!`;say=x.t==='verP'?`Vamos bater palmas: ${w}!`:`Bata no tambor: ${w}!`;
+    h=`<div class="lcfig"><span class="lccol"><span class="lcemo">${e}</span>${wl(w)}</span><button class="lcspk" data-say="${sy.map(sylSay).join('... ')}" aria-label="Ouvir">${SPK}</button></div><div class="lcdots">${sy.map((s,i)=>`<span class="lcdot" data-i="${i}">${s}</span>`).join('')}</div><button class="lcdrum" id="lcDrum" aria-label="Bater palma">👏</button>`}
+  B.innerHTML=prof(q)+h;B.classList.remove('in');void B.offsetWidth;B.classList.add('in');sayL(strip(say));
   if(x.t==='verP')setTimeout(()=>demoPalmas(),1900)}
 function demoPalmas(){const x=S.ex;if(S.state!=='ask'||!x||x.t!=='verP')return;x.p[2].forEach((s,i)=>setTimeout(()=>{if(S.ex!==x)return;const d=$(`.lcdot[data-i="${i}"]`);if(d)d.classList.add('on');pop(700+i*120);speak(sylSay(s),S.T,true);const dr=$('#lcDrum');if(dr)dr.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:300});if(i===x.p[2].length-1)setTimeout(()=>{if(S.ex===x)okE()},1100)},i*800))}
 function okE(){const x=S.ex;S.state='fb';S.done++;bar();setPose(PROF[S.T].viva);[880,1100,1320].forEach((f,i)=>setTimeout(()=>pop(f),i*110));
   const v=pick(['Muito bem!','Isso!','Parabéns!','Que lindo!','Uhuu!']);
   const w=x.t==='cade'?(x.kind==='sons'?x.it.w:x.it.w):x.t==='cadeL'?NOMEL[x.l]:x.t==='fig2'?x.ans:x.t==='rima'?`${x.r[0]}... ${x.r[2]}`:x.t==='palmas'?x.p[0]:'';
-  if(!['ver','verL','verR','verP'].includes(x.t))speak(`${v} ${w}!`,S.T);window.helperCheer&&window.helperCheer();setTimeout(next,['ver','verL','verR'].includes(x.t)?1500:2100)}
+  if(x.okSay)speak(`${v} ${x.okSay}`,S.T);else if(!['ver','verL','verR','verP'].includes(x.t))speak(`${v} ${w}!`,S.T);window.helperCheer&&window.helperCheer();setTimeout(next,['ver','verL','verR'].includes(x.t)?1500:2100)}
 function tapE(e){const x=S.ex;
   if(['ver','verL','verR','verP'].includes(x.t)){const b=e.target.closest('.lcverb,#lcDrum');if(!b)return;if(x.t==='verP'){demoPalmas();return}
     speak(b.dataset.say,S.T);pop(700);b.animate([{transform:'scale(1)'},{transform:'scale(1.12) rotate(-3deg)'},{transform:'scale(1)'}],{duration:450});if(!S.tapped){S.tapped=1;setTimeout(okE,1300)}return}
@@ -159,10 +248,10 @@ function tapE(e){const x=S.ex;
   const ok=[...$$('#lcBody .lco')].find(o=>o.dataset.v===x.ans);if(ok){ok.classList.remove('hint');void ok.offsetWidth;ok.classList.add('hint')}
   setPose(PROF[S.T].ops,1600);
   setTimeout(()=>{if(S.ex!==x||S.state!=='ask')return;speak(x.t==='cade'?(x.kind==='sons'?`Olha: quem faz ${x.it.s} é ${oa(x.it.w)} ${x.it.w}!`:`Olha ${oa(x.it.w)} ${x.it.w} aqui!`):x.t==='cadeL'?`Olha a letra ${NOMEL[x.l]} aqui!`:x.t==='fig2'?`${x.ans} começa com ${NOMEL[x.l]}!`:`${x.r[0]}... ${x.r[2]}! Rima!`,S.T)},b.dataset.say?900:100)}
-function start(u,li){const d=degAtual(),easy=d<2;Object.assign(S,{d,easy,T:profDe(u),u,li,used:new Set(),done:0,err:0,combo:0,xp0:prog().xp});S.q=easy?planE(d,u,li).map(t=>mkE(t,d,u,li)):PLAN(u)[li].map(t=>mk(fix(t,u),u));S.total=S.q.length;S.state='';$('#licao').classList.toggle('easy',easy);$('#licao').classList.remove('fimon');$('#lcBody').innerHTML='';foot('','','VERIFICAR',true);bar();show('licao');setTimeout(()=>{S.pose=PROF[S.T].oi;speak(li===3?'Hora do baú! Vamos brincar com tudo!':easy?introE(d,u):u===0?'Vamos aprender o som das vogais!':`Vamos aprender o som do ${UN[u][1][0]} e do ${UN[u][1][1]}!`,S.T);$('#lcBody').innerHTML=`<div class="lcend"><img class="lcpf big" src="${PIMG(li===3?'dupla':PROF[S.T].oi)}" alt=""><h2 class="lcintro">${li===3?'Clara e Lois':PROF[S.T].n}</h2></div>`;setTimeout(next,2200)},380)}
+function start(u,li){const d=degAtual(),easy=CUR==='mat'||d<2;Object.assign(S,{cur:CUR,d,easy,T:profDe(u),u,li,used:new Set(),done:0,err:0,combo:0,xp0:prog().xp});S.q=CUR==='mat'?planM(d,u,li).map(t=>mkM(t,d,u,li)):easy?planE(d,u,li).map(t=>mkE(t,d,u,li)):PLAN(u)[li].map(t=>mk(fix(t,u),u));S.total=S.q.length;S.state='';$('#licao').classList.toggle('easy',easy);$('#licao').classList.remove('fimon');$('#lcBody').innerHTML='';foot('','','VERIFICAR',true);bar();show('licao');setTimeout(()=>{S.pose=PROF[S.T].oi;speak(li===3?'Hora do baú! Vamos brincar com tudo!':CUR==='mat'?introM(d,u):easy?introE(d,u):u===0?'Vamos aprender o som das vogais!':`Vamos aprender o som do ${UN[u][1][0]} e do ${UN[u][1][1]}!`,S.T);$('#lcBody').innerHTML=`<div class="lcend"><img class="lcpf big" src="${PIMG(li===3?'dupla':PROF[S.T].oi)}" alt=""><h2 class="lcintro">${li===3?'Clara e Lois':PROF[S.T].n}</h2></div>`;setTimeout(next,2200)},380)}
 const bar=()=>{$('#lcBar').style.width=Math.round(S.done/S.total*100)+'%'};
 const foot=(cls,msg,btn,dis)=>{const f=$('#lcFoot');f.className=cls||'';$('#lcMsg').innerHTML=msg||'';const b=$('#lcBtn');b.textContent=btn;b.disabled=!!dis};
-function next(){bar();if(!S.q.length){finish();return}S.ex=S.q.shift();S.sel=null;S.state='ask';S.fill=[];S.tries=0;S.miss=0;S.tapped=0;S.taps=0;if(S.easy){renderE();return}render();foot('','', 'VERIFICAR',true)}
+function next(){bar();if(!S.q.length){finish();return}S.ex=S.q.shift();S.sel=null;S.state='ask';S.fill=[];S.tries=0;S.miss=0;S.tapped=0;S.taps=0;S.dvDone=0;if(S.cur==='mat'){renderM();return}if(S.easy){renderE();return}render();foot('','', 'VERIFICAR',true)}
 const big=(e,say)=>`<div class="lcfig"><span class="lcemo">${e}</span><button class="lcspk" data-say="${say}" aria-label="Ouvir de novo">${SPK}</button></div>`;
 const prof=q=>`<div class="lcprof"><img class="lcpf" id="lcPf" src="${PIMG(S.pose)}" alt="${PROF[S.T].n}"><div class="lcbub">${q}</div></div>`;
 function setPose(p,ms){S.pose=p;const i=$('#lcPf');if(!i)return;i.src=PIMG(p);i.animate([{transform:'scale(.9) translateY(6px)'},{transform:'scale(1.06) translateY(-6px)'},{transform:'scale(1)'}],{duration:420});if(ms){clearTimeout(setPose.t);setPose.t=setTimeout(()=>{if(S.state==='ask')setPose(pick(PROF[S.T].base))},ms)}}
@@ -171,15 +260,15 @@ function render(){const x=S.ex,B=$('#lcBody');let h='';S.pose=x.t==='falar'?PROF
   else if(x.t==='fig'){h=`<h3 class="lcq">Qual figura começa com esse som?</h3><div class="lcfig"><span class="lcbigl">${x.l}<small>${x.l.toLowerCase()}</small></span><button class="lcspk" data-say="${LET[x.l][2]}" aria-label="Ouvir o som">${SPK}</button></div><div class="lcopts">${x.opts.map(o=>`<button class="lco pic" data-v="${o[0]}" data-say="${o[0]}">${o[1]}</button>`).join('')}</div>`;sayL(`Qual começa com ${LET[x.l][2]}?`)}
   else if(x.t==='pares'){h=`<h3 class="lcq">Junte cada letra com a figura</h3><div class="lcpairs"><div>${x.ls.map(l=>`<button class="lco let pl" data-l="${l}">${l}</button>`).join('')}</div><div>${x.ps.map(l=>`<button class="lco pic pp" data-l="${l}">${LET[l][1]}</button>`).join('')}</div></div>`;S.pl=null;S.ok=0;sayL('Junte cada letra com a figura!')}
   else if(x.t==='sil'){h=`<h3 class="lcq">Toque na sílaba que você ouviu</h3><div class="lcfig"><button class="lcspk huge" data-say="${silSay(x.s)}" aria-label="Ouvir">${SPK}</button></div><div class="lcopts">${x.opts.map(o=>`<button class="lco syl" data-v="${o}">${o}</button>`).join('')}</div>`;sayL(silSay(x.s))}
-  else if(x.t==='montar'){h=`<h3 class="lcq">Monte a palavra</h3>${big(x.w[2],x.w[0])}<div class="lcans" id="lcAns"></div><div class="lcopts" id="lcTiles">${x.tiles.map((s,i)=>`<button class="lco syl" data-i="${i}">${s}</button>`).join('')}</div>`;sayL(x.w[0])}
+  else if(x.t==='montar'){h=`<h3 class="lcq">Monte a palavra</h3>${big(x.w[2],x.w[0])}${wl(x.w[0])}<div class="lcans" id="lcAns"></div><div class="lcopts" id="lcTiles">${x.tiles.map((s,i)=>`<button class="lco syl" data-i="${i}">${s}</button>`).join('')}</div>`;sayL(x.w[0])}
   else if(x.t==='completa'){h=`<h3 class="lcq">Qual sílaba está faltando?</h3>${big(x.w[2],x.w[0])}<div class="lcans">${x.sy.map((s,i)=>`<span class="lcsy${i===x.i?' gap':''}" ${i===x.i?'id="lcGap"':''}>${i===x.i?'?':s}</span>`).join('')}</div><div class="lcopts">${x.opts.map(o=>`<button class="lco syl" data-v="${o}">${o}</button>`).join('')}</div>`;sayL(x.w[0])}
-  else if(x.t==='falar'){h=`<h3 class="lcq">Fale a palavra bem alto</h3>${big(x.w[2],x.w[0])}<div class="lcans">${x.sy.map(s=>`<span class="lcsy">${s}</span>`).join('')}</div><button class="lcmic" id="lcMic" aria-label="Falar">${MIC}</button><div class="lcmst" id="lcMst">Toque no microfone e fale</div><button class="lcskip" id="lcSkip">Agora não posso falar</button>`;sayL(`Fale comigo: ${x.w[0]}!`)}
+  else if(x.t==='falar'){h=`<h3 class="lcq">Fale a palavra bem alto</h3>${big(x.w[2],x.w[0])}${wl(x.w[0])}<div class="lcans">${x.sy.map(s=>`<span class="lcsy">${s}</span>`).join('')}</div><button class="lcmic" id="lcMic" aria-label="Falar">${MIC}</button><div class="lcmst" id="lcMst">Toque no microfone e fale</div><button class="lcskip" id="lcSkip">Agora não posso falar</button>`;sayL(`Fale comigo: ${x.w[0]}!`)}
   h=h.replace(/<h3 class="lcq">(.*?)<\/h3>/,(m,q)=>prof(q));B.innerHTML=h;B.classList.remove('in');void B.offsetWidth;B.classList.add('in')}
 const sayL=t=>setTimeout(()=>speak(t,S.T),250);
 function renderAns(){const x=S.ex;$('#lcAns').innerHTML=S.fill.map((i,k)=>`<button class="lco syl in" data-k="${k}">${x.tiles[i]}</button>`).join('')||'<span class="lcline"></span>';
   $$('#lcTiles .lco').forEach(b=>b.classList.toggle('used',S.fill.includes(+b.dataset.i)));$('#lcBtn').disabled=!S.fill.length}
 $('#lcBody').onclick=e=>{const sp=e.target.closest('.lcspk');if(sp){pop(500);speak(sp.dataset.say,S.T);return}
-  if(S.state!=='ask')return;if(S.easy){tapE(e);return}const x=S.ex,b=e.target.closest('.lco,#lcMic,#lcSkip');if(!b)return;
+  if(S.state!=='ask')return;if(S.cur==='mat'){tapM(e);return}if(S.easy){tapE(e);return}const x=S.ex,b=e.target.closest('.lco,#lcMic,#lcSkip');if(!b)return;
   if(x.t==='pares'){pairTap(b);return}
   if(x.t==='montar'){if(b.dataset.k!==undefined){S.fill.splice(+b.dataset.k,1);pop(380)}else if(b.dataset.i!==undefined&&!b.classList.contains('used')){S.fill.push(+b.dataset.i);speak(silSay(x.tiles[+b.dataset.i]),S.T);pop(640)}renderAns();return}
   if(x.t==='falar'){if(b.id==='lcSkip'){S.q=S.q.filter(()=>true);S.done++;S.state='fb';foot('ok','Tudo bem! Vamos continuar.','CONTINUAR');return}if(b.id==='lcMic')listen();return}
@@ -229,11 +318,11 @@ function finish(){const perf=S.err===0,xp=S.easy?5+(S.li===3?5:0):10+(perf?5:0)+
     <div class="lccards"><div class="lcc xp"><b>XP</b><span>⚡ ${xp}</span></div><div class="lcc st"><b>Estrelas</b><span>⭐ ${stars}</span></div>${S.easy?'':`<div class="lcc ac"><b>${perf?'Perfeito':'Acertos'}</b><span>🎯 ${Math.round(S.total/(S.total+S.err)*100)}%</span></div>`}</div>
     <div class="lcstreak">🔥 ${n} ${n===1?'dia':'dias'} seguidos aprendendo!</div></div>`;
   foot('','', 'CONTINUAR');bar();party();speak(S.easy?'Parabéns! Você é muito esperto!':perf?'Perfeito! Você não errou nenhuma!':'Lição completa! Muito bem!',S.T)}
-function collect(){const P=prog();P.done[pk(S.d,S.u,S.li)]=1;
+function collect(){CUR=S.cur;const P=prog();P.done[pk(S.d,S.u,S.li)]=1;
   /* terminou o último baú do degrau: sobe para o próximo */
-  if(S.d<2&&S.li===3&&S.u===unitsOf(S.d).length-1&&degAtual()===S.d){const g=DEGS[S.d+1];LS.set('thur-ler-deg',S.d+1);setTimeout(()=>{TH.toast&&TH.toast('Subiu de degrau: '+g.e+' '+g.n+'!');speak('Uau! Agora você vai para: '+g.n+'!','clara')},2600)}P.xp+=S.gain.xp;LS.set('thur-ler',P);LS.set('thur-estrelas',LS.get('thur-estrelas',0)+S.gain.stars);bumpStreak();
-  S.state='';complete(null,()=>show('ler'),stk(S.d,S.u,S.li))}
-$('#lcX').onclick=()=>{pop(380);if(S.state==='fim'){collect();return}TH.ask?TH.ask('Sair da lição? Você vai perder o progresso desta lição.',()=>show('ler')):show('ler')};
-document.addEventListener('thur-fala',e=>{const d=e.detail||{};$$('#licao .lcpf,#ler .lpet.prof').forEach(i=>i.classList.toggle('talk',!!d.on&&(d.who==='clara'||d.who==='lois')))});
+  if(S.d<2&&S.li===3&&S.u===unitsOf(S.d).length-1&&degAtual()===S.d){const g=degs()[S.d+1];LS.set(KC().deg,S.d+1);setTimeout(()=>{TH.toast&&TH.toast('Subiu de degrau: '+g.e+' '+g.n+'!');speak('Uau! Agora você vai para: '+g.n+'!','clara')},2600)}P.xp+=S.gain.xp;LS.set(KC().prog,P);LS.set('thur-estrelas',LS.get('thur-estrelas',0)+S.gain.stars);bumpStreak();
+  S.state='';complete(null,()=>show(CFGC[S.cur].view),stk(S.d,S.u,S.li))}
+$('#lcX').onclick=()=>{pop(380);if(S.state==='fim'){collect();return}TH.ask?TH.ask('Sair da lição? Você vai perder o progresso desta lição.',()=>show(CFGC[S.cur].view)):show(CFGC[S.cur].view)};
+document.addEventListener('thur-fala',e=>{const d=e.detail||{};$$('#licao .lcpf,#ler .lpet.prof,#mat .lpet.prof').forEach(i=>i.classList.toggle('talk',!!d.on&&(d.who==='clara'||d.who==='lois')))});
 })();
 

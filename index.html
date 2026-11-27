@@ -233,7 +233,7 @@
     <h3 class="psec">Criança</h3>
     <div class="cfgrow"><label for="cfgNome">Nome:</label><input id="cfgNome" maxlength="14" placeholder="Thur" autocomplete="off"></div>
     <div class="cfgrow"><label for="cfgIdade">Idade:</label><select id="cfgIdade"><option value="2">2 anos</option><option value="3">3 anos</option><option value="4">4 anos</option><option value="5">5 anos ou mais</option></select></div>
-    <p class="small">A idade escolhe o degrau do "Aprender a ler": 2 anos começa em Primeiras palavras, 3 anos em Primeiras letras e 4 anos ou mais em Aprender a ler. A criança sobe sozinha quando termina um degrau.</p>
+    <p class="small">A idade escolhe o degrau do "Aprender a ler" e da "Matemática": 2 anos começa em Primeiras palavras, 3 anos em Primeiras letras e 4 anos ou mais em Aprender a ler. A criança sobe sozinha quando termina um degrau.</p>
     <div class="cfgrow"><label for="cfgPausa">Lembrete de pausa:</label><select id="cfgPausa"><option value="0">Desligado</option><option value="15">15 minutos por dia</option><option value="20">20 minutos por dia</option><option value="30">30 minutos por dia</option><option value="45">45 minutos por dia</option><option value="60">1 hora por dia</option></select></div>
     <p class="small">A Sociedade Brasileira de Pediatria recomenda, de 2 a 5 anos, no máximo 1 hora de tela por dia (somando TV, celular e tablet), sempre com um adulto por perto.</p>
     <h3 class="psec">Voz</h3>
@@ -260,6 +260,10 @@
 <section id="ler" class="view" aria-label="Aprender a ler">
   <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Aprender a ler</h2><span class="lerst" id="lerStat"></span></div>
   <div id="lerPath"></div>
+</section>
+<section id="mat" class="view" aria-label="Matemática">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Matemática</h2><span class="lerst" id="matStat"></span></div>
+  <div id="matPath"></div>
 </section>
 <section id="licao" class="view" aria-label="Lição">
   <div class="lctop"><button class="ico" id="lcX" aria-label="Sair da lição"><svg viewBox="0 0 32 32"><path d="M8 8l16 16M24 8L8 24" stroke="#AFAFAF" stroke-width="4" stroke-linecap="round"/></svg></button><div class="lprog"><i id="lcBar"></i></div></div>

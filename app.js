@@ -134,7 +134,7 @@ palavras:'<rect x="4" y="20" width="17" height="24" rx="5" fill="#FFD60A"/><rect
 const GROUPS=[
   ['Brincar',[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946']]],
   ['Desenhar e colorir',[['balde','Colorir','#FF4D4D'],['giz','Rabiscar','#FF9F1C'],['numeros','Pintar por números','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['espelho','Espelho','#B8860B'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2']]],
-  ['Letras e palavras',[['ler','Aprender a ler','#58CC02'],['letras','Letras','#4FB3F0'],['palavras','Palavras','#FF6F61']]]];
+  ['Aprender',[['ler','Aprender a ler','#58CC02'],['mat','Matemática','#FF9600'],['letras','Letras','#4FB3F0'],['palavras','Palavras','#FF6F61']]]];
 const TILES=GROUPS.flatMap(g=>g[1]);
 function tileArt(id){const pg=n=>PAGES.find(p=>p.n===n);
   const tint=(n,cols,partial)=>{const p=pg(n);if(!p)return'';let k=0;return pageSvg(p).replace(/fill="#fff"/g,()=>{const c=(partial&&k%3===2)?'#fff':cols[k%cols.length];k++;return`fill="${c}"`})};
@@ -149,6 +149,7 @@ function tileArt(id){const pg=n=>PAGES.find(p=>p.n===n);
   case'revelar':{const s=REVEAL.find(r=>r.f&&!r.f.startsWith('data:'));return s?`<div class="trev"><img src="${s.f}" alt=""><img src="${s.f}" alt="" class="gray"></div>`:''}
   case'letras':return'<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="10" fill="#fff"/><text x="50" y="80" font-size="80" font-weight="800" text-anchor="middle" fill="#EAF6FF" stroke="#4FB3F0" stroke-width="3" stroke-dasharray="7 6" font-family="Baloo 2,Arial Black,sans-serif">A</text><circle cx="30" cy="80" r="7" fill="#4CC764"/><path d="M34 76 L44 50" stroke="#FF4D4D" stroke-width="6" stroke-linecap="round"/></svg>';
   case'palavras':return'<svg viewBox="0 0 100 100"><circle cx="50" cy="30" r="16" fill="#FFD60A" stroke="#2E2440" stroke-width="3"/>'+['S','O','L'].map((l,i)=>`<rect x="${14+i*25}" y="56" width="22" height="26" rx="5" fill="${['#FF4D4D','#4FB3F0','#4CC764'][i]}" stroke="#2E2440" stroke-width="2.5"/><text x="${25+i*25}" y="76" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">${l}</text>`).join('')+'</svg>';
+  case'mat':return'<svg viewBox="0 0 100 100"><rect x="6" y="8" width="88" height="84" rx="14" fill="#fff"/><text x="28" y="46" font-size="34" font-weight="800" text-anchor="middle" fill="#58CC02">2</text><text x="50" y="46" font-size="34" font-weight="800" text-anchor="middle" fill="#FF9600">+</text><text x="72" y="46" font-size="34" font-weight="800" text-anchor="middle" fill="#1CB0F6">1</text><text x="50" y="82" font-size="30" font-weight="800" text-anchor="middle" fill="#CE82FF">= 3</text></svg>';
   case'ler':return'<svg viewBox="0 0 100 100"><path d="M50 92 C20 80 80 64 50 52 C20 40 80 28 50 14" fill="none" stroke="#E5E5E5" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 12"/>'+[[50,84,'#58CC02','✓'],[36,58,'#58CC02','✓'],[62,36,'#1CB0F6','B'],[44,14,'#AFAFAF','']].map(([x,y,c,t])=>`<circle cx="${x}" cy="${y+4}" r="13" fill="#0003"/><circle cx="${x}" cy="${y}" r="13" fill="${c}"/><text x="${x}" y="${y+6}" font-size="15" font-weight="800" text-anchor="middle" fill="#fff">${t}</text>`).join('')+'</svg>';
   case'mundo':return'<div class="tmundo"><img src="img/mundo/parque.jpg" alt=""><img src="img/thur.png" alt="" class="tt"><img src="img/pets/lelo.png" alt="" class="tp"></div>';
   case'carros':return(window.CARROS?window.CARROS.carSvg(window.CARROS.V.find(v=>v.id==='super')||window.CARROS.V[0]):'')}
@@ -490,7 +491,7 @@ $$('input[name=vozTipo]').forEach(r=>{r.checked=r.value===cfg.vozTipo;r.onchange
 $('#vozTeste').onclick=()=>speak('Olá! Eu sou o Thur. Vamos brincar?');
 /* criança: nome, idade (degrau do Aprender a ler) e lembrete de pausa */
 $('#cfgNome').value=cfg.nome||'';$('#cfgNome').onchange=e=>{cfg.nome=e.target.value.trim().slice(0,14);store.set('thur-cfg',cfg)};
-$('#cfgIdade').value=cfg.idade||'2';$('#cfgIdade').onchange=e=>{cfg.idade=e.target.value;store.set('thur-cfg',cfg);const i=cfg.idade;window.LER&&window.LER.setDeg(i==='2'?0:i==='3'?1:2);toast('Pronto! O Aprender a ler foi ajustado para '+e.target.selectedOptions[0].text+'.')};
+$('#cfgIdade').value=cfg.idade||'2';$('#cfgIdade').onchange=e=>{cfg.idade=e.target.value;store.set('thur-cfg',cfg);const i=cfg.idade;window.LER&&(window.LER.setDeg(i==='2'?0:i==='3'?1:2),window.LER.setDegM(i==='2'?0:i==='5'?2:1));toast('Pronto! Aprender a ler e Matemática ajustados para '+e.target.selectedOptions[0].text+'.')};
 $('#cfgPausa').value=String(cfg.pausa||0);$('#cfgPausa').onchange=e=>{cfg.pausa=+e.target.value;store.set('thur-cfg',cfg)};
 $('#cfgSom').checked=cfg.som;$('#cfgVoz').checked=cfg.voz;
 $('#cfgSom').onchange=e=>{cfg.som=e.target.checked;store.set('thur-cfg',cfg)};$('#cfgVoz').onchange=e=>{cfg.voz=e.target.checked;store.set('thur-cfg',cfg)};
@@ -508,9 +509,9 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* adesivos já ganhos (sem repetir o desenho), para colar nos carros */
 window.TH.meusAdesivos=()=>{const A=acts(),g=new Set(gotSet()),seen=new Set(),out=[];A.forEach((k,i)=>{if(g.has(k)){const e=stkOf(i).e;if(!seen.has(e)){seen.add(e);out.push(e)}}});return out};
 /* ---------- início ---------- */
-{const h=location.hash.slice(1);show(['galeria','adesivos','ler','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
+{const h=location.hash.slice(1);show(['galeria','adesivos','ler','mat','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='8.0';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='8.1';$('#appVer').textContent='Versão '+APP_VER;
 /* backup e importação (Área dos Pais): tudo do app num arquivo só */
 (()=>{
   $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}
@@ -569,7 +570,7 @@ $('#forceUpd').onclick=async()=>{toast('Atualizando o app…');try{if('serviceWo
     [/^bolelecos/i,'pet'],[/^bichos/i,'paw'],[/^ve[ií]culos/i,'car'],[/^natureza/i,'flower'],[/^coisas/i,'ball'],[/^letras/i,'letter'],[/^n[uú]meros/i,'number'],[/^palavras/i,'word'],
     [/^f[aá]cil/i,'star1'],[/^m[eé]dio/i,'star2'],[/^dif[ií]cil/i,'star3'],[/^fam[ií]lia/i,'family'],[/servir/i,'plate'],[/fogo/i,'fire'],[/^usando/i,'check'],[/^usar/i,'hand'],[/^\d×$/,'mirror']];
   const txt=el=>[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').replace(/[🔥🍽️]/gu,'').trim();
-  function deco(){document.querySelectorAll('button, .lbt').forEach(b=>{if(b.querySelector('.bi'))return;if(b.closest('#pais,#ler,#licao'))return;const t=txt(b);if(!t)return;const r=R.find(([re])=>re.test(t));if(!r)return;
+  function deco(){document.querySelectorAll('button, .lbt').forEach(b=>{if(b.querySelector('.bi'))return;if(b.closest('#pais,#ler,#mat,#licao'))return;const t=txt(b);if(!t)return;const r=R.find(([re])=>re.test(t));if(!r)return;
     b.insertAdjacentHTML('afterbegin',`<span class="bi" aria-hidden="true"><svg viewBox="0 0 32 32">${I[r[1]]}</svg></span>`);b.classList.add('hasbi')})}
   let q=0;new MutationObserver(()=>{if(!q)q=requestAnimationFrame(()=>{q=0;deco()})}).observe(document.body,{childList:true,subtree:true});deco()})();
 
