@@ -300,11 +300,11 @@ const honk=()=>{tone('square',440,420,.15,.07);tone('square',350,340,.2,.07,.18)
 const clank=()=>{tone('square',900,500,.06,.08);tone('triangle',300,200,.12,.12,.04)};
 
 /* ---------- garagem ---------- */
-function garage(){const d=done();$('#garGal').innerHTML=V.map((v,i)=>`<button class="card car" data-v="${i}">${carSvg(v)}${d.includes(v.id)?'<span class="badge"><svg viewBox="0 0 32 32"><path d="M6 17l7 7L26 9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}<span>${v.n}</span></button>`).join('')}
+function garage(){const d=done();$('#garGal').innerHTML=V.map((v,i)=>`<button class="card car" data-v="${i}">${carSvg(v)}${d.includes(v.id)?'<span class="badge"><svg viewBox="0 0 32 32"><path d="M6 17l7 7L26 9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}<span>${v.n}</span><span class="runbtn" data-run="${i}" role="button" aria-label="Correr direto com o ${v.n}"><svg viewBox="0 0 32 32"><path d="M7 4v26" stroke="#2E2440" stroke-width="3" stroke-linecap="round"/><rect x="8" y="5" width="18" height="12" fill="#fff" stroke="#2E2440" stroke-width="2"/><path d="M8 5h4.5v4H8zM17 5h4.5v4H17zM12.5 9H17v4h-4.5zM21.5 9H26v4h-4.5zM8 13h4.5v4H8zM17 13h4.5v4H17z" fill="#2E2440"/></svg></span></button>`).join('')}
 onShow.garagem=garage;
 window.openGaragem=()=>show('garagem');
 if($('#garagem').classList.contains('on'))garage();
-$('#garGal').onclick=e=>{const b=e.target.closest('.card');if(b){pop(520);openMontar(+b.dataset.v)}};
+$('#garGal').onclick=e=>{const r=e.target.closest('[data-run]');if(r){e.stopPropagation();pop(640);const i=+r.dataset.run;M.i=i;M.v=V[i];window.CARROS.openPistas();return}const b=e.target.closest('.card');if(b){pop(520);openMontar(+b.dataset.v)}};
 
 /* ---------- montar ---------- */
 const M={v:null,i:0,parts:[],drag:null,left:0};
