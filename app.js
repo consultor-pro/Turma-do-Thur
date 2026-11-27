@@ -490,7 +490,22 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='6.0';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='6.1';$('#appVer').textContent='Versão '+APP_VER;
+/* backup e importação (Área dos Pais): tudo do app num arquivo só */
+(()=>{
+  $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}
+    const arte=await dbAll()||[];const data={app:'turma-do-thur',v:APP_VER,quando:new Date().toISOString(),ls,arte:arte.map(({url,t,m})=>({url,t,m}))};
+    const blob=new Blob([JSON.stringify(data)],{type:'application/json'});const d=new Date();const nome=`turma-do-thur-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+    const file=new File([blob],nome,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Backup Turma do Thur'});toast('Backup pronto!');return}catch(e){if(e&&e.name==='AbortError')return}}
+    const u=URL.createObjectURL(blob);const lnk=document.createElement('a');lnk.href=u;lnk.download=nome;document.body.appendChild(lnk);lnk.click();lnk.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast(`Backup salvo: ${arte.length} desenhos`)}catch(e){toast('Não deu para fazer o backup.')}};
+  $('#bkImport').onclick=()=>$('#bkFile').click();
+  $('#bkFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let data;try{data=JSON.parse(await f.text())}catch(x){toast('Esse arquivo não é um backup do app.');return}
+    if(!data||data.app!=='turma-do-thur'||!data.ls){toast('Esse arquivo não é um backup do app.');return}
+    ask(`Importar o backup de ${new Date(data.quando).toLocaleDateString('pt-BR')}? Ele substitui o que está no app agora (${(data.arte||[]).length} desenhos).`,async()=>{
+      Object.keys(localStorage).filter(k=>k.startsWith('thur-')).forEach(k=>localStorage.removeItem(k));Object.entries(data.ls).forEach(([k,v])=>{try{localStorage.setItem(k,v)}catch(x){}});
+      await dbClear();for(const a of data.arte||[])await tx('readwrite',s=>s.add({url:a.url,t:a.t||Date.now(),m:a.m||''}));
+      toast('Backup importado!');setTimeout(()=>location.reload(),900)})};})();
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}

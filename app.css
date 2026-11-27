@@ -440,3 +440,5 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 .hbig svg{width:44px;height:44px}.hbig span{font-size:13px;font-weight:800;color:var(--ink);line-height:1}
 .hbig:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 @media (max-width:420px){.hbig{min-width:60px;padding:3px 5px}.hbig svg{width:34px;height:34px}.hbig span{font-size:11px}}
+
+.psec{margin:14px 0 4px;font-size:18px}
