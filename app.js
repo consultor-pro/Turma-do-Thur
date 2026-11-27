@@ -43,7 +43,7 @@ function show(id,rain=true){
   const swap=()=>{$$('.view').forEach(v=>v.classList.toggle('on',v.id===id));onShow[id]&&onShow[id]();
     if(location.hash.slice(1)!==id){try{history.replaceState(null,'','#'+id)}catch(e){}}};
   const tr=$('#tr');
-  if(rain&&!matchMedia('(prefers-reduced-motion: reduce)').matches){tr.classList.remove('go');void tr.offsetWidth;tr.classList.add('go');setTimeout(swap,330)}else swap();
+  if(rain&&!matchMedia('(prefers-reduced-motion: reduce)').matches){tr.classList.remove('go');void tr.offsetWidth;tr.classList.add('go');const tp=$('#trp');tp.classList.remove('go');void tp.offsetWidth;tp.classList.add('go');setTimeout(swap,330)}else swap();
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){pop(440);show(b.dataset.go)}});
 
@@ -159,7 +159,10 @@ const CATS=(()=>{const c3=window.CATS3||{};const C=[
   return C.map(([n,l])=>[n,l.filter(x=>PAGES.some(p=>p.n===x))]).filter(([,l])=>l.length)})();
 let pickCat=0;
 function drawPick(names){const list=names.map(n=>({p:PAGES.find(p=>p.n===n),i:PAGES.findIndex(p=>p.n===n)})).filter(x=>x.p);
-  $('#pickGal').innerHTML=list.map(({p,i})=>`<button class="card" data-p="${i}">${pageSvg(p)}<span>${p.n}</span></button>`).join('');$('#pickGal').scrollTop=0}
+  /* a miniatura mostra o desenho do jeito que a criança deixou: pintado (terminado) ou pela metade (para continuar) */
+  const thumb=(p,i)=>{const sv=store.get(`thur-s-${pickMode}-${i}`,null);const base=pageSvg(p);if(!sv)return base;const j=base.indexOf('>')+1;return base.slice(0,j)+sv.replace(/id="(c[a-z0-9]+)"/g,'id="t$1"').replace(/url\(#(c[a-z0-9]+)\)/g,'url(#t$1)')+'</svg>'};
+  const badge=i=>store.get(`thur-f-${pickMode}-${i}`,false)?'<span class="badge" aria-label="Terminado"><svg viewBox="0 0 32 32"><path d="M6 17l7 7L26 9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':store.get(`thur-s-${pickMode}-${i}`,null)?'<span class="badge wip" aria-label="Continuar"><svg viewBox="0 0 32 32"><path d="M20 5l7 7-13 13H7v-7z" fill="#fff"/></svg></span>':'';
+  $('#pickGal').innerHTML=list.map(({p,i})=>`<button class="card" data-p="${i}">${thumb(p,i)}${badge(i)}<span>${p.n}</span></button>`).join('');$('#pickGal').scrollTop=0}
 function openPicker(mode){pickMode=mode;$('#pickTitle').textContent=MODE_T[mode];const tabs=$('#pickTabs');
   if(mode==='balde'||mode==='giz'){tabs.hidden=false;tabs.innerHTML=CATS.map(([n],k)=>`<button class="ico txt${k===pickCat?' on':''}" data-c="${k}">${n}</button>`).join('');drawPick(CATS[pickCat][1])}
   else{tabs.hidden=true;drawPick(SETS[mode])}
@@ -232,14 +235,14 @@ function covCheck(sc){const a=sc.a;if(a.dataset.cov)return;try{const s=sc.s,b=a.
   if(tot&&hit/tot>.82){a.dataset.cov='1';pop(880)}}catch(e){}}
 $('#page').addEventListener('pointerup',pEnd);$('#page').addEventListener('pointercancel',pEnd);
 $('#pUndo').onclick=()=>{if(!P.hist.length)return;svgEl().innerHTML=P.hist.pop();saveP();markNumDone();pop(330)};
-$('#pClear').onclick=()=>ask('Recomeçar este desenho?',()=>{snap();freshPage();saveP();markNumDone()});
+$('#pClear').onclick=()=>ask('Recomeçar este desenho?',()=>{snap();freshPage();store.del(pKey());store.del(`thur-f-${P.mode}-${P.i}`);markNumDone()});
 $('#pBack').onclick=()=>{pop(440);openPicker(P.mode)};
 $('#pPrint').onclick=()=>{const pr=$('#print');pr.innerHTML=pageSvg(PAGES[P.i]);if(P.mode==='numeros'){pr.style.cssText='display:block;position:fixed;left:-9999px;top:0;width:800px;height:800px';addNums(pr.querySelector('svg'),PAGES[P.i]);pr.style.cssText=''}try{window.print()}catch(e){toast('Abra o app instalado para imprimir.')}};
 function svgToUrl(svg,size=900){return new Promise(res=>{const c=svg.cloneNode(true);c.setAttribute('width',size);c.setAttribute('height',size);c.setAttribute('xmlns',NS);c.querySelectorAll('.nums').forEach(n=>n.remove());
   const str=new XMLSerializer().serializeToString(c);const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=cv.height=size;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,size,size);x.drawImage(im,0,0,size,size);res(cv.toDataURL('image/jpeg',.88))};im.onerror=()=>res(null);im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(str)})}
 /* terminou de pintar tudo: parabéns e guarda na galeria sozinho */
-let bDone=false;function checkBalde(s){if(bDone)return;const left=[...s.querySelectorAll('.r')].filter(r=>(r.getAttribute('fill')||'').toLowerCase()==='#fff'&&!r.dataset.cov).length;if(!left){bDone=true;setTimeout(()=>{finishSvg().finally(()=>bDone=false)},600)}}
-async function finishSvg(){const url=await svgToUrl(svgEl());store.del(pKey());complete(url,()=>openPicker(P.mode),P.mode+':'+PAGES[P.i].n)}
+let bDone=false;function checkBalde(s){if(bDone||store.get(`thur-f-${P.mode}-${P.i}`,false))return;const left=[...s.querySelectorAll('.r')].filter(r=>(r.getAttribute('fill')||'').toLowerCase()==='#fff'&&!r.dataset.cov).length;if(!left){bDone=true;setTimeout(()=>{finishSvg().finally(()=>bDone=false)},600)}}
+async function finishSvg(){const url=await svgToUrl(svgEl());saveP();store.set(`thur-f-${P.mode}-${P.i}`,true);complete(url,()=>openPicker(P.mode),P.mode+':'+PAGES[P.i].n)}
 $('#pDone').onclick=()=>{pop(600);finishSvg()};
 
 /* ---------- tela livre: desenhar, brilho, espelho, aquarela ---------- */
@@ -291,7 +294,8 @@ $('#tUndo').onclick=()=>{T.strokes.pop();redrawT();saveT();pop(330)};
 $('#tClear').onclick=()=>ask('Apagar tudo?',()=>{T.strokes=[];redrawT();saveT()});
 $('#tBack').onclick=async()=>{pop(440);
   /* saiu do desenho livre: guarda sozinho na galeria */
-  if(T.strokes.length){const url=await telaUrl();dbAdd(url);T.strokes=[];saveT();redrawT();toast('Guardei seu desenho na galeria! 🎨')}
+  /* guarda na galeria (só se mudou desde a última vez) e o desenho continua na tela para continuar depois */
+  const sig=T.strokes.length+':'+JSON.stringify(T.strokes[T.strokes.length-1]||'').length;if(T.strokes.length&&store.get(tKey()+'-g','')!==sig){const url=await telaUrl();dbAdd(url);store.set(tKey()+'-g',sig);saveT();toast('Guardei seu desenho na galeria! 🎨')}
   if(T.mode==='aquarela')openPicker('aquarela');else show('home')};
 $$('.tsize').forEach(b=>b.onclick=()=>{T.s=+b.dataset.s;$$('.tsize').forEach(x=>x.classList.toggle('on',x===b));T.stamp=-1;syncT();pop(500)});
 $('#tEraser').onclick=()=>{T.e=!T.e;T.stamp=-1;syncT();pop(380)};
@@ -461,7 +465,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.8.2';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.9';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
