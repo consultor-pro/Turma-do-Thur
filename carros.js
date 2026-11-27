@@ -167,14 +167,72 @@ const V=[
    ['janelas','janela',p('M332 262 Q360 192 450 184 L450 262 Z',glass)+p('M470 184 Q558 190 610 262 L470 262 Z',glass)],
    ['porta','porta',r(340,270,170,64,'#7B3FC4',16)+handle(480,286)],
    ['farol','farol',c(758,286,16,'#FFF6B0')],['lanterna','lanterna',r(214,300,12,20,'#FF4D4D',5)],
-   ['roda1','roda',wheel(330,384,52,'#E0E0E0')],['roda2','roda',wheel(684,384,52,'#E0E0E0')]]}
+   ['roda1','roda',wheel(330,384,52,'#E0E0E0')],['roda2','roda',wheel(684,384,52,'#E0E0E0')]]},
+ /* carros de corrida de brinquedo */
+ {id:'chamas',n:'Turbo Chamas',main:'#FF4D4D',dark:'#B5170F',dec:[300,300],spo:[230,262],ant:[430,212],parts:[
+   ['base','base',r(210,326,610,16,'#3A3A3A',8)],
+   ['corpo','carroceria',p('M200 330 L200 290 Q200 272 220 268 L330 262 L360 220 Q366 212 378 212 L470 212 Q482 212 488 222 L510 262 L820 300 Q838 304 834 320 L828 334 Z','#FF4D4D')],
+   ['cupula','cúpula',p('M374 222 Q422 176 478 222 Z',glass)],
+   ['motor','motor',r(530,232,96,42,'#BDBDBD',8)+[0,1,2].map(k=>`<path d="M${548+k*28} 232 v-26" stroke="${OUT}" stroke-width="10" stroke-linecap="round"/><path d="M${548+k*28} 232 v-26" stroke="#E0E0E0" stroke-width="5" stroke-linecap="round"/>`).join('')],
+   ['chamas','pintura de chamas',p('M640 300 C670 280 700 296 730 286 C710 304 750 300 790 304 L640 318 Z','#FFD60A')+p('M660 304 C690 292 712 302 740 296 C724 308 756 306 776 308 L660 314 Z','#FF9F1C')],
+   ['farol','farol',c(824,312,10,'#FFF6B0')],['lanterna','lanterna',r(198,286,14,22,'#FF9F1C',5)],
+   ['roda1','roda',wheel(300,366,72,'#FFD60A')],['roda2','roda',wheel(744,384,46,'#FFD60A')]]},
+ {id:'tubarao',n:'Tubarão',main:'#4FB3F0',dark:'#2F8FCB',dec:[380,300],spo:[240,262],ant:[470,170],parts:[
+   ['corpo','carroceria',p('M196 342 L200 292 Q262 252 380 238 L460 236 L520 238 Q700 252 842 314 L832 342 Z','#4FB3F0')+p('M220 330 Q520 300 830 326 L832 342 L196 342 Z','#FFFFFF')],
+   ['barbatana','barbatana',p('M430 238 L476 166 L516 238 Z','#2F8FCB')],
+   ['janela','janela',p('M524 244 Q566 222 614 252 Z',glass)],
+   ['olho','olho',c(764,290,12,'#fff')+`<circle cx="767" cy="290" r="5" fill="${OUT}"/>`],
+   ['dentes','dentes',`<path d="M790 318 l8 10 l8 -10 l8 10 l8 -10" fill="#fff" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>`],
+   ['cauda','cauda',p('M200 296 L156 252 L170 300 L156 346 L200 330 Z','#2F8FCB')],
+   ['roda1','roda',wheel(318,372,58,'#E0E0E0')],['roda2','roda',wheel(704,376,54,'#E0E0E0')]]},
+ {id:'jato',n:'Jato Roxo',main:'#9B5DE5',dark:'#7B3FC4',dec:[420,296],spo:[250,250],ant:[560,210],parts:[
+   ['corpo','carroceria',p('M212 324 L222 282 L420 252 L520 218 L620 252 L842 298 L842 324 Z','#9B5DE5')],
+   ['asa','asa',p('M360 262 L300 198 L344 198 L446 256 Z','#7B3FC4')],
+   ['turbina','turbina',r(200,268,44,44,'#BDBDBD',10)],
+   ['fogo','fogo da turbina',p('M202 276 C184 270 176 290 162 290 C176 296 184 312 202 306 Z','#FF9F1C')+p('M202 282 C190 280 186 290 176 291 C186 294 190 302 202 300 Z','#FFD60A')],
+   ['cabine','cabine',p('M500 226 Q542 196 592 238 Z',glass)],
+   ['farol','farol',c(834,306,9,'#FFF6B0')],
+   ['roda1','roda',wheel(334,366,52,'#FFD60A')],['roda2','roda',wheel(704,368,50,'#FFD60A')]]},
+ /* carros do dia a dia */
+ {id:'hatch',n:'Hatch Prata',main:'#BDBDBD',dark:'#9E9E9E',dec:[480,310],spo:[226,240],ant:[420,180],parts:[
+   ['base','base',r(206,348,596,34,'#3A3A3A',16)],
+   ['corpo','carroceria',p('M200 360 L200 286 Q200 268 218 262 L250 250 L300 196 Q308 188 320 188 L500 188 Q514 188 524 200 L580 262 L784 282 Q808 286 808 314 L808 360 Z','#BDBDBD')],
+   ['janelas','janela',p('M312 202 L272 250 L404 250 L404 202 Z',glass)+p('M420 202 L420 250 L560 250 L514 202 Z',glass)],
+   ['porta1','porta',r(270,262,140,82,'#9E9E9E',12)+handle(376,278)],['porta2','porta',r(418,262,150,82,'#9E9E9E',12)+handle(534,278)],
+   ['farol','farol',p('M772 286 L806 296 L804 308 L766 302 Z','#FFF6B0')],['lanterna','lanterna',r(198,272,14,30,'#FF4D4D',5)],
+   ['roda1','roda',wheel(322,386,54,'#E0E0E0')],['roda2','roda',wheel(690,386,54,'#E0E0E0')]]},
+ {id:'seda',n:'Sedã Azul',main:'#3D5AFE',dark:'#2A40C9',dec:[460,316],spo:[226,262],ant:[460,188],parts:[
+   ['base','base',r(206,350,600,34,'#3A3A3A',16)],
+   ['corpo','carroceria',p('M196 360 L196 300 Q196 286 214 282 L300 270 L350 206 Q358 196 372 196 L540 196 Q556 196 566 208 L616 270 L784 284 Q810 288 810 316 L810 360 Z','#3D5AFE')],
+   ['janelas','janela',p('M362 210 L326 262 L456 262 L456 210 Z',glass)+p('M472 210 L472 262 L598 262 L552 210 Z',glass)],
+   ['porta1','porta',r(322,272,136,74,'#2A40C9',12)+handle(424,288)],['porta2','porta',r(466,272,140,74,'#2A40C9',12)+handle(572,288)],
+   ['farol','farol',p('M774 290 L808 300 L806 312 L768 306 Z','#FFF6B0')],['lanterna','lanterna',r(196,290,14,24,'#FF4D4D',5)],
+   ['roda1','roda',wheel(322,388,54,'#E0E0E0')],['roda2','roda',wheel(694,388,54,'#E0E0E0')]]},
+ {id:'suv',n:'SUV Urbano',main:'#4FB3F0',dark:'#2F8FCB',dec:[470,300],spo:[232,214],ant:[430,140],parts:[
+   ['base','base',r(214,340,590,28,'#3A3A3A',12)],
+   ['corpo','carroceria',p('M204 352 L204 248 Q204 230 222 226 L262 220 L300 168 Q308 158 322 158 L540 158 Q556 158 566 170 L620 226 L784 244 Q808 248 808 276 L808 352 Z','#4FB3F0')],
+   ['janelas','janela',p('M314 172 L276 218 L420 218 L420 172 Z',glass)+p('M436 172 L436 218 L600 218 L550 172 Z',glass)],
+   ['porta1','porta',r(272,230,150,96,'#2F8FCB',12)+handle(388,248)],['porta2','porta',r(430,230,160,96,'#2F8FCB',12)+handle(556,248)],
+   ['bagageiro','bagageiro',r(300,146,250,10,'#2B2B2B',4)],
+   ['farol','farol',p('M772 250 L806 262 L804 276 L764 268 Z','#FFF6B0')],['lanterna','lanterna',r(206,240,14,34,'#FF4D4D',5)],
+   ['roda1','roda',wheel(326,376,62,'#E0E0E0')],['roda2','roda',wheel(690,376,62,'#E0E0E0')]]},
+ {id:'aventura',n:'SUV Aventura',main:'#FF9F1C',dark:'#E8860A',dec:[460,290],spo:[234,212],ant:[420,140],parts:[
+   ['base','base',r(214,336,590,28,'#3A3A3A',12)],
+   ['corpo','carroceria',p('M206 350 L206 244 Q206 228 222 226 L272 220 L310 162 L556 162 L612 226 L790 240 Q808 242 808 266 L808 350 Z','#FF9F1C')],
+   ['paralamas','para-lamas',p('M250 350 A76 76 0 0 1 402 350 Z','#2B2B2B')+p('M612 350 A76 76 0 0 1 764 350 Z','#2B2B2B')],
+   ['janelas','janela',p('M322 176 L290 218 L426 218 L426 176 Z',glass)+p('M442 176 L442 218 L590 218 L546 176 Z',glass)],
+   ['porta','porta',r(290,226,300,72,'#E8860A',12)+handle(406,242)+handle(560,242)],
+   ['bagageiro','bagageiro',r(312,146,232,12,'#2B2B2B',4)+`<path d="M330 146 v16 M526 146 v16" stroke="${OUT}" stroke-width="6"/>`],
+   ['farol','farol',p('M774 246 L806 258 L804 272 L766 264 Z','#FFF6B0')],['lanterna','lanterna',r(208,238,14,34,'#FF4D4D',5)],
+   ['roda1','roda',wheel(326,374,64,'#9A9A9A')],['roda2','roda',wheel(688,374,64,'#9A9A9A')]]}
 ];
 const done=()=>store().get('thur-carros',[]);
 function store(){return{get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}}}
 /* loja: enfeites comprados com as estrelas da pista */
 const LOJA={
   cor:[['#FF4D4D','Vermelho',0],['#4FB3F0','Azul',8],['#4CC764','Verde',8],['#FFD60A','Amarelo',8],['#FF85C0','Rosa',10],['#9B5DE5','Roxo',10],['#FF9F1C','Laranja',10],['#2B2B2B','Preto',12],['#FFFFFF','Branco',12]],
-  roda:[['#FFD60A','Amarela',0],['#BDBDBD','Prata',6],['#FF4D4D','Vermelha',8],['#4FB3F0','Azul',8],['#FF85C0','Rosa',8],['#F5B800','Dourada',15]],
+  roda:[['#FFD60A','Amarela',0],['#BDBDBD','Prata',6],['#FF4D4D','Vermelha',8],['#4FB3F0','Azul',8],['#FF85C0','Rosa',8],['#F5B800','Dourada',15],
+    ['pneu-vermelho','Pneu vermelho',12],['pneu-azul','Pneu azul',12],['faixa-branca','Faixa branca',14],['raios','Raios',16],['estrela','Estrela',20],['flor','Flor',18],['brilho','Brilhante',25],['arco','Arco-íris',30]],
   adesivo:[['estrela','Estrela',10],['raio','Raio',12],['coracao','Coração',12],['chamas','Chamas',18],['sete','Número 7',15],['arco','Arco-íris',20]],
   extra:[['aero','Aerofólio',25],['antena','Bandeirinha',20],['ambos','Os dois',40]],
   buzina:[['normal','Fom-fom',0],['pato','Pato',10],['palhaco','Palhaço',12],['trem','Trem',15]],
@@ -189,11 +247,25 @@ const DECAL={
 const AERO=(x,y)=>`<path d="M${x-8} ${y} v-26" stroke="#2E2440" stroke-width="8"/><path d="M${x-64} ${y-24} h96 l-10 -18 h-82 z" fill="#2B2B2B" stroke="#2E2440" stroke-width="5" stroke-linejoin="round"/>`;
 const ANT=(x,y)=>`<path d="M${x} ${y} v-74" stroke="#2E2440" stroke-width="5" stroke-linecap="round"/><path d="M${x} ${y-74} l40 12 l-40 12 z" fill="#FF4D4D" stroke="#2E2440" stroke-width="4" stroke-linejoin="round"/>`;
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+/* rodas especiais: pneu colorido, faixa branca, raios, estrela, flor, brilhante, arco-íris */
+function wheelStyle(x,y,R,st){const T=(f)=>`<circle cx="${x}" cy="${y}" r="${R}" fill="${f}" ${ST}/>`;const hub=(f,k=.52)=>`<circle cx="${x}" cy="${y}" r="${(R*k).toFixed(1)}" fill="${f}" ${ST}/>`;
+  const star=(rr,f)=>{let pts=[];for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,q=k%2?rr*.45:rr;pts.push((x+Math.cos(a)*q).toFixed(1)+','+(y+Math.sin(a)*q).toFixed(1))}return`<polygon points="${pts.join(' ')}" fill="${f}" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>`};
+  let inner;
+  if(st==='pneu-vermelho')inner=T('#E63946')+hub('#FFFFFF');
+  else if(st==='pneu-azul')inner=T('#3D5AFE')+hub('#FFD60A');
+  else if(st==='faixa-branca')inner=T('#2B2B2B')+`<circle cx="${x}" cy="${y}" r="${(R*.74).toFixed(1)}" fill="none" stroke="#fff" stroke-width="${(R*.14).toFixed(1)}"/>`+hub('#D9D9D9',.46);
+  else if(st==='raios')inner=T('#2B2B2B')+hub('#E0E0E0',.62)+[0,1,2,3,4,5].map(k=>{const a=k*Math.PI/3;return`<path d="M${x} ${y} L${(x+Math.cos(a)*R*.6).toFixed(1)} ${(y+Math.sin(a)*R*.6).toFixed(1)}" stroke="${OUT}" stroke-width="4" stroke-linecap="round"/>`}).join('')+`<circle cx="${x}" cy="${y}" r="${(R*.12).toFixed(1)}" fill="${OUT}"/>`;
+  else if(st==='estrela')inner=T('#2B2B2B')+star(R*.62,'#FFD60A');
+  else if(st==='flor')inner=T('#2B2B2B')+[0,1,2,3,4].map(k=>{const a=k*Math.PI*2/5;return`<circle cx="${(x+Math.cos(a)*R*.3).toFixed(1)}" cy="${(y+Math.sin(a)*R*.3).toFixed(1)}" r="${(R*.22).toFixed(1)}" fill="#FF85C0" stroke="${OUT}" stroke-width="2.5"/>`}).join('')+`<circle cx="${x}" cy="${y}" r="${(R*.16).toFixed(1)}" fill="#FFD60A" stroke="${OUT}" stroke-width="2.5"/>`;
+  else if(st==='brilho')inner=T('#2B2B2B')+`<circle cx="${x}" cy="${y}" r="${(R*.56).toFixed(1)}" fill="#FFE27A" stroke="${OUT}" stroke-width="4"/><circle cx="${x}" cy="${y}" r="${(R*.36).toFixed(1)}" fill="#FFF6C8"/>`+star(R*.22,'#fff')+`<path d="M${x-R*.3} ${y-R*.18} l${R*.12} ${-R*.12}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`;
+  else if(st==='arco')inner=T('#2B2B2B')+['#FF4D4D','#FF9F1C','#FFD60A','#4CC764','#4FB3F0','#9B5DE5'].map((col,k)=>{const a0=k*Math.PI/3,a1=a0+Math.PI/3,r0=R*.6;return`<path d="M${x} ${y} L${(x+Math.cos(a0)*r0).toFixed(1)} ${(y+Math.sin(a0)*r0).toFixed(1)} A${r0} ${r0} 0 0 1 ${(x+Math.cos(a1)*r0).toFixed(1)} ${(y+Math.sin(a1)*r0).toFixed(1)} Z" fill="${col}"/>`}).join('')+`<circle cx="${x}" cy="${y}" r="${(R*.6).toFixed(1)}" fill="none" stroke="${OUT}" stroke-width="4"/>`;
+  else return null;
+  return`<g class="wh">${inner}</g>`}
 const custom=id=>ls.get('thur-custom',{})[id]||{};
 const shade=(h,k)=>{const n=parseInt(h.slice(1),16);const f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return'#'+[n>>16,n>>8&255,n&255].map(c=>f(c).toString(16).padStart(2,'0')).join('')};
 function partsOf(v){const c=custom(v.id);const fl=FLIP[v.id]||[];let out=v.parts.map(([id,nm,s])=>{let t=fl.includes(id)?`<g transform="translate(1020 0) scale(-1 1)">${s}</g>`:s;
     if(c.cor&&!t.startsWith('<g class="wh">')){t=t.split(`fill="${v.main}"`).join(`fill="${c.cor}"`);if(v.dark)t=t.split(`fill="${v.dark}"`).join(`fill="${shade(c.cor,c.cor==='#2B2B2B'?1.6:.88)}"`)}
-    if(c.roda&&t.startsWith('<g class="wh">'))t=t.replace(/(<g class="wh"><circle[^>]*\/><circle [^>]*?fill=")[^"]+/,`$1${c.roda}`);
+    if(c.roda&&t.startsWith('<g class="wh">')){const m=t.match(/^<g class="wh"><circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/);const ws=m&&c.roda[0]!=='#'?wheelStyle(+m[1],+m[2],+m[3],c.roda):null;t=ws||t.replace(/(<g class="wh"><circle[^>]*\/><circle [^>]*?fill=")[^"]+/,`$1${c.roda}`)}
     return[id,nm,t]});
   if(c.adesivo&&DECAL[c.adesivo])out.push(['adesivo','adesivo',`<g transform="translate(${v.dec[0]} ${v.dec[1]})">${DECAL[c.adesivo]}</g>`]);
   if(c.extra==='aero'||c.extra==='ambos')out.push(['aero','aerofólio',AERO(v.spo[0],v.spo[1])]);
@@ -283,7 +355,7 @@ function loop(t){if(!R.run)return;if(!$('#estrada').classList.contains('on')){R.
 function jump(){if(R.jump>0)return;R.jump=900;tone('sine',300,700,.25,.12)}
 $('#eScene').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;actx();jump()});
 $('#eJump').onclick=jump;$('#eHonk').onclick=()=>{actx();honk();const sv=$('#eCar svg');if(sv)sv.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:250})};
-window.CARROS={V,M,carSvg,openPosto,partsOf,LOJA,DECAL,ls,custom};
+window.CARROS={V,M,carSvg,openPosto,partsOf,LOJA,DECAL,ls,custom,wheelStyle};
 function finishDrive(){R.run=false;R.stars.forEach(s=>s.el.remove());R.stars=[];TH.complete(null,()=>show('garagem'))}
 }
 
@@ -420,7 +492,7 @@ const has=(tab,id,price,vid)=>{if(!price)return true;const o=owned();const v=vid
 function using(tab,id){if(tab==='pista')return ls.get('thur-pista','dia')===id;const c=custom(V[L.vi].id)[tab];return tab==='buzina'?(c||'normal')===id:(c||'')===id}
 function preview(tab,id){
   if(tab==='cor')return id?`<span class="swc" style="background:${id}"></span>`:`<span class="swc orig">${carSvg(V[L.vi])}</span>`;
-  if(tab==='roda')return`<svg viewBox="-34 -34 68 68" class="ipv"><circle r="30" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><circle r="16" fill="${id||'#FFD60A'}" stroke="#2E2440" stroke-width="3"/></svg>`;
+  if(tab==='roda')return id&&id[0]!=='#'?`<svg viewBox="-34 -34 68 68" class="ipv">${C.wheelStyle(0,0,30,id)}</svg>`:`<svg viewBox="-34 -34 68 68" class="ipv"><circle r="30" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><circle r="16" fill="${id||'#FFD60A'}" stroke="#2E2440" stroke-width="3"/></svg>`;
   if(tab==='adesivo')return id?`<svg viewBox="-44 -36 88 72" class="ipv">${DECAL[id]}</svg>`:'<span class="ipt">—</span>';
   if(tab==='extra')return id?`<svg viewBox="0 0 120 90" class="ipv">${id!=='antena'?'<path d="M20 50 h80 l-10 -18 h-62 z" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><path d="M60 50 v20" stroke="#2E2440" stroke-width="6"/>':''}${id!=='aero'?'<path d="M98 86 v-70" stroke="#2E2440" stroke-width="4"/><path d="M98 16 l-30 9 l30 9 z" fill="#FF4D4D" stroke="#2E2440" stroke-width="3"/>':''}</svg>`:'<span class="ipt">—</span>';
   if(tab==='buzina')return'<svg viewBox="0 0 32 32" class="ipv"><path d="M5 12h6l10-6v20l-10-6H5z" fill="#2E2440"/><path d="M24 11a6 6 0 0 1 0 10" fill="none" stroke="#2E2440" stroke-width="3" stroke-linecap="round"/></svg>';

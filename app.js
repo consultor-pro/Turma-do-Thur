@@ -205,7 +205,9 @@ $$('#sizeRow .psize').forEach(b=>b.onclick=()=>{P.w=+b.dataset.w;$$('#sizeRow .p
 const toSvg=(s,e)=>{const p=s.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(s.getScreenCTM().inverse())};
 function clipFor(s,a){const id='c'+Date.now().toString(36)+rnd(1e6).toString(36);const cp=document.createElementNS(NS,'clipPath');cp.id=id;const sh=a.cloneNode();sh.removeAttribute('class');sh.removeAttribute('data-n');sh.removeAttribute('data-k');cp.appendChild(sh);s.querySelector('defs').appendChild(cp);
   const g=document.createElementNS(NS,'g');g.setAttribute('clip-path',`url(#${id})`);g.setAttribute('pointer-events','none');
-  const ol=a.cloneNode();ol.setAttribute('class','o');ol.setAttribute('fill','none');ol.removeAttribute('data-n');ol.setAttribute('pointer-events','none');a.after(g);g.after(ol);return g}
+  const ol=a.cloneNode();ol.setAttribute('class','o');ol.setAttribute('fill','none');ol.removeAttribute('data-n');ol.setAttribute('pointer-events','none');
+  /* o rabisco novo fica POR CIMA dos anteriores (antes entrava por baixo e parecia que não pintava) */
+  let ref=a;while(ref.nextElementSibling&&(ref.nextElementSibling.matches('g[clip-path]')||ref.nextElementSibling.classList.contains('o')))ref=ref.nextElementSibling;ref.after(g);g.after(ol);return g}
 $('#page').addEventListener('pointerdown',e=>{const s=svgEl();if(!s)return;const el=document.elementFromPoint(e.clientX,e.clientY);const a=el&&el.closest?el.closest('.r'):null;if(!a)return;e.preventDefault();
   if(P.mode==='balde'&&P.tool!=='giz'){const f=paintOf(s,P.color);if(a.getAttribute('fill')===f)return;snap();a.setAttribute('fill',f);saveP();pop(700);checkBalde(s);return}
   if(P.mode==='numeros'){if(a.dataset.n===undefined||a.dataset.f)return;if(+a.dataset.n!==P.num){a.classList.remove('bad');void a.getBBox();a.classList.add('bad');pop(200);return}
@@ -374,22 +376,35 @@ const glyphFont=px=>`800 ${px}px "Baloo 2", "Arial Rounded MT Bold", Arial, sans
 function setLetter(i){const it=lItems();lIdx=(i+it.length)%it.length;const ch=it[lIdx][0];lDone=false;$('#lStars').innerHTML='';$('#lTitle').textContent=ch;$('#lPic').textContent=it[lIdx][2];$('#lWord').textContent=it[lIdx][1];
   const r=tcv.parentElement.getBoundingClientRect();if(!r.width)return;const d=DPR();tW=r.width;tH=r.height;tcv.width=tW*d;tcv.height=tH*d;tctx.setTransform(d,0,0,d,0,0);
   tFs=Math.min(tH*.9,tW*.85);tctx.fillStyle='#fff';tctx.fillRect(0,0,tW,tH);tctx.font=glyphFont(tFs);tctx.textAlign='center';tctx.textBaseline='middle';const y=tH/2+tFs*.06;
-  tctx.fillStyle='#EFE8FA';tctx.fillText(ch,tW/2,y);tctx.setLineDash([2,14]);tctx.lineCap='round';tctx.lineWidth=6;tctx.strokeStyle='#B9A6E8';tctx.strokeText(ch,tW/2,y);tctx.setLineDash([]);
-  for(const c of[mk,um]){c.width=Math.ceil(tW*K);c.height=Math.ceil(tH*K)}const m=mk.getContext('2d');m.font=glyphFont(tFs*K);m.textAlign='center';m.textBaseline='middle';m.fillStyle='#000';m.fillText(ch,mk.width/2,y*K)}
+  for(const c of[mk,um]){c.width=Math.ceil(tW*K);c.height=Math.ceil(tH*K)}const m=mk.getContext('2d');m.font=glyphFont(tFs*K);m.textAlign='center';m.textBaseline='middle';m.fillStyle='#000';m.fillText(ch,mk.width/2,y*K);
+  /* letra em pontilhado único: a linha do meio da letra, para passar o dedo por cima (sem pintar por dentro) */
+  LS=skeleton(mk);const sp=Math.max(3,tFs*K*.055);const kept=[];LS.pts.forEach(([x,yy])=>{if(kept.every(([a,b])=>(a-x)**2+(b-yy)**2>sp*sp))kept.push([x,yy])});
+  tctx.fillStyle='#A08BE0';kept.forEach(([x,yy])=>{tctx.beginPath();tctx.arc((x+.5)/K,(yy+.5)/K,Math.max(4,tFs*.022),0,7);tctx.fill()})}
+let LS={pts:[],W:0,H:0,sk:null};tcv._ls=()=>LS;
+/* afina a letra até sobrar só a linha do meio (Zhang-Suen) */
+function skeleton(cv){const W=cv.width,H=cv.height,d=cv.getContext('2d').getImageData(0,0,W,H).data;const im=new Uint8Array(W*H);for(let i=0;i<W*H;i++)im[i]=d[i*4+3]>100?1:0;
+  const at=(x,y)=>x<0||y<0||x>=W||y>=H?0:im[y*W+x];let ch=true,it=0;
+  while(ch&&it<60){ch=false;it++;for(const step of[0,1]){const del=[];for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){if(!im[y*W+x])continue;
+      const p=[at(x,y-1),at(x+1,y-1),at(x+1,y),at(x+1,y+1),at(x,y+1),at(x-1,y+1),at(x-1,y),at(x-1,y-1)];const B=p.reduce((s,v)=>s+v,0);if(B<2||B>6)continue;
+      let A=0;for(let k=0;k<8;k++)if(!p[k]&&p[(k+1)%8])A++;if(A!==1)continue;
+      if(step===0){if(p[0]*p[2]*p[4]||p[2]*p[4]*p[6])continue}else{if(p[0]*p[2]*p[6]||p[0]*p[4]*p[6])continue}del.push(y*W+x)}
+    if(del.length){ch=true;del.forEach(i=>im[i]=0)}}}
+  const pts=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(im[y*W+x])pts.push([x,y]);return{pts,W,H,sk:im}}
 function tLine(c,p,from,w,k){c.lineCap='round';c.lineJoin='round';c.lineWidth=w*k;c.beginPath();const a=Math.max(0,from-1);c.moveTo(p[a][0]*k,p[a][1]*k);if(p.length===1)c.lineTo(p[0][0]*k+.1,p[0][1]*k);for(let i=a+1;i<p.length;i++)c.lineTo(p[i][0]*k,p[i][1]*k);c.stroke()}
 const lPt=e=>{const r=tcv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
-function lDraw(from){const w=tFs*.13;tctx.strokeStyle=lColor;tLine(tctx,tStroke,from,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,tStroke,from,w,K)}
+function lDraw(from){const w=tFs*.1;tctx.strokeStyle=lColor;tLine(tctx,tStroke,from,w,1);const u=um.getContext('2d');u.strokeStyle='#000';tLine(u,tStroke,from,w,K)}
 tcv.addEventListener('pointerdown',e=>{e.preventDefault();tcv.setPointerCapture(e.pointerId);tStroke=[lPt(e)];lDraw(0);lDrawn=1});
 let lDrawn=0,lRaf=0;
 tcv.addEventListener('pointermove',e=>{if(!tStroke)return;evs(e).forEach(ev=>tStroke.push(lPt(ev)));if(!lRaf)lRaf=requestAnimationFrame(()=>{lRaf=0;if(tStroke){lDraw(lDrawn);lDrawn=tStroke.length}})});
 const lEnd=()=>{if(!tStroke)return;if(lDrawn<tStroke.length)lDraw(lDrawn);tStroke=null;lCheck()};tcv.addEventListener('pointerup',lEnd);tcv.addEventListener('pointercancel',lEnd);
-function lCheck(){if(lDone||!mk.width)return;const a=mk.getContext('2d').getImageData(0,0,mk.width,mk.height).data,b=um.getContext('2d').getImageData(0,0,um.width,um.height).data;let L=0,both=0,U=0;
-  for(let i=3;i<a.length;i+=4){const l=a[i]>100,u=b[i]>100;if(l)L++;if(u)U++;if(l&&u)both++}
-  /* mais difícil: cobrir quase toda a letra, pouco rabisco fora, e todas as partes da letra precisam estar pintadas */
-  const W=mk.width,H=mk.height,G=5,cl=new Array(G*G).fill(0),cb=new Array(G*G).fill(0);
-  for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2){const i=(y*W+x)*4+3;if(a[i]>100){const c=Math.min(G-1,Math.floor(x/W*G))+G*Math.min(G-1,Math.floor(y/H*G));cl[c]++;if(b[i]>100)cb[c]++}}
-  const tot=cl.reduce((p,q)=>p+q,0);const parts=cl.every((n,c)=>n<tot*.02||cb[c]/n>.7);
-  if(L&&both/L>.8&&both/U>.45&&parts){lDone=true;$('#lStars').innerHTML='<svg viewBox="0 0 100 100" width="55%" height="55%" aria-hidden="true"><polygon points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round" opacity=".9"/></svg>';party();const it=lItems()[lIdx];speak('Muito bem! '+(lSet==='num'?it[1]:it[0].toUpperCase()+' de '+it[1]));
+function lCheck(){if(lDone||!LS.pts.length)return;const b=um.getContext('2d').getImageData(0,0,um.width,um.height).data,W=LS.W,H=LS.H;
+  /* cobrir a linha pontilhada inteira (todas as partes da letra) sem rabiscar muito longe dela */
+  const R=Math.max(2,Math.round(tFs*K*.09));const band=new Uint8Array(W*H);LS.pts.forEach(([x,y])=>{for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<W&&Y<H&&dx*dx+dy*dy<=R*R)band[Y*W+X]=1}});
+  let hit=0;const G=5,cl=new Array(G*G).fill(0),cb=new Array(G*G).fill(0);
+  LS.pts.forEach(([x,y])=>{const c=Math.min(G-1,Math.floor(x/W*G))+G*Math.min(G-1,Math.floor(y/H*G));cl[c]++;if(b[(y*W+x)*4+3]>100){hit++;cb[c]++}});
+  let U=0,inB=0;for(let i=0;i<W*H;i++)if(b[i*4+3]>100){U++;if(band[i])inB++}
+  const L=LS.pts.length,both=hit,tot=L;const parts=cl.every((n,c)=>n<tot*.03||cb[c]/n>.75);
+  if(L&&both/L>.85&&U&&inB/U>.6&&parts){lDone=true;$('#lStars').innerHTML='<svg viewBox="0 0 100 100" width="55%" height="55%" aria-hidden="true"><polygon points="50,8 61,38 93,38 67,57 77,89 50,70 23,89 33,57 7,38 39,38" fill="#FFD60A" stroke="#2E2440" stroke-width="3" stroke-linejoin="round" opacity=".9"/></svg>';party();const it=lItems()[lIdx];speak('Muito bem! '+(lSet==='num'?it[1]:it[0].toUpperCase()+' de '+it[1]));
     const lk='l:'+lSet+':'+it[0];if(every('thur-cnt-l',3))setTimeout(()=>complete(null,null,lk),1600);else award(lk)}}
 function sayLetter(){const it=lItems()[lIdx];speak(lSet==='num'?it[1]:it[0].toUpperCase()+', de '+it[1])}
 $('#lNext').onclick=()=>{pop(520);setLetter(lIdx+1);sayLetter()};$('#lPrev').onclick=()=>{pop(520);setLetter(lIdx-1);sayLetter()};
@@ -446,7 +461,7 @@ window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complet
 /* ---------- início ---------- */
 {const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='5.3';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='5.4';$('#appVer').textContent='Versão '+APP_VER;
 if('serviceWorker' in navigator){try{const sw=navigator.serviceWorker,had=!!sw.controller;let re=false;
   sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});setInterval(()=>reg.update().catch(()=>{}),20*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{});
   sw.addEventListener('controllerchange',()=>{if(!had||re)return;re=true;toast('Atualizando o app…');setTimeout(()=>location.reload(),600)})}catch(e){}}
