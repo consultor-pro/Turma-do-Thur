@@ -243,6 +243,11 @@
       <button class="pbtn" id="clrSt">Zerar adesivos</button>
       <button class="pbtn" id="clrWip">Apagar pinturas em andamento</button>
     </div>
+    <h3 class="psec">Vídeos</h3>
+    <p class="small">Cole o link de um vídeo do YouTube (do seu canal da Turma do Thur, por exemplo). Ele aparece em Histórias → Vídeos. Para assistir precisa de internet.</p>
+    <div class="cfgrow"><input id="vidUrl" placeholder="https://youtu.be/..." autocomplete="off"></div>
+    <div class="cfgrow"><input id="vidT" placeholder="Nome do vídeo" maxlength="50" autocomplete="off"><button class="pbtn go2" id="vidAdd">Adicionar</button></div>
+    <div class="wlist" id="vidList"></div>
     <h3 class="psec">Backup</h3>
     <p class="small">Guarde tudo num arquivo (desenhos da galeria, pinturas em andamento, estrelas, adesivos, carros e compras da loja). Para passar para outro celular ou se precisar reinstalar o app, use "Importar backup".</p>
     <div class="row left">
@@ -265,6 +270,26 @@
   <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Matemática</h2><span class="lerst" id="matStat"></span></div>
   <div id="matPath"></div>
 </section>
+<!-- HISTÓRIAS: vídeos, livros e quadrinhos -->
+<section id="historias" class="view" aria-label="Histórias">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Histórias</h2></div>
+  <div class="htabs" id="hTabs"></div>
+  <div class="hlib" id="hLib"></div>
+</section>
+<section id="hler" class="view" aria-label="Ler história">
+  <div class="bar"><button class="ico" id="hrBack" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2 id="hrTitle"></h2><button class="ico" id="hrEdit" aria-label="Editar ou copiar"><svg viewBox="0 0 32 32"><path d="M6 26l2-7L21 6l5 5-13 13z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg></button></div>
+  <div class="hrbody" id="hrBody"></div>
+  <div class="hrnav"><button class="ico" id="hrPrev" aria-label="Página anterior"><svg><use href="#i-back"/></svg></button><button class="hrbtn" id="hrRead"><svg viewBox="0 0 32 32" width="26" height="26"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff"/></svg> Ler</button><button class="hrbtn alt" id="hrAuto">▶ Ler tudo</button><span id="hrPg"></span><button class="ico" id="hrNext" aria-label="Próxima página"><svg><use href="#i-next"/></svg></button></div>
+  <button class="hrdel" id="hrDel">Apagar esta história</button>
+</section>
+<section id="hedit" class="view" aria-label="Criar história">
+  <div class="bar"><button class="ico" id="heBack" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><input id="heTitle" class="hetitle" maxlength="40" aria-label="Título"><button class="ico" id="hePlay" aria-label="Ver como fica">▶</button><button class="ico" id="heImg" aria-label="Salvar como imagem na galeria"><svg><use href="#i-frame"/></svg></button><button class="ico ok" id="heSave" aria-label="Guardar"><svg><use href="#i-ok"/></svg></button></div>
+  <div class="hepages"><div id="hePages"></div><div id="heLay"></div></div>
+  <div class="hecanvas" id="heCanvas"></div>
+  <div class="hetools" id="heTools"></div>
+</section>
+<div id="hVid" class="hvid"></div>
+<div id="htxt" class="hdlg"><div class="hdbox"><b id="htxtT"></b><input id="htxtIn" maxlength="90" autocomplete="off"><div class="row"><button class="pbtn" id="htxtNo">Cancelar</button><button class="pbtn go2" id="htxtOk">OK</button></div></div></div>
 <section id="licao" class="view" aria-label="Lição">
   <div class="lctop"><button class="ico" id="lcX" aria-label="Sair da lição"><svg viewBox="0 0 32 32"><path d="M8 8l16 16M24 8L8 24" stroke="#AFAFAF" stroke-width="4" stroke-linecap="round"/></svg></button><div class="lprog"><i id="lcBar"></i></div></div>
   <div id="lcBody"></div>
@@ -426,5 +451,6 @@
 <script src="carros.js"></script>
 <script src="cozinha.js"></script>
 <script src="ler.js"></script>
+<script src="hist.js"></script>
 </body>
 </html>
