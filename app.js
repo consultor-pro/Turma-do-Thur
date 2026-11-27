@@ -3,7 +3,7 @@
 {
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
-const cfg=Object.assign({som:true,voz:true},store.get('thur-cfg',{}));
+const cfg=Object.assign({som:true,voz:true,vozTipo:'masc'},store.get('thur-cfg',{}));
 const COLORS=['#FF4D4D','#FF9F1C','#FFD60A','#4CC764','#8FE0A0','#4FB3F0','#3D5AFE','#9B5DE5','#FF85C0','#F4C9A0','#8D5B3E','#2B2B2B','#FFFFFF'];
 const NEON=['#FF2E88','#FF9F1C','#FFE600','#39FF14','#00F0FF','#3D7BFF','#B44CFF','#FFFFFF'];
 const rnd=n=>Math.floor(Math.random()*n);
@@ -21,8 +21,12 @@ function splashSound(){if(!cfg.som)return;const a=actx();if(!a)return;try{const 
 /* vozes: Thur = menino; mascotes = vozinhas de bichinho (estilo esquilo: bem aguda e rápida) */
 const VOZES={thur:{p:1.75,r:1.05},zuzu:{p:2,r:1.3},lelo:{p:2,r:1.18},pituca:{p:2,r:1.4},bubu:{p:2,r:1.24}};
 const MASC=/daniel|ant[oô]nio|felipe|fabio|f[aá]bio|humberto|julio|j[uú]lio|ricardo|donato|valerio|male|masculin/i;
-let VCACHE=null;function ptVoice(){const vs=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));if(!vs.length)return null;if(VCACHE&&vs.includes(VCACHE))return VCACHE;VCACHE=vs.find(v=>MASC.test(v.name)&&v.localService)||vs.find(v=>MASC.test(v.name))||vs.find(v=>v.localService)||vs[0];return VCACHE}
-function speak(t,who='thur',queue=false){if(!cfg.voz)return;try{const s=window.speechSynthesis;if(!s)return;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vz=VOZES[who]||VOZES.thur;u.pitch=vz.p;u.rate=vz.r;const v=ptVoice();if(v)u.voice=v;
+const FEM=/maria|luciana|francisca|vit[oó]ria|thalita|raquel|camila|leila|helo[ií]sa|manuela|yara|female|feminin/i;
+/* os pais escolhem voz masculina ou feminina; se o celular não tiver a voz pedida, muda o tom da que existe */
+let VCACHE=null;function ptVoice(){const vs=speechSynthesis.getVoices().filter(v=>/pt[-_]BR/i.test(v.lang));if(!vs.length)return null;if(VCACHE&&vs.includes(VCACHE))return VCACHE;const W=cfg.vozTipo==='fem'?FEM:MASC,N=cfg.vozTipo==='fem'?MASC:FEM;
+  VCACHE=vs.find(v=>W.test(v.name)&&v.localService)||vs.find(v=>W.test(v.name))||vs.find(v=>!N.test(v.name)&&v.localService)||vs.find(v=>!N.test(v.name))||vs[0];VCACHE._ok=W.test(VCACHE.name);return VCACHE}
+const vozAjuste=v=>v&&v._ok?1:cfg.vozTipo==='fem'?1.12:.82;
+function speak(t,who='thur',queue=false){if(!cfg.voz)return;try{const s=window.speechSynthesis;if(!s)return;if(!queue)s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';const vz=VOZES[who]||VOZES.thur;const v=ptVoice();if(v)u.voice=v;u.pitch=Math.min(2,vz.p*vozAjuste(v));u.rate=vz.r;
   /* avisa quem está falando, para a boca mexer */
   const fala=on=>document.dispatchEvent(new CustomEvent('thur-fala',{detail:{who,on}}));clearTimeout(speak.t);
   u.onstart=()=>{if(speak.cur!==u)return;fala(true);clearTimeout(speak.t);speak.t=setTimeout(()=>fala(false),600+t.length*75/vz.r)};u.onend=u.onerror=()=>{if(speak.cur!==u)return;clearTimeout(speak.t);fala(false)};speak.cur=u;
@@ -87,7 +91,8 @@ function acts(){if(ACTS_)return ACTS_;const k=[];const seen=new Set();
   PALAVRAS.forEach(w=>k.push('w:'+w[0]));
   const C=window.CARROS;if(C){C.V.forEach(v=>k.push('car:'+v.id));Object.keys(C.PISTAS||{}).forEach(p=>k.push('pista:'+p))}
   ['arroz','feijao','macarrao','carne','salada'].forEach(r=>k.push('cook:'+r));
-  ACTS_=[...new Set(k)];return ACTS_}
+  if(window.LER)window.LER.keys().forEach(x=>k.push(x));
+  const r=[...new Set(k)];if(window.LER)ACTS_=r;return r}
 const STK_BG=['#FFF4D2','#DDF3FF','#E5F9DD','#FFE3F0','#EEE5FF','#FFE8D6'];
 const stkOf=i=>({e:STICKERS[i%STICKERS.length],bg:STK_BG[Math.floor(i/STICKERS.length)%STK_BG.length]});
 function gotSet(){let g=store.get('thur-st2',null);if(!g){g=[];const old=store.get('thur-st',[]);const A=acts();old.forEach(()=>{const left=A.filter(x=>!g.includes(x));if(left.length)g.push(left[rnd(left.length)])});store.set('thur-st2',g)}return g}
@@ -129,7 +134,7 @@ palavras:'<rect x="4" y="20" width="17" height="24" rx="5" fill="#FFD60A"/><rect
 const GROUPS=[
   ['Brincar',[['mundo','Mundinho','#FF9F1C'],['carros','Garagem','#E63946']]],
   ['Desenhar e colorir',[['balde','Colorir','#FF4D4D'],['giz','Rabiscar','#FF9F1C'],['numeros','Pintar por números','#9B5DE5'],['desenho','Desenhar','#3D5AFE'],['brilho','Caneta brilhante','#2E2440'],['espelho','Espelho','#B8860B'],['pixel','Pixel','#21A35A'],['revelar','Revelar','#F25CA2']]],
-  ['Letras e palavras',[['letras','Letras','#4FB3F0'],['palavras','Palavras','#FF6F61']]]];
+  ['Letras e palavras',[['ler','Aprender a ler','#58CC02'],['letras','Letras','#4FB3F0'],['palavras','Palavras','#FF6F61']]]];
 const TILES=GROUPS.flatMap(g=>g[1]);
 function tileArt(id){const pg=n=>PAGES.find(p=>p.n===n);
   const tint=(n,cols,partial)=>{const p=pg(n);if(!p)return'';let k=0;return pageSvg(p).replace(/fill="#fff"/g,()=>{const c=(partial&&k%3===2)?'#fff':cols[k%cols.length];k++;return`fill="${c}"`})};
@@ -144,6 +149,7 @@ function tileArt(id){const pg=n=>PAGES.find(p=>p.n===n);
   case'revelar':{const s=REVEAL.find(r=>r.f&&!r.f.startsWith('data:'));return s?`<div class="trev"><img src="${s.f}" alt=""><img src="${s.f}" alt="" class="gray"></div>`:''}
   case'letras':return'<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="10" fill="#fff"/><text x="50" y="80" font-size="80" font-weight="800" text-anchor="middle" fill="#EAF6FF" stroke="#4FB3F0" stroke-width="3" stroke-dasharray="7 6" font-family="Baloo 2,Arial Black,sans-serif">A</text><circle cx="30" cy="80" r="7" fill="#4CC764"/><path d="M34 76 L44 50" stroke="#FF4D4D" stroke-width="6" stroke-linecap="round"/></svg>';
   case'palavras':return'<svg viewBox="0 0 100 100"><circle cx="50" cy="30" r="16" fill="#FFD60A" stroke="#2E2440" stroke-width="3"/>'+['S','O','L'].map((l,i)=>`<rect x="${14+i*25}" y="56" width="22" height="26" rx="5" fill="${['#FF4D4D','#4FB3F0','#4CC764'][i]}" stroke="#2E2440" stroke-width="2.5"/><text x="${25+i*25}" y="76" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">${l}</text>`).join('')+'</svg>';
+  case'ler':return'<svg viewBox="0 0 100 100"><path d="M50 92 C20 80 80 64 50 52 C20 40 80 28 50 14" fill="none" stroke="#E5E5E5" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 12"/>'+[[50,84,'#58CC02','✓'],[36,58,'#58CC02','✓'],[62,36,'#1CB0F6','B'],[44,14,'#AFAFAF','']].map(([x,y,c,t])=>`<circle cx="${x}" cy="${y+4}" r="13" fill="#0003"/><circle cx="${x}" cy="${y}" r="13" fill="${c}"/><text x="${x}" y="${y+6}" font-size="15" font-weight="800" text-anchor="middle" fill="#fff">${t}</text>`).join('')+'</svg>';
   case'mundo':return'<div class="tmundo"><img src="img/mundo/parque.jpg" alt=""><img src="img/thur.png" alt="" class="tt"><img src="img/pets/lelo.png" alt="" class="tp"></div>';
   case'carros':return(window.CARROS?window.CARROS.carSvg(window.CARROS.V.find(v=>v.id==='super')||window.CARROS.V[0]):'')}
   return''}
@@ -480,19 +486,21 @@ onShow.palavras=()=>{if(!word)newWord()};
 onShow.pais=()=>{$('#panel').hidden=true;$('#gate').hidden=false;const a=3+rnd(7),b=3+rnd(7),ok=a+b;$('#gq').textContent=`${a} + ${b}`;
   const opts=shuffle([ok,ok+1+rnd(3),Math.max(2,ok-1-rnd(3))]);$('#gopts').innerHTML=opts.map(v=>`<button class="gnum" data-v="${v}">${v}</button>`).join('');
   $('#gopts').onclick=e=>{const b2=e.target.closest('.gnum');if(!b2)return;if(+b2.dataset.v===ok){$('#gate').hidden=true;$('#panel').hidden=false}else{pop(200);onShow.pais()}}};
+$$('input[name=vozTipo]').forEach(r=>{r.checked=r.value===cfg.vozTipo;r.onchange=()=>{cfg.vozTipo=r.value;store.set('thur-cfg',cfg);VCACHE=null;speak(r.value==='fem'?'Oi! Agora eu falo com voz feminina.':'Oi! Agora eu falo com voz masculina.')}});
+$('#vozTeste').onclick=()=>speak('Olá! Eu sou o Thur. Vamos brincar?');
 $('#cfgSom').checked=cfg.som;$('#cfgVoz').checked=cfg.voz;
 $('#cfgSom').onchange=e=>{cfg.som=e.target.checked;store.set('thur-cfg',cfg)};$('#cfgVoz').onchange=e=>{cfg.voz=e.target.checked;store.set('thur-cfg',cfg)};
 $('#clrArt').onclick=()=>ask('Apagar todas as artes da galeria?',()=>{dbClear();toast('Galeria apagada.')});
 $('#clrSt').onclick=()=>ask('Zerar todos os adesivos?',()=>{store.del('thur-st');store.set('thur-st2',[]);toast('Adesivos zerados.')});
 $('#clrWip').onclick=()=>ask('Apagar as pinturas em andamento?',()=>{try{Object.keys(localStorage).filter(k=>/^thur-(s|t|px)-/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}toast('Pinturas em andamento apagadas.')});
 
-window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award};
+window.TH={$,$$,show,pop,speak,party,hop,actx,cfg,rnd,onShow,splashSound,complete,award,ask,toast};
 /* adesivos já ganhos (sem repetir o desenho), para colar nos carros */
 window.TH.meusAdesivos=()=>{const A=acts(),g=new Set(gotSet()),seen=new Set(),out=[];A.forEach((k,i)=>{if(g.has(k)){const e=stkOf(i).e;if(!seen.has(e)){seen.add(e);out.push(e)}}});return out};
 /* ---------- início ---------- */
-{const h=location.hash.slice(1);show(['galeria','adesivos','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
+{const h=location.hash.slice(1);show(['galeria','adesivos','ler','letras','palavras','pixpick','revpick','garagem','loja'].includes(h)?h:'home',false)}
 try{speechSynthesis.getVoices()}catch(e){}
-const APP_VER='6.2';$('#appVer').textContent='Versão '+APP_VER;
+const APP_VER='7.0';$('#appVer').textContent='Versão '+APP_VER;
 /* backup e importação (Área dos Pais): tudo do app num arquivo só */
 (()=>{
   $('#bkExport').onclick=async()=>{try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('thur-'))ls[k]=localStorage.getItem(k)}
@@ -551,7 +559,7 @@ $('#forceUpd').onclick=async()=>{toast('Atualizando o app…');try{if('serviceWo
     [/^bolelecos/i,'pet'],[/^bichos/i,'paw'],[/^ve[ií]culos/i,'car'],[/^natureza/i,'flower'],[/^coisas/i,'ball'],[/^letras/i,'letter'],[/^n[uú]meros/i,'number'],[/^palavras/i,'word'],
     [/^f[aá]cil/i,'star1'],[/^m[eé]dio/i,'star2'],[/^dif[ií]cil/i,'star3'],[/^fam[ií]lia/i,'family'],[/servir/i,'plate'],[/fogo/i,'fire'],[/^usando/i,'check'],[/^usar/i,'hand'],[/^\d×$/,'mirror']];
   const txt=el=>[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').replace(/[🔥🍽️]/gu,'').trim();
-  function deco(){document.querySelectorAll('button, .lbt').forEach(b=>{if(b.querySelector('.bi'))return;if(b.closest('#pais'))return;const t=txt(b);if(!t)return;const r=R.find(([re])=>re.test(t));if(!r)return;
+  function deco(){document.querySelectorAll('button, .lbt').forEach(b=>{if(b.querySelector('.bi'))return;if(b.closest('#pais,#ler,#licao'))return;const t=txt(b);if(!t)return;const r=R.find(([re])=>re.test(t));if(!r)return;
     b.insertAdjacentHTML('afterbegin',`<span class="bi" aria-hidden="true"><svg viewBox="0 0 32 32">${I[r[1]]}</svg></span>`);b.classList.add('hasbi')})}
   let q=0;new MutationObserver(()=>{if(!q)q=requestAnimationFrame(()=>{q=0;deco()})}).observe(document.body,{childList:true,subtree:true});deco()})();
 

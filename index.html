@@ -230,6 +230,7 @@
   <div class="pbox" id="panel" hidden>
     <label class="opt"><input type="checkbox" id="cfgSom"> Sons dos botões</label>
     <label class="opt"><input type="checkbox" id="cfgVoz"> Voz que fala as letras e palavras</label>
+    <div class="vozrow"><span>Voz:</span><label class="opt"><input type="radio" name="vozTipo" value="masc"> Masculina</label><label class="opt"><input type="radio" name="vozTipo" value="fem"> Feminina</label><button class="pbtn" id="vozTeste">Testar voz</button></div>
     <div class="row left">
       <button class="pbtn" id="clrArt">Apagar a galeria</button>
       <button class="pbtn" id="clrSt">Zerar adesivos</button>
@@ -246,6 +247,17 @@
     <div class="row left"><button class="pbtn go2" id="forceUpd">Atualizar o app agora</button><span class="small" id="appVer"></span></div>
     <p class="small">Tudo fica guardado só neste aparelho. Nenhuma informação da criança é enviada para a internet.</p>
   </div>
+</section>
+
+<!-- APRENDER A LER (trilha estilo Duolingo) -->
+<section id="ler" class="view" aria-label="Aprender a ler">
+  <div class="bar"><button class="ico" data-go="home" aria-label="Voltar"><svg><use href="#i-back"/></svg></button><h2>Aprender a ler</h2><span class="lerst" id="lerStat"></span></div>
+  <div id="lerPath"></div>
+</section>
+<section id="licao" class="view" aria-label="Lição">
+  <div class="lctop"><button class="ico" id="lcX" aria-label="Sair da lição"><svg viewBox="0 0 32 32"><path d="M8 8l16 16M24 8L8 24" stroke="#AFAFAF" stroke-width="4" stroke-linecap="round"/></svg></button><div class="lprog"><i id="lcBar"></i></div></div>
+  <div id="lcBody"></div>
+  <div id="lcFootW"><div id="lcFoot"><div id="lcMsg"></div><button id="lcBtn" class="lbtn">VERIFICAR</button></div></div>
 </section>
 
 <!-- GARAGEM -->
@@ -401,5 +413,6 @@
 <script src="mundo.js"></script>
 <script src="carros.js"></script>
 <script src="cozinha.js"></script>
+<script src="ler.js"></script>
 </body>
 </html>
