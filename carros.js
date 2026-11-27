@@ -234,7 +234,8 @@ const LOJA={
   roda:[['#FFD60A','Amarela',0],['#BDBDBD','Prata',6],['#FF4D4D','Vermelha',8],['#4FB3F0','Azul',8],['#FF85C0','Rosa',8],['#F5B800','Dourada',15],
     ['pneu-vermelho','Pneu vermelho',12],['pneu-azul','Pneu azul',12],['faixa-branca','Faixa branca',14],['raios','Raios',16],['estrela','Estrela',20],['flor','Flor',18],['brilho','Brilhante',25],['arco','Arco-íris',30]],
   adesivo:[['estrela','Estrela',10],['raio','Raio',12],['coracao','Coração',12],['chamas','Chamas',18],['sete','Número 7',15],['arco','Arco-íris',20]],
-  extra:[['aero','Aerofólio',25],['antena','Bandeirinha',20],['ambos','Os dois',40]],
+  extra:[['aero','Aerofólio',25],['antena','Bandeirinha',20],['ambos','Aerofólio e bandeira',40],['coroa','Coroa',30],['unicornio','Chifre de unicórnio',35],['orelhas','Orelhinhas',25],['luzes','Luzes no teto',30],['flores','Flores',25],
+    ['zuzu','Zuzu no teto',45],['lelo','Lelo no teto',45],['pituca','Pituca no teto',45],['bubu','Bubu no teto',45],['turma','Bolelecos no teto',120]],
   buzina:[['normal','Fom-fom',0],['pato','Pato',10],['palhaco','Palhaço',12],['trem','Trem',15]],
   pista:[]};
 const DECAL={
@@ -261,6 +262,18 @@ function wheelStyle(x,y,R,st){const T=(f)=>`<circle cx="${x}" cy="${y}" r="${R}"
   else if(st==='arco')inner=T('#2B2B2B')+['#FF4D4D','#FF9F1C','#FFD60A','#4CC764','#4FB3F0','#9B5DE5'].map((col,k)=>{const a0=k*Math.PI/3,a1=a0+Math.PI/3,r0=R*.6;return`<path d="M${x} ${y} L${(x+Math.cos(a0)*r0).toFixed(1)} ${(y+Math.sin(a0)*r0).toFixed(1)} A${r0} ${r0} 0 0 1 ${(x+Math.cos(a1)*r0).toFixed(1)} ${(y+Math.sin(a1)*r0).toFixed(1)} Z" fill="${col}"/>`}).join('')+`<circle cx="${x}" cy="${y}" r="${(R*.6).toFixed(1)}" fill="none" stroke="${OUT}" stroke-width="4"/>`;
   else return null;
   return`<g class="wh">${inner}</g>`}
+/* enfeites de teto (inclusive os Bolelecos andando junto) */
+const PETDATA={};['zuzu','lelo','pituca','bubu'].forEach(n=>{fetch('img/pets/'+n+'.png').then(r=>r.blob()).then(b=>{const fr=new FileReader();fr.onload=()=>{PETDATA[n]=fr.result};fr.readAsDataURL(b)}).catch(()=>{})});
+function EXTRA(id,x,y){const K2='stroke="#2E2440" stroke-width="4" stroke-linejoin="round"';
+  if(id==='coroa')return`<path d="M${x-40} ${y} L${x-46} ${y-44} L${x-22} ${y-22} L${x} ${y-54} L${x+22} ${y-22} L${x+46} ${y-44} L${x+40} ${y} Z" fill="#FFD60A" ${K2}/><circle cx="${x}" cy="${y-16}" r="7" fill="#FF4D6D" ${K2}/>`;
+  if(id==='unicornio')return`<path d="M${x+30} ${y} L${x+60} ${y-70} L${x+50} ${y} Z" fill="#FFF0B3" ${K2}/><path d="M${x+38} ${y-20} l16 -6 M${x+42} ${y-38} l14 -6" stroke="#FF85C0" stroke-width="4"/>`;
+  if(id==='orelhas')return`<path d="M${x-50} ${y} L${x-36} ${y-44} L${x-18} ${y} Z" fill="#FF85C0" ${K2}/><path d="M${x+18} ${y} L${x+36} ${y-44} L${x+50} ${y} Z" fill="#FF85C0" ${K2}/>`;
+  if(id==='luzes')return`<rect x="${x-60}" y="${y-18}" width="120" height="18" rx="6" fill="#2B2B2B" ${K2}/>`+[0,1,2,3].map(k=>`<circle cx="${x-42+k*28}" cy="${y-9}" r="7" fill="#FFF6B0"/>`).join('');
+  if(id==='flores')return[-48,-16,16,48].map((o,k)=>`<g transform="translate(${x+o} ${y-12})">${[0,1,2,3,4].map(j=>`<circle cx="${Math.cos(j*1.256)*8}" cy="${Math.sin(j*1.256)*8}" r="7" fill="${['#FF85C0','#FFD60A','#9B5DE5','#4FB3F0'][k]}" stroke="#2E2440" stroke-width="2"/>`).join('')}<circle r="5" fill="#fff" stroke="#2E2440" stroke-width="2"/></g>`).join('');
+  const pet=(n,px,w)=>PETDATA[n]?`<image href="${PETDATA[n]}" x="${px-w/2}" y="${y-w*.98}" width="${w}" height="${w}"/>`:`<circle cx="${px}" cy="${y-w/2}" r="${w/2}" fill="#ddd"/>`;
+  if(['zuzu','lelo','pituca','bubu'].includes(id))return pet(id,x,96);
+  if(id==='turma')return pet('zuzu',x-90,74)+pet('lelo',x-30,74)+pet('pituca',x+30,74)+pet('bubu',x+90,74);
+  return''}
 const custom=id=>ls.get('thur-custom',{})[id]||{};
 const shade=(h,k)=>{const n=parseInt(h.slice(1),16);const f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return'#'+[n>>16,n>>8&255,n&255].map(c=>f(c).toString(16).padStart(2,'0')).join('')};
 function partsOf(v){const c=custom(v.id);const fl=FLIP[v.id]||[];let out=v.parts.map(([id,nm,s])=>{let t=fl.includes(id)?`<g transform="translate(1020 0) scale(-1 1)">${s}</g>`:s;
@@ -269,7 +282,9 @@ function partsOf(v){const c=custom(v.id);const fl=FLIP[v.id]||[];let out=v.parts
     return[id,nm,t]});
   if(c.adesivo&&DECAL[c.adesivo])out.push(['adesivo','adesivo',`<g transform="translate(${v.dec[0]} ${v.dec[1]})">${DECAL[c.adesivo]}</g>`]);
   if(c.extra==='aero'||c.extra==='ambos')out.push(['aero','aerofólio',AERO(v.spo[0],v.spo[1])]);
-  if(c.extra==='antena'||c.extra==='ambos')out.push(['antena','bandeirinha',ANT(v.ant[0],v.ant[1])]);
+  const AX=fl.length?1020-v.ant[0]:v.ant[0];
+  if(c.extra==='antena'||c.extra==='ambos')out.push(['antena','bandeirinha',ANT(AX,v.ant[1])]);
+  const ex=c.extra&&EXTRA(c.extra,AX,v.ant[1]);if(ex)out.push(['enfeite','enfeite',ex]);
   const w=out.filter(p=>p[2].startsWith('<g class="wh">')),o=out.filter(p=>!p[2].startsWith('<g class="wh">'));const ext=o.filter(p=>['aero','antena'].includes(p[0])),rest=o.filter(p=>!['aero','antena'].includes(p[0]));
   return[...ext,...rest,...w]}
 /* faróis e lanternas viram peças separadas (cada uma do seu tamanho, mais fáceis de pegar) */
@@ -355,7 +370,7 @@ function loop(t){if(!R.run)return;if(!$('#estrada').classList.contains('on')){R.
 function jump(){if(R.jump>0)return;R.jump=900;tone('sine',300,700,.25,.12)}
 $('#eScene').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;actx();jump()});
 $('#eJump').onclick=jump;$('#eHonk').onclick=()=>{actx();honk();const sv=$('#eCar svg');if(sv)sv.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:250})};
-window.CARROS={V,M,carSvg,openPosto,partsOf,LOJA,DECAL,ls,custom,wheelStyle};
+window.CARROS={V,M,carSvg,openPosto,partsOf,LOJA,DECAL,ls,custom,wheelStyle,EXTRA,PETDATA};
 function finishDrive(){R.run=false;R.stars.forEach(s=>s.el.remove());R.stars=[];TH.complete(null,()=>show('garagem'))}
 }
 
@@ -392,6 +407,7 @@ const PISTAS={
   cidade:{n:'Cidade',price:45,t:mkTrack([['f',300],['r',300,80],['f',400],['h',400,60],['r',360,110],['f',300],['v',400,50],['r',400,130],['f',300],['h',300,50],['r',380,120]]),sky:['#87CEEB','#E6F6FF'],hill:'#A7B4C6',hillAmp:.5,dirt:'#5E5E66',grass:'#9AA3AF',deco:'predio',cloud:'#FFFFFF',dash:'#FFD60A'},
   vulcao:{n:'Vulcão',price:70,g:1300,t:mkTrack([['h',600,150],['r',380,130],['v',500,80],['h',800,200],['r',420,150],['f',300],['h',700,180],['r',420,160]]),sky:['#2A0A0A','#B23A1A'],hill:'#5A2E1E',dirt:'#3D2B24',grass:'#FF6A00',deco:'lava',cloud:'#6B3A30',dash:'#FFD60A'},
   arcoiris:{n:'Arco-íris',price:80,g:1100,t:mkTrack([['h',300,60],['r',400,140],['h',300,60],['h',300,60],['r',420,160],['v',400,60],['h',500,120],['r',420,170],['h',300,60]]),sky:['#FFD6F5','#D6F0FF'],hill:'#FFFFFF',hillAmp:.6,dirt:'#B39DDB',grass:'#FF85C0',deco:'arco',cloud:'#FFFFFF',dash:'#FFFFFF'},
+  bolelecos:{n:'Pista dos Bolelecos',price:100,g:1250,t:mkTrack([['h',300,60],['r',380,120],['h',300,70],['h',300,70],['f',200],['r',420,150],['v',400,70],['h',500,120],['r',400,140],['h',300,60],['h',300,60],['r',420,170],['f',300],['h',600,140],['r',420,160],['h',300,60]]),sky:['#C9B6FF','#FFE3F3'],hill:'#BDEBA0',dirt:'#C9A0DC',grass:'#7ED957',deco:'bolelecos',cloud:'#FFFFFF',dash:'#FFD60A',sun:1},
   lua:{n:'Lua',price:60,g:560,t:mkTrack([['r',400,120],['f',300],['h',800,160],['r',420,160],['v',600,90],['r',380,150],['f',300],['h',900,200],['r',420,170],['f',200]]),sky:['#05060F','#1B1E3A'],hill:'#6E7180',dirt:'#8D90A0',grass:'#B8BBC8',deco:'pedra',cloud:null,dash:'#FFD60A',night:1,terra:1}};
 window.CARROS.PISTAS=PISTAS;
 function g(x){const PTS=PTS2;if(x<=0)return PTS[0][1];for(let i=1;i<PTS.length;i++){const [x1,y1]=PTS[i];if(x<=x1){const [x0,y0]=PTS[i-1];const t=(x-x0)/(x1-x0);return y0+(y1-y0)*(1-Math.cos(Math.PI*t))/2}}return PTS[PTS.length-1][1]}
@@ -406,7 +422,8 @@ const THEMES=PISTAS,_old={
   noite:{sky:['#0B1340','#3A3F8F'],hill:'#2F5D50',dirt:'#5B4030',grass:'#2E7D4A',tree:['#2E8B57','#256F47'],cloud:'#5C64A8',dash:'#FFD60A',night:1},
   neve:{sky:['#A9DCFF','#F2FBFF'],hill:'#FFFFFF',dirt:'#DDEBF7',grass:'#FFFFFF',tree:['#2E8B57','#3FA36A'],cloud:'#FFFFFF',dash:'#FFFFFF',snow:1}};
 function openPista(){const v=M.v;S.trick=null;S.th=THEMES[window.CARROS.ls.get('thur-pista','dia')]||THEMES.dia;PTS2=S.th.t.pts;END=S.th.t.end;JUMPS=S.th.t.jumps;G=S.th.g||1500;prep(v);Object.assign(S,{x:120,v:0,y:g(120),vy:0,air:false,ang:0,got:0,done:false,gas:false,brake:false});
-  S.stars=[];for(let x=500;x<END-200;x+=260){const high=JUMPS.some(r=>Math.abs(x-r-150)<160);S.stars.push({x,y:g(x)-(high?150:70),got:false})}
+  /* estrelas: no mínimo 25 e mais nas pistas mais caras (metade do preço) */
+  const NST=Math.max(25,Math.ceil((S.th.price||0)/2)),gap=(END-700)/NST;S.stars=[];for(let x=500;x<END-200&&S.stars.length<NST;x+=gap){const high=JUMPS.some(r=>Math.abs(x-r-150)<160);S.stars.push({x,y:g(x)-(high?150:70),got:false})}
   $('#psCount').textContent='0';$('#psTot').textContent=S.stars.length;$('#pTitle2').textContent=v.n+' • '+S.th.n;show('pista');
   setTimeout(()=>{fitP();S.on=true;S.last=performance.now();requestAnimationFrame(tick);speak('Segure o pedal verde para acelerar!')},380)}
 window.CARROS.openPista=openPista;
@@ -425,8 +442,9 @@ function tick(t){if(!S.on)return;if(!$('#pista').classList.contains('on')){S.on=
   S.spin+=S.v*dt;
   if(S.eng&&cfg.som)try{S.eng.o.frequency.setTargetAtTime(55+S.v*.25,actx().currentTime,.1)}catch(e){}
   S.stars.forEach(s=>{if(!s.got&&Math.abs(s.x-S.x)<70&&Math.abs(s.y-(S.y-60))<90){s.got=true;S.got++;$('#psCount').textContent=S.got;const w=window.CARROS.ls.get('thur-estrelas',0)+1;window.CARROS.ls.set('thur-estrelas',w);TH.pop(900)}});
-  if(!S.done&&S.x>=END){S.done=true;S.gas=false;engine(false);setTimeout(()=>{const st=TH.award('pista:'+window.CARROS.ls.get('thur-pista','dia'));parabens('Parabéns!',`Você pegou ${S.got} estrelas! Agora você tem ${window.CARROS.ls.get('thur-estrelas',0)} para gastar na loja.`,carSvg(M.v),[['Correr de novo',()=>openPista()],['Outra pista',()=>window.CARROS.openPistas()],['Ir para a loja',()=>window.CARROS.openLoja(M.i)],['Garagem',()=>show('garagem')]],st)},900)}
+  if(!S.done&&S.x>=END){S.done=true;S.gas=false;engine(false);setTimeout(()=>{window.helperCheer&&window.helperCheer();const st=TH.award('pista:'+window.CARROS.ls.get('thur-pista','dia'));parabens('Parabéns!',`Você pegou ${S.got} estrelas! Agora você tem ${window.CARROS.ls.get('thur-estrelas',0)} para gastar na loja.`,carSvg(M.v),[['Correr de novo',()=>openPista()],['Outra pista',()=>window.CARROS.openPistas()],['Ir para a loja',()=>window.CARROS.openLoja(M.i)],['Garagem',()=>show('garagem')]],st)},900)}
   draw();requestAnimationFrame(tick)}
+const PETIMG={};['zuzu','lelo','pituca','bubu'].forEach(n=>{const i=new Image();i.src='img/pets/'+n+'.png';PETIMG[n]=i});
 function deco(kind,x,y){px.strokeStyle='#2E2440';px.lineWidth=4;
   if(kind==='palma'){px.strokeStyle='#8B5A2B';px.lineWidth=12;px.beginPath();px.moveTo(x,y);px.quadraticCurveTo(x+18,y-60,x+8,y-130);px.stroke();px.fillStyle='#3FB35A';[[-1,0],[1,0],[-.7,-.6],[.7,-.6],[0,-1]].forEach(([dx,dy])=>{px.beginPath();px.ellipse(x+8+dx*36,y-130+dy*14+12,40,11,Math.atan2(dy+.5,dx)*.6,0,7);px.fill()});px.fillStyle='#8B5A2B';px.beginPath();px.arc(x+8,y-124,9,0,7);px.fill()}
   else if(kind==='cacto'){px.fillStyle='#4CAF50';const rr=(a,b,w,h)=>{px.beginPath();px.roundRect(a,b,w,h,w/2);px.fill();px.stroke()};rr(x-14,y-120,28,122);rr(x-48,y-90,20,50);rr(x-48,y-58,40,18);rr(x+28,y-100,20,46);rr(x+10,y-72,38,18)}
@@ -436,6 +454,7 @@ function deco(kind,x,y){px.strokeStyle='#2E2440';px.lineWidth=4;
   else if(kind==='predio'){const k=Math.abs(x/430|0)%3,h=[150,200,120][k],w=[70,80,90][k],col=['#7FA7D9','#F2A65A','#9B8BD9'][k];px.fillStyle=col;px.fillRect(x-w/2,y-h,w,h);px.strokeRect(x-w/2,y-h,w,h);px.fillStyle='#FFF4B0';for(let yy=y-h+14;yy<y-24;yy+=26)for(let xx=x-w/2+10;xx<x+w/2-14;xx+=22)px.fillRect(xx,yy,12,14)}
   else if(kind==='lava'){px.fillStyle='#4A2418';px.beginPath();px.moveTo(x-60,y);px.lineTo(x-16,y-90);px.lineTo(x+16,y-90);px.lineTo(x+60,y);px.closePath();px.fill();px.stroke();px.fillStyle='#FF6A00';px.beginPath();px.moveTo(x-16,y-90);px.quadraticCurveTo(x-6,y-60,x-10,y-40);px.quadraticCurveTo(x+4,y-62,x+16,y-90);px.closePath();px.fill();px.fillStyle='rgba(120,120,120,.7)';px.beginPath();px.arc(x,y-112,16,0,7);px.arc(x+18,y-130,12,0,7);px.fill()}
   else if(kind==='arco'){['#FF4D4D','#FF9F1C','#FFD60A','#4CC764','#4FB3F0','#9B5DE5'].forEach((col,i)=>{px.strokeStyle=col;px.lineWidth=8;px.beginPath();px.arc(x,y,70-i*8,Math.PI,0);px.stroke()});px.fillStyle='#fff';px.beginPath();px.arc(x-70,y-4,18,0,7);px.arc(x+70,y-4,18,0,7);px.fill()}
+  else if(kind==='bolelecos'){const n=['zuzu','lelo','pituca','bubu'][Math.abs(x/430|0)%4],im=PETIMG[n];if(im&&im.complete){const h=110,w=h*im.width/im.height;const b=Math.sin(performance.now()/300+x)*6;px.drawImage(im,x-w/2,y-h+b,w,h)}}
   else if(kind==='pedra'){px.fillStyle='#5D606E';px.beginPath();px.ellipse(x,y-14,46,24,0,0,7);px.fill();px.stroke();px.fillStyle='#4A4C58';px.beginPath();px.ellipse(x+180,y+4,40,9,0,0,7);px.fill()}}
 function draw(){const {W,H,d,k}=S;if(!W)return;px.setTransform(d,0,0,d,0,0);const vw=W/k,vh=H/k;
   const sky=px.createLinearGradient(0,0,0,H);const th=S.th||THEMES.dia;sky.addColorStop(0,th.sky[0]);sky.addColorStop(1,th.sky[1]);px.fillStyle=sky;px.fillRect(0,0,W,H);
@@ -479,7 +498,7 @@ function doJump(n){if(S.done||!S.on)return;if(S.air&&!(S.trick&&S.trick.kind==='
   S.trick={kind,dir:flipDir,t0:performance.now(),dur:Math.max(450,tAir*.85)};
   try{const a=actx();if(a&&cfg.som){const o=a.createOscillator(),gn=a.createGain();o.type='square';o.frequency.setValueAtTime(260,a.currentTime);o.frequency.exponentialRampToValueAtTime(n>=3?900:n===2?700:520,a.currentTime+.25);gn.gain.setValueAtTime(.08,a.currentTime);gn.gain.exponentialRampToValueAtTime(.001,a.currentTime+.3);o.connect(gn).connect(a.destination);o.start();o.stop(a.currentTime+.32)}}catch(e){}
   if(n>=2)trickLabel(kind==='mortal'?(flipDir<0?'MORTAL PARA TRÁS!':'MORTAL PARA FRENTE!'):'GIRO!')}
-function landTrick(){const T=S.trick;S.trick=null;if(T.kind!=='pulo'){TH.party&&TH.party();}}
+function landTrick(){const T=S.trick;S.trick=null;if(T.kind!=='pulo'){TH.party&&TH.party();window.helperCheer&&window.helperCheer()}}
 function trickLabel(t){const el=document.createElement('div');el.className='trick';el.textContent=t;$('#pista').appendChild(el);el.animate([{transform:'translate(-50%,0) scale(.6)',opacity:0},{transform:'translate(-50%,-20px) scale(1.15)',opacity:1,offset:.3},{transform:'translate(-50%,-60px) scale(1)',opacity:0}],{duration:1300,easing:'ease-out'}).onfinish=()=>el.remove();speak(t.toLowerCase())}
 $('#jmpP').addEventListener('pointerdown',e=>{e.preventDefault();actx();const b=$('#jmpP');b.classList.add('down');setTimeout(()=>b.classList.remove('down'),120);
   jTaps++;clearTimeout(jT);if(!S.air&&jTaps===1){doJump(1)}else if(S.trick&&S.trick.kind!=='mortal'&&jTaps>1){S.trick.t0=performance.now();doJump(jTaps)}
@@ -512,6 +531,7 @@ function preview(tab,id){
   if(tab==='cor')return id?`<span class="swc" style="background:${id}"></span>`:`<span class="swc orig">${carSvg(V[L.vi])}</span>`;
   if(tab==='roda')return id&&id[0]!=='#'?`<svg viewBox="-34 -34 68 68" class="ipv">${C.wheelStyle(0,0,30,id)}</svg>`:`<svg viewBox="-34 -34 68 68" class="ipv"><circle r="30" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><circle r="16" fill="${id||'#FFD60A'}" stroke="#2E2440" stroke-width="3"/></svg>`;
   if(tab==='adesivo')return id?`<svg viewBox="-44 -36 88 72" class="ipv">${DECAL[id]}</svg>`:'<span class="ipt">—</span>';
+  if(tab==='extra'&&id&&!['aero','antena','ambos'].includes(id))return`<svg viewBox="-70 -110 140 120" class="ipv"><rect x="-66" y="0" width="132" height="10" rx="5" fill="#BDBDBD"/>${C.EXTRA(id,0,0)}</svg>`;
   if(tab==='extra')return id?`<svg viewBox="0 0 120 90" class="ipv">${id!=='antena'?'<path d="M20 50 h80 l-10 -18 h-62 z" fill="#2B2B2B" stroke="#2E2440" stroke-width="4"/><path d="M60 50 v20" stroke="#2E2440" stroke-width="6"/>':''}${id!=='aero'?'<path d="M98 86 v-70" stroke="#2E2440" stroke-width="4"/><path d="M98 16 l-30 9 l30 9 z" fill="#FF4D4D" stroke="#2E2440" stroke-width="3"/>':''}</svg>`:'<span class="ipt">—</span>';
   if(tab==='buzina')return'<svg viewBox="0 0 32 32" class="ipv"><path d="M5 12h6l10-6v20l-10-6H5z" fill="#2E2440"/><path d="M24 11a6 6 0 0 1 0 10" fill="none" stroke="#2E2440" stroke-width="3" stroke-linecap="round"/></svg>';
   if(tab==='pista')return`<span class="swc" style="background:${grad(C.PISTAS[id])};border-radius:14px"></span>`;}

@@ -399,3 +399,10 @@ canvas.full{position:absolute;inset:0;width:100%;height:100%;touch-action:none;d
 #jmpP{left:50%;transform:translateX(-50%);background:#9B5DE5}
 #jmpP.down{transform:translate(-50%,6px)}
 .trick{position:absolute;left:50%;top:22%;font-size:clamp(26px,5vw,48px);font-weight:800;color:#FFD60A;-webkit-text-stroke:2px #2E2440;pointer-events:none;white-space:nowrap;z-index:5}
+
+/* Boleleco ajudante */
+#helper{position:fixed;left:8px;bottom:8px;width:clamp(64px,10vw,96px);height:clamp(64px,10vw,96px);z-index:40;display:none;background:none;padding:0;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+#helper.on{display:block}#helper img{width:100%;height:100%;object-fit:contain}
+#helper[data-v="pista"]{left:auto;right:10px;bottom:auto;top:64px}
+#helper[data-v="montar"]{left:auto;right:12px;bottom:12px}
+.peek{display:none!important}
